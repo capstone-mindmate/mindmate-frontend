@@ -1,8 +1,6 @@
 import './App.css'
 import * as IconComponents from './components/icon/iconComponents'
 import { GlobalStyles } from '../styles/GlobalStyles'
-import { useToast } from './components/toast/ToastProvider.tsx'
-import TopBar from './components/topbar/Topbar.tsx'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import NavigationComponent from './components/navigation/navigationComponent'
 import { useToast } from './components/toast/ToastProvider.tsx'
@@ -55,7 +53,7 @@ function App() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'c햣enter',
           height: '100%',
           paddingTop: '70px', // TopBar 높이만큼 여백 추가
         }}
@@ -104,7 +102,6 @@ function App() {
             />
           </div>
         </div>
-
 
         <div className="card" style={{ marginBottom: '30px' }}>
           <button
