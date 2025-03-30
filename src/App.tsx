@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import './App.css'
 import * as IconComponents from './components/icon/iconComponents'
 import { GlobalStyles } from '../styles/GlobalStyles'
 import { useToast } from './components/toast/ToastProvider.tsx'
 import TopBar from './components/topbar/Topbar.tsx'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import NavigationComponent from './components/navigation/navigationComponent'
 
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
@@ -105,6 +106,20 @@ function App() {
           <IconComponents.NormalPlusIcon color="#F7374F" />
           <IconComponents.UserIcon color="#F7374F" />
           <IconComponents.CloseIcon color="#F7374F" />
+        </div>
+
+        <div className="navigation" style={{ width: '50%' }}>
+          <Router>
+            <div style={{ paddingBottom: '60px' }}>
+              <Routes>
+                {/* <Route path="/" element={} />
+                <Route path="/chat" element={} />
+                <Route path="/profile" element={} /> */}
+                {/* 위에 path 나중에 정한거 업데이트 하기 */}
+              </Routes>
+              <NavigationComponent />
+            </div>
+          </Router>
         </div>
       </div>
     </>
