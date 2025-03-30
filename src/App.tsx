@@ -1,6 +1,8 @@
 import './App.css'
 import * as IconComponents from './components/icon/iconComponents'
 import { GlobalStyles } from '../styles/GlobalStyles'
+import { useToast } from './components/toast/ToastProvider.tsx'
+import TopBar from './components/topbar/Topbar.tsx'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import NavigationComponent from './components/navigation/navigationComponent'
 import { useToast } from './components/toast/ToastProvider.tsx'
@@ -102,6 +104,7 @@ function App() {
             />
           </div>
         </div>
+
 
         <div className="card" style={{ marginBottom: '30px' }}>
           <button
