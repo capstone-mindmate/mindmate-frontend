@@ -3,9 +3,13 @@ import * as IconComponents from './components/icon/iconComponents'
 import { GlobalStyles } from '../styles/GlobalStyles'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import NavigationComponent from './components/navigation/navigationComponent'
+import { useToast } from './components/toast/ToastProvider.tsx'
+import TopBar from './components/topbar/Topbar.tsx'
+import Frame from './components/frame/Frame'
 
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
+import { useState } from 'react'
 
 const iconListStyles = css`
   width: 100%;
@@ -18,9 +22,31 @@ const iconListStyles = css`
 `
 
 function App() {
+  const [count, setCount] = useState(0)
+  const { showToast } = useToast()
+
+  const handleBackClick = () => {
+    showToast('뒤로가기 버튼이 클릭되었습니다', 'info')
+  }
+
+  const handleAction = () => {
+    showToast('액션 버튼이 클릭되었습니다', 'success')
+  }
+
+  const handleFrameClick = () => {
+    showToast('프레임이 클릭되었습니다', 'info')
+  }
+
   return (
     <>
       <GlobalStyles />
+      <TopBar
+        title="타이틀 입력"
+        showBackButton
+        onBackClick={handleBackClick}
+        actionText="등록"
+        onActionClick={handleAction}
+      />
 
       <div
         style={{
@@ -29,15 +55,79 @@ function App() {
           alignItems: 'center',
           justifyContent: 'center',
           height: '100%',
+          paddingTop: '70px', // TopBar 높이만큼 여백 추가
         }}
       >
+        {/* Frame 컴포넌트 예시들 (다양한 길이의 제목) */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '20px',
+            maxWidth: '900px',
+            flexWrap: 'wrap',
+            gap: '15px',
+          }}
+        >
+          <div style={{ width: '280px', height: '380px' }}>
+            <Frame
+              title="친구 사이에도 거리두기가 필요해"
+              imageSrc="public/image.png"
+              detail="인간관계 때문에 고민중이라면 필독 👀"
+              currentPage={2}
+              totalPages={25}
+              onClick={handleFrameClick}
+            />
+          </div>
+
+          <div style={{ width: '280px', height: '380px' }}>
+            <Frame
+              title="익명 대화 뜻밖의 현실조언"
+              imageSrc="public/image copy.png"
+              detail="아무 이해관계 없는 사람이라 더 객관적인 조언들이 필요하다."
+              currentPage={25}
+              totalPages={25}
+              onClick={handleFrameClick}
+            />
+          </div>
+
+          <div style={{ width: '280px', height: '380px' }}>
+            <Frame
+              title="작심삼일도 10번 하면 한달이다"
+              imageSrc="public/image copy 2.png"
+              detail="작심삼일하던 사람이 1등한 비법"
+              currentPage={3}
+              totalPages={25}
+              onClick={handleFrameClick}
+            />
+          </div>
+        </div>
+
+        <div className="card" style={{ marginBottom: '30px' }}>
+          <button
+            onClick={() => {
+              setCount((count) => count + 1)
+              if (count % 4 === 0) {
+                showToast('카운트가 증가했습니다!', 'success')
+              } else if (count % 4 === 1) {
+                showToast('아주대학교 이메일을 입력해주세요', 'info')
+              } else if (count % 4 === 2) {
+                showToast('네트워크 연결을 확인해주세요', 'warning')
+              } else {
+                showToast('전송에 실패했습니다', 'error')
+              }
+            }}
+          >
+            count is {count}
+          </button>
+        </div>
+
         <h1>Icon List</h1>
         <div className="icon-list" css={iconListStyles}>
           <IconComponents.AlarmIcon color="#F7374F" />
           <IconComponents.BackIcon color="#F7374F" />
           <IconComponents.CheckIconBig color="#F7374F" />
           <IconComponents.CheckIconSmall color="#F7374F" />
-
           <IconComponents.ErrorIcon color="#F7374F" />
           <IconComponents.ImageIcon color="#F7374F" />
           <IconComponents.InfoIcon color="#F7374F" />
