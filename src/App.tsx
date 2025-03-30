@@ -76,6 +76,7 @@ function App() {
                 {/* <Route path="/" element={} />
                 <Route path="/chat" element={} />
                 <Route path="/profile" element={} /> */}
+                {/* 위에 path 나중에 정한거 업데이트 하기 */}
               </Routes>
               <NavigationComponent />
             </div>
