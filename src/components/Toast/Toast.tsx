@@ -4,28 +4,49 @@ import {
   IconContainer,
   MessageText,
   CloseButton,
-  IconImage,
 } from '../../styles/ToastStyles.tsx'
 import { ToastType } from '../toast/ToastProvider.tsx'
+import {
+  InfoIcon,
+  ErrorIcon,
+  WarningIcon,
+  CheckIconSmall,
+  CloseIcon,
+} from '../icon/iconComponents.tsx'
+
+// 토스트 타입별 색상 매핑 함수 (공통으로 사용)
+const getTypeColor = (type: ToastType): string => {
+  switch (type) {
+    case 'info':
+      return '#1B5BFE'
+    case 'error':
+      return '#FB4F50'
+    case 'warning':
+      return '#F8C73D'
+    case 'success':
+      return '#01A700'
+    default:
+      return '#1B5BFE'
+  }
+}
+
 
 // 토스트 타입별 아이콘 컴포넌트
 const ToastIcon = ({ type }: { type: ToastType }) => {
-  const getIconPath = () => {
-    switch (type) {
-      case 'info':
-        return '/icon/info.svg'
-      case 'error':
-        return '/icon/error.svg'
-      case 'warning':
-        return '/icon/warning.svg'
-      case 'success':
-        return '/icon/check_small.svg'
-      default:
-        return '/icon/info.svg'
-    }
-  }
+  const color = getTypeColor(type)
 
-  return <IconImage src={getIconPath()} alt={`${type} icon`} type={type} />
+  switch (type) {
+    case 'info':
+      return <InfoIcon width={24} height={24} color={color} />
+    case 'error':
+      return <ErrorIcon width={24} height={24} color={color} />
+    case 'warning':
+      return <WarningIcon width={24} height={24} color={color} />
+    case 'success':
+      return <CheckIconSmall width={24} height={24} color={color} />
+    default:
+      return <InfoIcon width={24} height={24} color={color} />
+  }
 }
 
 // 토스트 박스 컴포넌트 Props 인터페이스
@@ -71,7 +92,9 @@ const Toast: React.FC<ToastProps> = ({
         <ToastIcon type={type} />
       </IconContainer>
       <MessageText>{message}</MessageText>
-      <CloseButton onClick={handleClose}>×</CloseButton>
+      <CloseButton onClick={handleClose}>
+        <CloseIcon width={18} height={18} color={getTypeColor(type)} />
+      </CloseButton>
     </ToastContainer>
   )
 }

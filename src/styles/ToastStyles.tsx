@@ -75,6 +75,7 @@ export const IconContainer = styled.div`
   justify-content: center;
 `
 
+
 // 아이콘 스타일
 export const IconImage = styled.img<{ type: ToastType }>`
   width: 24px;
@@ -100,12 +101,22 @@ export const MessageText = styled.div`
 
 export const CloseButton = styled.button`
   background: none;
-  font-size: 20px;
+  border: 0;
   padding: 0;
-  line-height: 1;
-  color: #000000;
+  margin-left: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  outline: none;
 
   &:hover {
-    color: #333;
+    opacity: 0.7;
+  }
+
+  &:focus {
+    outline: none;
   }
 `
