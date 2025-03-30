@@ -28,9 +28,11 @@ const navigationStyle = {
     left: 0;
     right: 0;
     background: #ffffff;
-    border-top: 1px solid #eaeaea;
+    boder: none;
     padding: 12px 0;
     z-index: 1000;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0px 0px 4px 0px #39211140;
   `,
   nav: css`
     display: flex;
