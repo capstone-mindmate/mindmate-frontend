@@ -39,7 +39,6 @@ function App() {
     showToast('프레임이 클릭되었습니다', 'info')
   }
 
-
   return (
     <>
       <GlobalStyles />
