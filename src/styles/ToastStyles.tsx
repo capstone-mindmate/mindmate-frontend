@@ -75,7 +75,24 @@ export const IconContainer = styled.div`
   justify-content: center;
 `
 
-// 메시지 텍스트 스타일
+
+// 아이콘 스타일
+export const IconImage = styled.img<{ type: ToastType }>`
+  width: 24px;
+  height: 24px;
+  filter: ${(props) =>
+    props.type === 'info'
+      ? 'invert(31%) sepia(85%) saturate(2151%) hue-rotate(215deg) brightness(97%) contrast(101%)' // #1B5BFE
+      : props.type === 'error'
+        ? 'invert(43%) sepia(82%) saturate(1752%) hue-rotate(330deg) brightness(101%) contrast(101%)' // #FB4F50
+        : props.type === 'warning'
+          ? 'invert(79%) sepia(61%) saturate(861%) hue-rotate(338deg) brightness(103%) contrast(96%)' // #F8C73D
+          : props.type === 'success'
+            ? 'invert(42%) sepia(99%) saturate(1073%) hue-rotate(61deg) brightness(95%) contrast(106%)' // #01A700
+            : 'none'};
+`
+
+// 메시지 텍스트 스타일 - 왼쪽 정렬
 export const MessageText = styled.div`
   flex: 1;
   font-size: 14px;

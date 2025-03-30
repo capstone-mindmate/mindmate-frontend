@@ -30,6 +30,7 @@ const getTypeColor = (type: ToastType): string => {
   }
 }
 
+
 // 토스트 타입별 아이콘 컴포넌트
 const ToastIcon = ({ type }: { type: ToastType }) => {
   const color = getTypeColor(type)
