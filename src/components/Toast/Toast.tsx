@@ -6,7 +6,7 @@ import {
   CloseButton,
   IconImage,
 } from '../../styles/ToastStyles.tsx'
-import { ToastType } from './ToastProvider.tsx'
+import { ToastType } from '../toast/ToastProvider.tsx'
 
 // 토스트 타입별 아이콘 컴포넌트
 const ToastIcon = ({ type }: { type: ToastType }) => {
@@ -77,5 +77,3 @@ const Toast: React.FC<ToastProps> = ({
 }
 
 export default Toast
-
-//pr

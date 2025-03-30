@@ -88,5 +88,3 @@ test('닫기 버튼을 클릭하면 토스트가 닫힌다', async ({ page }) =>
   // 토스트가 사라졌는지 확인
   await expect(page.getByText('카운트가 증가했습니다!')).not.toBeVisible()
 })
-
-//pr
