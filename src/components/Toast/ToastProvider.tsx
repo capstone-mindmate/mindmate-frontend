@@ -58,7 +58,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       // 기존 토스트를 모두 대체하여 하나의 토스트만 표시
       setToasts([{ id, message, type, autoClose, duration }])
 
-      return id // ID 반환 (나중에 특정 토스트를 제거할 수 있도록)
+      return id // ID 반환(나중에 특정 토스트를 제거할 수 있도록)
     },
     []
   )
@@ -90,3 +90,5 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 }
 
 export default ToastProvider
+
+//pr
