@@ -16,6 +16,7 @@ import FloatingButton from './components/buttons/floatingButton'
 import PurchaseButton from './components/buttons/purchaseButton'
 import { ReportButton, ReportItem } from './components/buttons/reportButton'
 import ReviewButton from './components/buttons/reviewButton'
+import ProgressBar from './components/buttons/progressBar'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -324,6 +325,48 @@ function App() {
             <ReviewButton reviewText="⚡️ 응답이 빨라요" />
             <ReviewButton reviewText="❤️‍🩹 공감을 잘해줘요" />
             <ReviewButton reviewText="🤝🏻 신뢰할 수 있는 대화였어요" />
+          </div>
+
+          <div className="progressBar">
+            <ProgressBar
+              slides={[
+                <div style={{ width: '280px', height: '380px' }}>
+                  <Frame
+                    title="친구 사이에도 거리두기가 필요해"
+                    imageSrc="public/image.png"
+                    detail="인간관계 때문에 고민중이라면 필독 👀"
+                    currentPage={2}
+                    totalPages={25}
+                    onClick={() => {}}
+                  />
+                </div>,
+
+                <div style={{ width: '280px', height: '380px' }}>
+                  <Frame
+                    title="익명 대화 뜻밖의 현실조언"
+                    imageSrc="public/image copy.png"
+                    detail="아무 이해관계 없는 사람이라 더 객관적인 조언들이 필요하다."
+                    currentPage={25}
+                    totalPages={25}
+                    onClick={() => {}}
+                  />
+                </div>,
+
+                <div style={{ width: '280px', height: '380px' }}>
+                  <Frame
+                    title="작심삼일도 10번 하면 한달이다"
+                    imageSrc="public/image copy 2.png"
+                    detail="작심삼일하던 사람이 1등한 비법"
+                    currentPage={3}
+                    totalPages={25}
+                    onClick={() => {}}
+                  />
+                </div>,
+              ]}
+              onIndexChange={(index) => {
+                console.log('현재 슬라이드 : ', index)
+              }}
+            />
           </div>
         </div>
 
