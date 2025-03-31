@@ -13,6 +13,7 @@ import BrownRoundButton from './components/buttons/brownRoundButton'
 import YellowRoundButton from './components/buttons/yellowRoundButton'
 import FilterButton from './components/buttons/filterButton'
 import FloatingButton from './components/buttons/floatingButton'
+import PurchaseButton from './components/buttons/purchaseButton'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -287,6 +288,21 @@ function App() {
                 console.log('버튼 상태 : ', isActive)
               }}
             />
+          </div>
+
+          <div
+            className="purchaseList"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              padding: '20px 0',
+            }}
+          >
+            <PurchaseButton priceText={2500} />
+            <PurchaseButton priceText={1000} />
+            <PurchaseButton priceText={4000} />
+            <PurchaseButton priceText={12341234} />
           </div>
         </div>
 
