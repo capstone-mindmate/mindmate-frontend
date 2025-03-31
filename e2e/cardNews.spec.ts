@@ -76,4 +76,28 @@ test.describe('홈화면 카드 뉴스 컴포넌트', () => {
 
     await cardNews.click()
   })
+
+  test('긴 제목이 있을 때 말줄임표가 올바르게 적용되는지 확인', async ({
+    page,
+  }) => {
+    const cardNews = page
+      .locator('div')
+      .filter({ hasClass: 'container' })
+      .first()
+
+    const titleElement = cardNews.locator('.title p')
+
+    await expect(titleElement).toHaveCSS('white-space', 'nowrap')
+    await expect(titleElement).toHaveCSS('overflow', 'hidden')
+    await expect(titleElement).toHaveCSS('text-overflow', 'ellipsis')
+
+    const titleContainer = cardNews.locator('.title')
+    await expect(titleContainer).toHaveCSS('max-width', '100%')
+
+    const titleBoundingBox = await titleElement.boundingBox()
+    const containerBoundingBox = await cardNews.boundingBox()
+    expect(titleBoundingBox?.width).toBeLessThanOrEqual(
+      containerBoundingBox?.width || 0
+    )
+  })
 })

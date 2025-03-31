@@ -98,4 +98,26 @@ describe('CardNewsComponent', () => {
       marginTop: '8px',
     })
   })
+
+  it('긴 제목이 있을 때 text-overflow가 올바르게 적용되는지 확인', () => {
+    const longTitleProps = {
+      ...defaultProps,
+      title:
+        '어디까지 쓸 수 있는 거에요? 어디까지 쓸 수 있는 거에요? 어디까지 쓸 수 있는 거에요?',
+    }
+
+    const { getByText } = render(<CardNewsComponent {...longTitleProps} />)
+    const titleElement = getByText(longTitleProps.title).parentElement
+
+    expect(titleElement).toHaveStyle({
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      maxWidth: '100%',
+    })
+
+    // 컴퓨티드 스타일을 확인하여 실제로 말줄임표가 적용되는지 검증
+    const computedStyle = window.getComputedStyle(titleElement as Element)
+    expect(computedStyle.textOverflow).toBe('ellipsis')
+  })
 })
