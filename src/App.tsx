@@ -14,7 +14,7 @@ import YellowRoundButton from './components/buttons/yellowRoundButton'
 import FilterButton from './components/buttons/filterButton'
 import FloatingButton from './components/buttons/floatingButton'
 import PurchaseButton from './components/buttons/purchaseButton'
-import { ReportButton } from './components/buttons/reportButton'
+import { ReportButton, ReportItem } from './components/buttons/reportButton'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -307,7 +307,8 @@ function App() {
           </div>
 
           <div className="reportList">
-            <ReportButton reportText="신고 항목 내용" />
+            <ReportItem reportText="신고 항목 내용" />
+            <ReportButton />
           </div>
         </div>
 

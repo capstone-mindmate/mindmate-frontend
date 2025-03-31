@@ -2,7 +2,7 @@
 import { css } from '@emotion/react'
 import { useState } from 'react'
 
-interface ReportButtonProps {
+interface ReportItemProps {
   reportText: string
   onActiveChange?: (isActive: boolean) => void
 }
@@ -50,7 +50,7 @@ const innercircleStyle = (isActive: boolean) => css`
   transition: all 0.2s ease;
 `
 
-export const ReportButton: React.FC<ReportButtonProps> = ({
+export const ReportItem: React.FC<ReportItemProps> = ({
   reportText,
   onActiveChange,
 }) => {
@@ -69,6 +69,47 @@ export const ReportButton: React.FC<ReportButtonProps> = ({
         <div css={circleStyle(isActive)}>
           <div css={innercircleStyle(isActive)} />
         </div>
+      </button>
+    </div>
+  )
+}
+
+interface ReportButtonProps {
+  onActiveChange?: (isActive: boolean) => void
+}
+
+const ReportButtonStyle = (isActive: boolean) => css`
+  width: 100%;
+  height: 50px;
+  background-color: ${isActive ? '#FB4F50' : '#D9D9D9'};
+  color: ${isActive ? '#ffffff' : '#A3A3A3'};
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+`
+
+export const ReportButton: React.FC<ReportButtonProps> = ({
+  onActiveChange,
+}) => {
+  const [isActive, setIsActive] = useState(false)
+
+  const handleClick = () => {
+    const newActiveState = !isActive
+    setIsActive(newActiveState)
+    onActiveChange?.(newActiveState)
+  }
+
+  return (
+    <div className="container">
+      <button css={ReportButtonStyle(isActive)} onClick={handleClick}>
+        <span>신고하기</span>
       </button>
     </div>
   )
