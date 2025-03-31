@@ -14,6 +14,7 @@ import YellowRoundButton from './components/buttons/yellowRoundButton'
 import FilterButton from './components/buttons/filterButton'
 import FloatingButton from './components/buttons/floatingButton'
 import PurchaseButton from './components/buttons/purchaseButton'
+import { ReportButton } from './components/buttons/reportButton'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -303,6 +304,10 @@ function App() {
             <PurchaseButton priceText={1000} />
             <PurchaseButton priceText={4000} />
             <PurchaseButton priceText={12341234} />
+          </div>
+
+          <div className="reportList">
+            <ReportButton reportText="신고 항목 내용" />
           </div>
         </div>
 
