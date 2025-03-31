@@ -1,7 +1,7 @@
 import './App.css'
 import * as IconComponents from './components/icon/iconComponents'
 import { GlobalStyles } from '../styles/GlobalStyles'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes } from 'react-router-dom'
 import NavigationComponent from './components/navigation/navigationComponent'
 import { useToast } from './components/Toast/ToastProvider.tsx'
 import TopBar from './components/topbar/Topbar.tsx'
@@ -11,6 +11,7 @@ import CategoryButton from './components/buttons/categoryButton'
 import ConfirmButton from './components/buttons/confirmButton'
 import BrownRoundButton from './components/buttons/brownRoundButton'
 import YellowRoundButton from './components/buttons/yellowRoundButton'
+import FilterButton from './components/buttons/filterButton'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -202,40 +203,80 @@ function App() {
             }}
           />
 
-          <BrownRoundButton
-            buttonText="리스너"
-            onActiveChange={(isActive) => {
-              console.log('버튼 상태 : ', isActive)
+          <div
+            className="buttonList__"
+            style={{
+              display: 'flex',
+              gap: '10px',
+              flexWrap: 'wrap',
+              padding: '20px 0',
             }}
-          />
+          >
+            <BrownRoundButton
+              buttonText="리스너"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
 
-          <BrownRoundButton
-            buttonText="랜덤매칭 허용"
-            onActiveChange={(isActive) => {
-              console.log('버튼 상태 : ', isActive)
-            }}
-          />
+            <BrownRoundButton
+              buttonText="랜덤매칭 허용"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
 
-          <BrownRoundButton
-            buttonText="👂🏻 리스너"
-            onActiveChange={(isActive) => {
-              console.log('버튼 상태 : ', isActive)
-            }}
-          />
+            <BrownRoundButton
+              buttonText="👂🏻 리스너"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
 
-          <YellowRoundButton
-            buttonText="스피커"
-            onActiveChange={(isActive) => {
-              console.log('버튼 상태 : ', isActive)
-            }}
-          />
+            <YellowRoundButton
+              buttonText="스피커"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
 
-          <YellowRoundButton
-            buttonText="🗣️ 스피커"
-            onActiveChange={(isActive) => {
-              console.log('버튼 상태 : ', isActive)
-            }}
-          />
+            <YellowRoundButton
+              buttonText="🗣️ 스피커"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+          </div>
+
+          <div className="filterList" style={{ display: 'flex', gap: '10px' }}>
+            <FilterButton
+              buttonText="전체"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <FilterButton
+              buttonText="리스너"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <FilterButton
+              buttonText="스피커"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <FilterButton
+              buttonText="완료"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+          </div>
         </div>
 
         <div className="navigation" style={{ width: '50%' }}>
