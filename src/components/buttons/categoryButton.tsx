@@ -11,7 +11,7 @@ const buttonStyle = (isActive: boolean) => css`
   width: 165px;
   height: 68px;
   background-color: ${isActive ? '#FFF9EB' : '#FFFFFF'};
-  color: #727272;
+  color: ${isActive ? '#392111' : '#727272'};
   border: 1px solid ${isActive ? '#F0DAA9' : '#D9D9D9'};
   border-radius: 10px;
   font-size: 16px;
