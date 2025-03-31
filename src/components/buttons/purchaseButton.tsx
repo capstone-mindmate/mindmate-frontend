@@ -24,6 +24,12 @@ const buttonStyle = css`
   transition: all 0.3s ease;
 `
 
+const priceTextStyle = css`
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+`
+
 const PurchaseButton: React.FC<PurchaseButtonProps> = ({
   priceText,
   onActiveChange,
@@ -39,7 +45,9 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
   return (
     <div className="container">
       <button css={buttonStyle} onClick={handleClick}>
-        <p>{priceText.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}원</p>
+        <p css={priceTextStyle}>
+          {priceText.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}원
+        </p>
       </button>
     </div>
   )
