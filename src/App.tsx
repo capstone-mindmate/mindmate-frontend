@@ -12,6 +12,7 @@ import ConfirmButton from './components/buttons/confirmButton'
 import BrownRoundButton from './components/buttons/brownRoundButton'
 import YellowRoundButton from './components/buttons/yellowRoundButton'
 import FilterButton from './components/buttons/filterButton'
+import FloatingButton from './components/buttons/floatingButton'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -272,6 +273,16 @@ function App() {
 
             <FilterButton
               buttonText="완료"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+          </div>
+
+          <div className="floatingList">
+            <FloatingButton
+              buttonIcon={<IconComponents.NormalPlusIcon color="#ffffff" />}
+              buttonText="글쓰기"
               onActiveChange={(isActive) => {
                 console.log('버튼 상태 : ', isActive)
               }}
