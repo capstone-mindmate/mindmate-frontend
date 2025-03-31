@@ -8,7 +8,7 @@ interface FloatingButtonProps {
   onActiveChange?: (isActive: boolean) => void
 }
 
-const buttonStyle = (isActive: boolean) => css`
+const buttonStyle = css`
   position: fixed;
   bottom: 100px;
   right: 80px;
@@ -48,7 +48,7 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({
 
   return (
     <div className="container">
-      <button css={buttonStyle(isActive)} onClick={handleClick}>
+      <button css={buttonStyle} onClick={handleClick}>
         {buttonIcon}
         {buttonText}
       </button>
