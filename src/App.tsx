@@ -1,12 +1,23 @@
 import './App.css'
 import * as IconComponents from './components/icon/iconComponents'
 import { GlobalStyles } from '../styles/GlobalStyles'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes } from 'react-router-dom'
 import NavigationComponent from './components/navigation/navigationComponent'
-import { useToast } from './components/toast/ToastProvider.tsx'
+import { useToast } from './components/Toast/ToastProvider.tsx'
 import TopBar from './components/topbar/Topbar.tsx'
 import Frame from './components/frame/Frame'
-
+import InputBox from './components/buttons/inputBox'
+import CategoryButton from './components/buttons/categoryButton'
+import ConfirmButton from './components/buttons/confirmButton'
+import BrownRoundButton from './components/buttons/brownRoundButton'
+import YellowRoundButton from './components/buttons/yellowRoundButton'
+import FilterButton from './components/buttons/filterButton'
+import FloatingButton from './components/buttons/floatingButton'
+import PurchaseButton from './components/buttons/purchaseButton'
+import { ReportButton, ReportItem } from './components/buttons/reportButton'
+import ReviewButton from './components/buttons/reviewButton'
+import ProgressBar from './components/buttons/progressBar'
+import BrownRectButton from './components/buttons/brownRectButton'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -20,6 +31,10 @@ const iconListStyles = css`
   justify-content: center;
   gap: 10px;
 `
+
+const handleInputChange = (value: string) => {
+  console.log('input 박스 값 변경되는가?? : ', value)
+}
 
 function App() {
   const [count, setCount] = useState(0)
@@ -122,7 +137,6 @@ function App() {
           </button>
         </div>
 
-        <h1>Icon List</h1>
         <div className="icon-list" css={iconListStyles}>
           <IconComponents.AlarmIcon color="#F7374F" />
           <IconComponents.BackIcon color="#F7374F" />
@@ -157,6 +171,208 @@ function App() {
           <IconComponents.NormalPlusIcon color="#F7374F" />
           <IconComponents.UserIcon color="#F7374F" />
           <IconComponents.CloseIcon color="#F7374F" />
+        </div>
+
+        <div className="buttons" style={{ width: '375px', margin: '30px 0' }}>
+          <InputBox
+            placeholder="텍스트를 입력해주세요"
+            value=""
+            onChange={handleInputChange}
+            titleText="타이틀 텍스트"
+          />
+
+          <CategoryButton
+            buttonText="💼 취업"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <CategoryButton
+            buttonText="🤯 진로"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <CategoryButton
+            buttonText="👥 인간관계"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <ConfirmButton
+            buttonText="인증하기"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <div
+            className="buttonList__"
+            style={{
+              display: 'flex',
+              gap: '10px',
+              flexWrap: 'wrap',
+              padding: '20px 0',
+            }}
+          >
+            <BrownRoundButton
+              buttonText="리스너"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="랜덤매칭 허용"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="👂🏻 리스너"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <YellowRoundButton
+              buttonText="스피커"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <YellowRoundButton
+              buttonText="🗣️ 스피커"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+          </div>
+
+          <div className="filterList" style={{ display: 'flex', gap: '10px' }}>
+            <FilterButton
+              buttonText="전체"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <FilterButton
+              buttonText="리스너"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <FilterButton
+              buttonText="스피커"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <FilterButton
+              buttonText="완료"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+          </div>
+
+          <div className="floatingList">
+            <FloatingButton
+              buttonIcon={<IconComponents.NormalPlusIcon color="#ffffff" />}
+              buttonText="글쓰기"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+          </div>
+
+          <div
+            className="purchaseList"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              padding: '20px 0',
+            }}
+          >
+            <PurchaseButton priceText={2500} />
+            <PurchaseButton priceText={1000} />
+            <PurchaseButton priceText={4000} />
+            <PurchaseButton priceText={12341234} />
+          </div>
+
+          <div className="reportList">
+            <ReportItem reportText="신고 항목 내용" />
+            <ReportButton />
+          </div>
+
+          <div
+            className="reviewList"
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '10px',
+              padding: '20px 0',
+            }}
+          >
+            <ReviewButton reviewText="⚡️ 응답이 빨라요" />
+            <ReviewButton reviewText="❤️‍🩹 공감을 잘해줘요" />
+            <ReviewButton reviewText="🤝🏻 신뢰할 수 있는 대화였어요" />
+          </div>
+
+          <div className="progressBar" style={{ padding: '30px 0' }}>
+            <ProgressBar
+              slides={[
+                <div style={{ width: '280px', height: '380px' }}>
+                  <Frame
+                    title="친구 사이에도 거리두기가 필요해"
+                    imageSrc="public/image.png"
+                    detail="인간관계 때문에 고민중이라면 필독 👀"
+                    currentPage={2}
+                    totalPages={25}
+                    onClick={() => {}}
+                  />
+                </div>,
+
+                <div style={{ width: '280px', height: '380px' }}>
+                  <Frame
+                    title="익명 대화 뜻밖의 현실조언"
+                    imageSrc="public/image copy.png"
+                    detail="아무 이해관계 없는 사람이라 더 객관적인 조언들이 필요하다."
+                    currentPage={25}
+                    totalPages={25}
+                    onClick={() => {}}
+                  />
+                </div>,
+
+                <div style={{ width: '280px', height: '380px' }}>
+                  <Frame
+                    title="작심삼일도 10번 하면 한달이다"
+                    imageSrc="public/image copy 2.png"
+                    detail="작심삼일하던 사람이 1등한 비법"
+                    currentPage={3}
+                    totalPages={25}
+                    onClick={() => {}}
+                  />
+                </div>,
+              ]}
+              onIndexChange={(index) => {
+                console.log('현재 슬라이드 : ', index)
+              }}
+            />
+          </div>
+
+          <div className="brownRectButton" style={{ padding: '30px 0' }}>
+            <BrownRectButton buttonText="매칭 신청하기" />
+          </div>
         </div>
 
         <div className="navigation" style={{ width: '50%' }}>
