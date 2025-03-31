@@ -55,6 +55,10 @@ const infoBoxStyles = {
     font-weight: bold;
     color: #000000;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   `,
   organizationStyle: css`
     margin-top: 2px;
