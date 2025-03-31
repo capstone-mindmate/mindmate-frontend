@@ -3,9 +3,10 @@ import { css } from '@emotion/react'
 import { ToastType } from '../components/toast/ToastProvider.tsx'
 
 // 토스트 컨테이너 스타일
+// 2025.03.30 석지원 : 네비게이션이 70px의 height를 가지고 있기에 bottom을 100px로 설정 했습니다.
 export const ToastsContainer = styled.div`
   position: fixed;
-  bottom: 20px;
+  bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
@@ -74,7 +75,6 @@ export const IconContainer = styled.div`
   align-items: center;
   justify-content: center;
 `
-
 
 // 아이콘 스타일
 export const IconImage = styled.img<{ type: ToastType }>`

@@ -47,7 +47,7 @@ const navigationStyle = {
     align-items: center;
     text-decoration: none;
     color: #d9d9d9;
-    gap: 4px;
+    gap: 0px;
     position: relative;
   `,
   label: css`

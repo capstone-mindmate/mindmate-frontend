@@ -6,6 +6,8 @@ import NavigationComponent from './components/navigation/navigationComponent'
 import { useToast } from './components/toast/ToastProvider.tsx'
 import TopBar from './components/topbar/Topbar.tsx'
 import Frame from './components/frame/Frame'
+import InputBox from './components/buttons/inputBox'
+import CategoryButton from './components/buttons/categoryButton'
 
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
@@ -20,6 +22,10 @@ const iconListStyles = css`
   justify-content: center;
   gap: 10px;
 `
+
+const handleInputChange = (value: string) => {
+  console.log('input 박스 값 변경되는가?? : ', value)
+}
 
 function App() {
   const [count, setCount] = useState(0)
@@ -122,7 +128,6 @@ function App() {
           </button>
         </div>
 
-        <h1>Icon List</h1>
         <div className="icon-list" css={iconListStyles}>
           <IconComponents.AlarmIcon color="#F7374F" />
           <IconComponents.BackIcon color="#F7374F" />
@@ -157,6 +162,36 @@ function App() {
           <IconComponents.NormalPlusIcon color="#F7374F" />
           <IconComponents.UserIcon color="#F7374F" />
           <IconComponents.CloseIcon color="#F7374F" />
+        </div>
+
+        <div className="buttons" style={{ width: '375px', margin: '30px 0' }}>
+          <InputBox
+            placeholder="텍스트를 입력해주세요"
+            value=""
+            onChange={handleInputChange}
+            titleText="타이틀 텍스트"
+          />
+
+          <CategoryButton
+            buttonText="💼 취업"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <CategoryButton
+            buttonText="🤯 진로"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <CategoryButton
+            buttonText="👥 인간관계"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
         </div>
 
         <div className="navigation" style={{ width: '50%' }}>
