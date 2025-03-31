@@ -3,12 +3,14 @@ import * as IconComponents from './components/icon/iconComponents'
 import { GlobalStyles } from '../styles/GlobalStyles'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import NavigationComponent from './components/navigation/navigationComponent'
-import { useToast } from './components/toast/ToastProvider.tsx'
+import { useToast } from './components/Toast/ToastProvider.tsx'
 import TopBar from './components/topbar/Topbar.tsx'
 import Frame from './components/frame/Frame'
 import InputBox from './components/buttons/inputBox'
 import CategoryButton from './components/buttons/categoryButton'
-
+import ConfirmButton from './components/buttons/confirmButton'
+import BrownRoundButton from './components/buttons/brownRoundButton'
+import YellowRoundButton from './components/buttons/yellowRoundButton'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -188,6 +190,48 @@ function App() {
 
           <CategoryButton
             buttonText="👥 인간관계"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <ConfirmButton
+            buttonText="인증하기"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <BrownRoundButton
+            buttonText="리스너"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <BrownRoundButton
+            buttonText="랜덤매칭 허용"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <BrownRoundButton
+            buttonText="👂🏻 리스너"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <YellowRoundButton
+            buttonText="스피커"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+
+          <YellowRoundButton
+            buttonText="🗣️ 스피커"
             onActiveChange={(isActive) => {
               console.log('버튼 상태 : ', isActive)
             }}
