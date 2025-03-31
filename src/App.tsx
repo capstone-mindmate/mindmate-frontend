@@ -17,6 +17,7 @@ import PurchaseButton from './components/buttons/purchaseButton'
 import { ReportButton, ReportItem } from './components/buttons/reportButton'
 import ReviewButton from './components/buttons/reviewButton'
 import ProgressBar from './components/buttons/progressBar'
+import BrownRectButton from './components/buttons/brownRectButton'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -327,7 +328,7 @@ function App() {
             <ReviewButton reviewText="🤝🏻 신뢰할 수 있는 대화였어요" />
           </div>
 
-          <div className="progressBar">
+          <div className="progressBar" style={{ padding: '30px 0' }}>
             <ProgressBar
               slides={[
                 <div style={{ width: '280px', height: '380px' }}>
@@ -367,6 +368,10 @@ function App() {
                 console.log('현재 슬라이드 : ', index)
               }}
             />
+          </div>
+
+          <div className="brownRectButton" style={{ padding: '30px 0' }}>
+            <BrownRectButton buttonText="매칭 신청하기" />
           </div>
         </div>
 
