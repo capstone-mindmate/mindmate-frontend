@@ -15,6 +15,7 @@ import FilterButton from './components/buttons/filterButton'
 import FloatingButton from './components/buttons/floatingButton'
 import PurchaseButton from './components/buttons/purchaseButton'
 import { ReportButton, ReportItem } from './components/buttons/reportButton'
+import ReviewButton from './components/buttons/reviewButton'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -309,6 +310,20 @@ function App() {
           <div className="reportList">
             <ReportItem reportText="신고 항목 내용" />
             <ReportButton />
+          </div>
+
+          <div
+            className="reviewList"
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '10px',
+              padding: '20px 0',
+            }}
+          >
+            <ReviewButton reviewText="⚡️ 응답이 빨라요" />
+            <ReviewButton reviewText="❤️‍🩹 공감을 잘해줘요" />
+            <ReviewButton reviewText="🤝🏻 신뢰할 수 있는 대화였어요" />
           </div>
         </div>
 
