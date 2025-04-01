@@ -19,6 +19,7 @@ import ReviewButton from './components/buttons/reviewButton'
 import ProgressBar from './components/buttons/progressBar'
 import BrownRectButton from './components/buttons/brownRectButton'
 import CardNewsComponent from './components/home/cardNewsComponent'
+import HomeCategoryButton from './components/home/homeCategoryButton.tsx'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -385,6 +386,28 @@ function App() {
             organization="인권센터 학생상담소"
             date="2025-01-16"
           />
+
+          <div
+            className="homeCategory"
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '10px',
+              padding: '30px 0',
+            }}
+          >
+            <HomeCategoryButton buttonText="진로고민" emoji="🤯" />
+
+            <HomeCategoryButton buttonText="취업고민" emoji="💼" />
+
+            <HomeCategoryButton buttonText="학업고민" emoji="📚" />
+
+            <HomeCategoryButton buttonText="인간관계" emoji="👥" />
+
+            <HomeCategoryButton buttonText="건강고민" emoji="💪🏻" />
+
+            <HomeCategoryButton buttonText="경제고민" emoji="💰" />
+          </div>
         </div>
 
         <div className="navigation" style={{ width: '50%' }}>
