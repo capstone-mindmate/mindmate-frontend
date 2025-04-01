@@ -18,6 +18,7 @@ import { ReportButton, ReportItem } from './components/buttons/reportButton'
 import ReviewButton from './components/buttons/reviewButton'
 import ProgressBar from './components/buttons/progressBar'
 import BrownRectButton from './components/buttons/brownRectButton'
+import CardNewsComponent from './components/home/cardNewsComponent'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -176,7 +177,6 @@ function App() {
         <div className="buttons" style={{ width: '375px', margin: '30px 0' }}>
           <InputBox
             placeholder="텍스트를 입력해주세요"
-            value=""
             onChange={handleInputChange}
             titleText="타이틀 텍스트"
           />
@@ -373,6 +373,18 @@ function App() {
           <div className="brownRectButton" style={{ padding: '30px 0' }}>
             <BrownRectButton buttonText="매칭 신청하기" />
           </div>
+        </div>
+
+        <div
+          className="homeComponent"
+          style={{ width: '375px', margin: '30px 0' }}
+        >
+          <CardNewsComponent
+            imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
+            title="슬기로운 방학생활 넘어가나 넘어가나 넘어가나 넘어가나 넘어가나"
+            organization="인권센터 학생상담소"
+            date="2025-01-16"
+          />
         </div>
 
         <div className="navigation" style={{ width: '50%' }}>
