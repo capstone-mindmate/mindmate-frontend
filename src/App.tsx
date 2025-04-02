@@ -43,6 +43,9 @@ function App() {
   const [count, setCount] = useState(0)
   const { showToast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalType, setModalType] = useState<
+    '매칭신청' | '매칭실패' | '채팅종료'
+  >('매칭신청')
 
   const handleBackClick = () => {
     showToast('뒤로가기 버튼이 클릭되었습니다', 'info')
@@ -63,7 +66,14 @@ function App() {
 
   // 매칭 신청 버튼 클릭 핸들러
   const handleMatchingRequest = () => {
-    // setIsModalOpen(false)
+    // 매칭 신청 처리 로직
+    console.log('매칭 신청 처리')
+  }
+
+  // 모달 열기 핸들러
+  const handleOpenModal = (type: '매칭신청' | '매칭실패' | '채팅종료') => {
+    setModalType(type)
+    setIsModalOpen(true)
   }
 
   return (
@@ -430,15 +440,35 @@ function App() {
             <BrownRoundButton
               buttonText="매칭방 모달 열기"
               onActiveChange={() => {
-                setIsModalOpen(true)
+                handleOpenModal('매칭신청')
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="매칭 실패 모달 열기"
+              onActiveChange={() => {
+                handleOpenModal('매칭실패')
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="채팅종료 모달 열기"
+              onActiveChange={() => {
+                handleOpenModal('채팅종료')
               }}
             />
           </div>
 
           {isModalOpen && (
             <ModalComponent
-              modalType="매칭신청"
-              buttonText="매칭 신청하기"
+              modalType={modalType}
+              buttonText={
+                modalType === '매칭신청'
+                  ? '매칭 신청하기'
+                  : modalType === '매칭실패'
+                    ? '닫기'
+                    : '리뷰 쓰기'
+              }
               buttonClick={handleMatchingRequest}
               onClose={handleModalClose}
               isOpen={isModalOpen}
