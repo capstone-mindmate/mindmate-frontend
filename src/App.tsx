@@ -20,6 +20,7 @@ import ProgressBar from './components/buttons/progressBar'
 import BrownRectButton from './components/buttons/brownRectButton'
 import CardNewsComponent from './components/home/cardNewsComponent'
 import HomeCategoryButton from './components/home/homeCategoryButton.tsx'
+import ModalComponent from './components/modal/modalComponent'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -408,6 +409,40 @@ function App() {
 
             <HomeCategoryButton buttonText="경제고민" emoji="💰" />
           </div>
+        </div>
+
+        <div className="modalComponetLine" style={{ padding: '50px 0' }}>
+          <div
+            className="modalOpener"
+            style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}
+          >
+            <BrownRoundButton
+              buttonText="매칭방 모달 열기"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="매칭 실패 모달"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="채팅 종료 모달"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+          </div>
+
+          <ModalComponent
+            modalType="매칭신청"
+            buttonText="매칭신청"
+            buttonClick={() => {}}
+          />
         </div>
 
         <div className="navigation" style={{ width: '50%' }}>
