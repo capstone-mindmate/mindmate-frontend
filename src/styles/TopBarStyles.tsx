@@ -7,7 +7,6 @@ export const TopBarContainer = styled.div`
   height: 56px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
   background-color: #ffffff;
   border-bottom: 1px solid #eeeeee;
   position: relative;
@@ -27,13 +26,9 @@ export const TopBarTitle = styled.h1`
 export const TopBarBackButton = styled.button`
   background: none;
   border: none;
-  padding: 8px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: absolute;
-  left: 8px;
+  left: 24px;
 
   &:hover {
     opacity: 0.8;
@@ -44,10 +39,8 @@ export const TopBarBackButton = styled.button`
 export const TopBarActionButton = styled.button<{ isDisabled: boolean }>`
   background: none;
   border: none;
-  padding: 8px 35px;
-  margin-right: 4px;
   position: absolute;
-  right: 16px;
+  right: 24px;
 
   ${(props) => {
     if (props.isDisabled) {

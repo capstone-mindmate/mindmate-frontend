@@ -20,6 +20,7 @@ import ProgressBar from './components/buttons/progressBar'
 import BrownRectButton from './components/buttons/brownRectButton'
 import CardNewsComponent from './components/home/cardNewsComponent'
 import HomeCategoryButton from './components/home/homeCategoryButton.tsx'
+import InfoBox from './components/mypage/InfoBox'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -75,6 +76,11 @@ function App() {
           paddingTop: '70px', // TopBar 높이만큼 여백 추가
         }}
       >
+        {/* InfoBox 컴포넌트 테스트 */}
+        <div>
+          <InfoBox averageScore={4.6} coins={500} matchCount={3} />
+        </div>
+
         {/* Frame 컴포넌트 예시들 (다양한 길이의 제목) */}
         <div
           style={{
@@ -175,6 +181,7 @@ function App() {
           <IconComponents.CloseIcon color="#F7374F" />
         </div>
 
+        {/* Rest of your component code remains unchanged */}
         <div className="buttons" style={{ width: '375px', margin: '30px 0' }}>
           <InputBox
             placeholder="텍스트를 입력해주세요"
@@ -366,7 +373,7 @@ function App() {
                 </div>,
               ]}
               onIndexChange={(index) => {
-                console.log('현재 슬라이드 : ', index)
+                //console.log('현재 슬라이드 : ', index)
               }}
             />
           </div>
