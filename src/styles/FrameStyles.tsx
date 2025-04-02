@@ -60,7 +60,7 @@ export const TitleText = styled.h3`
 
 // 세부 내용 텍스트
 export const DetailText = styled.p`
-  font-size: 14.5px;
+  font-size: 13px;
   color: #ffffff;
   margin: 3px 0 0 0;
   line-height: 1.4;
