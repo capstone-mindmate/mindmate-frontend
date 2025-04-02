@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 
-interface InputBoxProps {
+interface TitleInputBoxProps {
   placeholder: string
   initialValue?: string
   onChange?: (value: string) => void
@@ -38,7 +38,7 @@ const inputBoxStyle = {
   `,
 }
 
-const InputBox: React.FC<InputBoxProps> = ({
+const TitleInputBox: React.FC<TitleInputBoxProps> = ({
   placeholder,
   initialValue = '',
   onChange,
@@ -79,4 +79,4 @@ const InputBox: React.FC<InputBoxProps> = ({
   )
 }
 
-export default InputBox
+export default TitleInputBox

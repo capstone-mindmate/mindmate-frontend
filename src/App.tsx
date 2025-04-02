@@ -6,7 +6,7 @@ import NavigationComponent from './components/navigation/navigationComponent'
 import { useToast } from './components/toast/ToastProvider.tsx'
 import TopBar from './components/topbar/Topbar.tsx'
 import Frame from './components/frame/Frame'
-import InputBox from './components/buttons/inputBox'
+import TitleInputBox from './components/inputs/titleInputBox.tsx'
 import CategoryButton from './components/buttons/categoryButton'
 import ConfirmButton from './components/buttons/confirmButton'
 import BrownRoundButton from './components/buttons/brownRoundButton'
@@ -20,6 +20,7 @@ import ProgressBar from './components/buttons/progressBar'
 import BrownRectButton from './components/buttons/brownRectButton'
 import CardNewsComponent from './components/home/cardNewsComponent'
 import HomeCategoryButton from './components/home/homeCategoryButton.tsx'
+import ModalComponent from './components/modal/modalComponent'
 import InfoBox from './components/mypage/InfoBox'
 import MatchingGraph from './components/mypage/MatchingGraph'
 /** @jsxImportSource @emotion/react */
@@ -43,6 +44,10 @@ const handleInputChange = (value: string) => {
 function App() {
   const [count, setCount] = useState(0)
   const { showToast } = useToast()
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalType, setModalType] = useState<
+    '매칭신청' | '매칭실패' | '채팅종료'
+  >('매칭신청')
 
   const handleBackClick = () => {
     showToast('뒤로가기 버튼이 클릭되었습니다', 'info')
@@ -54,6 +59,23 @@ function App() {
 
   const handleFrameClick = () => {
     showToast('프레임이 클릭되었습니다', 'info')
+  }
+
+  // 모달 닫기 전용 핸들러
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+  }
+
+  // 매칭 신청 버튼 클릭 핸들러
+  const handleMatchingRequest = () => {
+    // 매칭 신청 처리 로직
+    console.log('매칭 신청 처리')
+  }
+
+  // 모달 열기 핸들러
+  const handleOpenModal = (type: '매칭신청' | '매칭실패' | '채팅종료') => {
+    setModalType(type)
+    setIsModalOpen(true)
   }
 
   return (
@@ -198,7 +220,7 @@ function App() {
 
         {/* Rest of your component code remains unchanged */}
         <div className="buttons" style={{ width: '375px', margin: '30px 0' }}>
-          <InputBox
+          <TitleInputBox
             placeholder="텍스트를 입력해주세요"
             onChange={handleInputChange}
             titleText="타이틀 텍스트"
@@ -430,6 +452,57 @@ function App() {
 
             <HomeCategoryButton buttonText="경제고민" emoji="💰" />
           </div>
+        </div>
+
+        <div className="modalComponetLine" style={{ padding: '50px 0' }}>
+          <div
+            className="modalOpener"
+            style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}
+          >
+            <BrownRoundButton
+              buttonText="매칭방 모달 열기"
+              onActiveChange={() => {
+                handleOpenModal('매칭신청')
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="매칭 실패 모달 열기"
+              onActiveChange={() => {
+                handleOpenModal('매칭실패')
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="채팅종료 모달 열기 (디자인 필요)"
+              onActiveChange={() => {
+                handleOpenModal('채팅종료')
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="랜덤매칭 실패 (디자인 필요)"
+              onActiveChange={() => {
+                handleOpenModal('채팅종료')
+              }}
+            />
+          </div>
+
+          {isModalOpen && (
+            <ModalComponent
+              modalType={modalType}
+              buttonText={
+                modalType === '매칭신청'
+                  ? '매칭 신청하기'
+                  : modalType === '매칭실패'
+                    ? '닫기'
+                    : '리뷰 쓰기'
+              }
+              buttonClick={handleMatchingRequest}
+              onClose={handleModalClose}
+              isOpen={isModalOpen}
+            />
+          )}
         </div>
 
         <div className="navigation" style={{ width: '50%' }}>
