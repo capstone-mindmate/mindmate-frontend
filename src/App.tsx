@@ -3,7 +3,7 @@ import * as IconComponents from './components/icon/iconComponents'
 import { GlobalStyles } from '../styles/GlobalStyles'
 import { BrowserRouter as Router, Routes } from 'react-router-dom'
 import NavigationComponent from './components/navigation/navigationComponent'
-import { useToast } from './components/Toast/ToastProvider.tsx'
+import { useToast } from './components/toast/ToastProvider.tsx'
 import TopBar from './components/topbar/Topbar.tsx'
 import Frame from './components/frame/Frame'
 import TitleInputBox from './components/inputs/titleInputBox.tsx'
@@ -21,6 +21,8 @@ import BrownRectButton from './components/buttons/brownRectButton'
 import CardNewsComponent from './components/home/cardNewsComponent'
 import HomeCategoryButton from './components/home/homeCategoryButton.tsx'
 import ModalComponent from './components/modal/modalComponent'
+import InfoBox from './components/mypage/InfoBox'
+import MatchingGraph from './components/mypage/MatchingGraph'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -97,6 +99,25 @@ function App() {
           paddingTop: '70px', // TopBar 높이만큼 여백 추가
         }}
       >
+        {/* InfoBox 컴포넌트 테스트 */}
+        <div>
+          <InfoBox averageScore={4.6} coins={500} matchCount={3} />
+        </div>
+
+        {/* MatchingGraph 컴포넌트 테스트 */}
+        <div style={{ marginTop: '20px' }}>
+          <MatchingGraph
+            categoryData={{
+              진로: 3,
+              취업: 7,
+              학업: 1,
+              인간관계: 6,
+              경제: 4,
+              기타: 1,
+            }}
+          />
+        </div>
+
         {/* Frame 컴포넌트 예시들 (다양한 길이의 제목) */}
         <div
           style={{
@@ -197,6 +218,7 @@ function App() {
           <IconComponents.CloseIcon color="#F7374F" />
         </div>
 
+        {/* Rest of your component code remains unchanged */}
         <div className="buttons" style={{ width: '375px', margin: '30px 0' }}>
           <TitleInputBox
             placeholder="텍스트를 입력해주세요"
@@ -388,7 +410,7 @@ function App() {
                 </div>,
               ]}
               onIndexChange={(index) => {
-                console.log('현재 슬라이드 : ', index)
+                //console.log('현재 슬라이드 : ', index)
               }}
             />
           </div>
