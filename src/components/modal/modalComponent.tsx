@@ -2,7 +2,10 @@
 import { css } from '@emotion/react'
 import { CoinIcon, CloseIcon } from '../icon/iconComponents'
 import BrownRectButton from '../buttons/brownRectButton'
-import { ModalMatchingUserProfile } from './modalUserProfile'
+import {
+  ModalMatchingUserProfile,
+  ModalMatchingFailureUserProfile,
+} from './modalUserProfile'
 import YellowInputBox from '../inputs/yellowInputBox'
 import GrayInputBox from '../inputs/grayInputBox'
 import { useEffect } from 'react'
@@ -107,6 +110,14 @@ const ModalComponent = ({
       gap: 12px;
       margin: 12px 0;
     `,
+
+    modalHeaderText: css`
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.4;
+      text-align: center;
+      color: #000000;
+    `,
   }
 
   if (modalType === '매칭신청') {
@@ -189,18 +200,29 @@ const ModalComponent = ({
     return (
       <div className="container" css={modalStyles.container}>
         <div className="modal-content" css={modalStyles.modalContent}>
-          <div
-            className="close-btn"
-            css={modalStyles.closeBtn}
-            onClick={() => onClose()}
-            role="button"
-            aria-label="닫기"
-          >
-            <CloseIcon color="#000000" width={24} height={24} />
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>
+              매칭에 실패했어요 🥹
+              <br />
+              다른 사람과 매칭을 시도해보세요!
+            </p>
           </div>
-          <div className="modal-header"></div>
-          <div className="modal-body"></div>
-          <div className="modal-footer"></div>
+          <div className="modal-body">
+            <ModalMatchingFailureUserProfile
+              profileImage=""
+              name="건드리면 짖는댕"
+              department="소프트웨어학과"
+              makeDate="03월 24일 18:52"
+            />
+          </div>
+          <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={() => onClose()}
+              />
+            </div>
+          </div>
         </div>
       </div>
     )

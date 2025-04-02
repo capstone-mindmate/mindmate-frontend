@@ -15,9 +15,6 @@ interface IconProps {
 const iconStyle = css`
   transition: transform 0.2s ease;
   cursor: pointer;
-  &:hover {
-    transform: scale(1.05);
-  }
 `
 
 const containerStyle = css`
@@ -65,7 +62,7 @@ export const BackIcon: React.FC<IconProps> = ({
 }) => (
   <div className="icon-container" css={containerStyle}>
     <svg
-      className={'alarm-icon ' + className}
+      className={'back-icon ' + className}
       width={width}
       height={height}
       viewBox="0 0 24 24"
