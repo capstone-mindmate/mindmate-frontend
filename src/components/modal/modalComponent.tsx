@@ -3,7 +3,7 @@ import { css } from '@emotion/react'
 import { CoinIcon, CloseIcon } from '../icon/iconComponents'
 import BrownRectButton from '../buttons/brownRectButton'
 import { ModalMatchingUserProfile } from './modalUserProfile'
-
+import YellowInputBox from '../inputs/yellowInputBox'
 interface ModalComponentProps {
   modalType: string
   buttonText: string
@@ -68,6 +68,15 @@ const modalStyles = {
     width: 100%;
     margin-top: 12px;
   `,
+
+  modalBody: css`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 12px 0;
+  `,
 }
 
 const ModalComponent = ({
@@ -90,7 +99,24 @@ const ModalComponent = ({
               makeDate="03월 24일 18:52"
             />
           </div>
-          <div className="modal-body"></div>
+          <div className="modal-body" css={modalStyles.modalBody}>
+            <YellowInputBox
+              placeholder="메시지를 입력해주세요"
+              value="진로 고민 들어주세요"
+              onChange={() => {}}
+              activeState={false}
+              isTitle={true}
+            />
+
+            <YellowInputBox
+              placeholder="메시지를 입력해주세요"
+              value="저 아주대 앞에서 붕어빵 팔아도 될까요? 친구들이 저 알아보면 어떻게 하죠???? 그건 두려운데 ㅠㅠ"
+              height={0}
+              onChange={() => {}}
+              activeState={false}
+              isTitle={false}
+            />
+          </div>
           <div className="modal-footer">
             <div className="coin-box" css={modalStyles.coinBox}>
               <div className="coin" css={modalStyles.coinWrapper}>
