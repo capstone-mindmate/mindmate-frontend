@@ -516,6 +516,8 @@ function App() {
             historyPoint={1000}
             historyBalance={1000}
             historyType="earn"
+            borderTop={false}
+            borderBottom={false}
           />
 
           <PointHistory
