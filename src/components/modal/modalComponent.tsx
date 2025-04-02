@@ -5,91 +5,133 @@ import BrownRectButton from '../buttons/brownRectButton'
 import { ModalMatchingUserProfile } from './modalUserProfile'
 import YellowInputBox from '../inputs/yellowInputBox'
 import GrayInputBox from '../inputs/grayInputBox'
+import { useEffect } from 'react'
+
 interface ModalComponentProps {
   modalType: string
   buttonText: string
   buttonClick: () => void
-}
-
-const modalStyles = {
-  container: css`
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgb(0 0 0 / 30%);
-    z-index: 1001;
-  `,
-  modalContent: css`
-    width: 342px;
-    height: auto;
-    padding: 16px 20px;
-    max-height: 500px;
-    background-color: #ffffff;
-    border-radius: 12px;
-  `,
-
-  closeBtn: css`
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    cursor: pointer;
-  `,
-
-  coinWrapper: css`
-    width: 22px;
-    height: 22px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    background-color: #f5f5f5;
-  `,
-
-  coinBox: css`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-  `,
-
-  coinText: css`
-    font-size: 12px;
-    line-height: 1.3;
-    color: #000000;
-    margin: 0;
-  `,
-
-  confirmBtn: css`
-    width: 100%;
-    margin-top: 12px;
-  `,
-
-  modalBody: css`
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin: 12px 0;
-  `,
+  isOpen: boolean
+  onClose: () => void
 }
 
 const ModalComponent = ({
   modalType = '매칭신청',
   buttonText = '닫기',
   buttonClick = () => {},
+  isOpen = false,
+  onClose = () => {},
 }: ModalComponentProps) => {
+  useEffect(() => {
+    if (isOpen) {
+      const scrollbarWidth =
+        window.innerWidth - document.documentElement.clientWidth
+
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+      document.body.style.overflow = 'hidden'
+    }
+
+    return () => {
+      document.body.style.paddingRight = ''
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
+  const modalStyles = {
+    container: css`
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgb(0 0 0 / 30%);
+      z-index: 1001;
+      backdrop-filter: blur(2px);
+    `,
+    modalContent: css`
+      width: 342px;
+      height: auto;
+      padding: 16px 20px 28px 16px;
+      max-height: 90vh;
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow-y: auto;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    `,
+
+    closeBtn: css`
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+    `,
+
+    coinWrapper: css`
+      width: 22px;
+      height: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      background-color: #f5f5f5;
+    `,
+
+    coinBox: css`
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    `,
+
+    coinText: css`
+      font-size: 12px;
+      line-height: 1.3;
+      color: #000000;
+      margin: 0;
+    `,
+
+    confirmBtn: css`
+      width: 100%;
+      margin-top: 12px;
+    `,
+
+    modalBody: css`
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 12px 0;
+    `,
+  }
+
   if (modalType === '매칭신청') {
     return (
-      <div className="container" css={modalStyles.container}>
-        <div className="modal-content" css={modalStyles.modalContent}>
-          <div className="close-btn" css={modalStyles.closeBtn}>
+      <div
+        className="container"
+        css={modalStyles.container}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose()
+          }
+        }}
+      >
+        <div
+          className="modal-content"
+          css={modalStyles.modalContent}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
             <CloseIcon color="#000000" width={24} height={24} />
           </div>
           <div className="modal-header">
@@ -134,7 +176,10 @@ const ModalComponent = ({
               <p css={modalStyles.coinText}>매칭 신청 시 50코인이 차감됩니다</p>
             </div>
             <div className="confirm-btn" css={modalStyles.confirmBtn}>
-              <BrownRectButton buttonText="매칭신청" buttonClick={() => {}} />
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={buttonClick}
+              />
             </div>
           </div>
         </div>
@@ -144,6 +189,15 @@ const ModalComponent = ({
     return (
       <div className="container" css={modalStyles.container}>
         <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
           <div className="modal-header"></div>
           <div className="modal-body"></div>
           <div className="modal-footer"></div>
@@ -154,6 +208,15 @@ const ModalComponent = ({
     return (
       <div className="container" css={modalStyles.container}>
         <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
           <div className="modal-header"></div>
           <div className="modal-body"></div>
           <div className="modal-footer"></div>

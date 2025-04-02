@@ -42,6 +42,7 @@ const handleInputChange = (value: string) => {
 function App() {
   const [count, setCount] = useState(0)
   const { showToast } = useToast()
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const handleBackClick = () => {
     showToast('뒤로가기 버튼이 클릭되었습니다', 'info')
@@ -53,6 +54,16 @@ function App() {
 
   const handleFrameClick = () => {
     showToast('프레임이 클릭되었습니다', 'info')
+  }
+
+  // 모달 닫기 전용 핸들러
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+  }
+
+  // 매칭 신청 버튼 클릭 핸들러
+  const handleMatchingRequest = () => {
+    // setIsModalOpen(false)
   }
 
   return (
@@ -418,31 +429,21 @@ function App() {
           >
             <BrownRoundButton
               buttonText="매칭방 모달 열기"
-              onActiveChange={(isActive) => {
-                console.log('버튼 상태 : ', isActive)
-              }}
-            />
-
-            <BrownRoundButton
-              buttonText="매칭 실패 모달"
-              onActiveChange={(isActive) => {
-                console.log('버튼 상태 : ', isActive)
-              }}
-            />
-
-            <BrownRoundButton
-              buttonText="채팅 종료 모달"
-              onActiveChange={(isActive) => {
-                console.log('버튼 상태 : ', isActive)
+              onActiveChange={() => {
+                setIsModalOpen(true)
               }}
             />
           </div>
 
-          <ModalComponent
-            modalType="매칭신청"
-            buttonText="매칭신청"
-            buttonClick={() => {}}
-          />
+          {isModalOpen && (
+            <ModalComponent
+              modalType="매칭신청"
+              buttonText="매칭 신청하기"
+              buttonClick={handleMatchingRequest}
+              onClose={handleModalClose}
+              isOpen={isModalOpen}
+            />
+          )}
         </div>
 
         <div className="navigation" style={{ width: '50%' }}>

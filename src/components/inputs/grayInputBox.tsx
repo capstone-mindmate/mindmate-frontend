@@ -28,6 +28,7 @@ const getTextareaStyle = (isTitle: boolean, height: number) => css`
   overflow-y: auto;
   font-family: inherit;
   box-sizing: border-box;
+  margin-top: 4px;
 `
 
 const inputBoxStyle = {
