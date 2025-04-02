@@ -75,7 +75,7 @@ const profileStyles = {
   `,
 }
 
-const ModalUserProfile = ({
+export const ModalMatchingUserProfile = ({
   profileImage = '',
   name,
   department,
@@ -99,5 +99,3 @@ const ModalUserProfile = ({
     </div>
   )
 }
-
-export default ModalUserProfile

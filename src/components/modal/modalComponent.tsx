@@ -2,7 +2,7 @@
 import { css } from '@emotion/react'
 import { CoinIcon, CloseIcon } from '../icon/iconComponents'
 import BrownRectButton from '../buttons/brownRectButton'
-import ModalUserProfile from './modalUserProfile'
+import { ModalMatchingUserProfile } from './modalUserProfile'
 
 interface ModalComponentProps {
   modalType: string
@@ -83,7 +83,7 @@ const ModalComponent = ({
             <CloseIcon color="#000000" width={24} height={24} />
           </div>
           <div className="modal-header">
-            <ModalUserProfile
+            <ModalMatchingUserProfile
               profileImage=""
               name="건드리면 짖는댕"
               department="소프트웨어학과"

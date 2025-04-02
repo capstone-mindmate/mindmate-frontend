@@ -6,7 +6,7 @@ import NavigationComponent from './components/navigation/navigationComponent'
 import { useToast } from './components/Toast/ToastProvider.tsx'
 import TopBar from './components/topbar/Topbar.tsx'
 import Frame from './components/frame/Frame'
-import InputBox from './components/buttons/inputBox'
+import TitleInputBox from './components/inputs/titleInputBox.tsx'
 import CategoryButton from './components/buttons/categoryButton'
 import ConfirmButton from './components/buttons/confirmButton'
 import BrownRoundButton from './components/buttons/brownRoundButton'
@@ -177,7 +177,7 @@ function App() {
         </div>
 
         <div className="buttons" style={{ width: '375px', margin: '30px 0' }}>
-          <InputBox
+          <TitleInputBox
             placeholder="텍스트를 입력해주세요"
             onChange={handleInputChange}
             titleText="타이틀 텍스트"
