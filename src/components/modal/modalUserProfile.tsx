@@ -5,7 +5,9 @@ interface ModalUserProfileProps {
   profileImage: string
   name: string
   department: string
-  makeDate: string
+  makeDate?: string
+  onBackClick?: () => void
+  showDetails?: boolean
 }
 
 const profileStyles = {
@@ -97,8 +99,8 @@ const profileStyles = {
 
   modalFailureRightBox: css``,
 
-  backIcon: css`
-    transform: rotate(-90deg);
+  backIcon: (showDetails: boolean = false) => css`
+    transform: rotate(${showDetails ? '90deg' : '-90deg'});
   `,
 }
 
@@ -131,7 +133,8 @@ export const ModalMatchingFailureUserProfile = ({
   profileImage = '',
   name,
   department,
-  makeDate,
+  onBackClick,
+  showDetails,
 }: ModalUserProfileProps) => {
   return (
     <div className="container" css={profileStyles.containerFailure}>
@@ -151,7 +154,10 @@ export const ModalMatchingFailureUserProfile = ({
       </div>
 
       <div className="rightBox" css={profileStyles.modalFailureRightBox}>
-        <BackIcon css={profileStyles.backIcon} />
+        <BackIcon
+          css={profileStyles.backIcon(showDetails)}
+          onClick={onBackClick}
+        />
       </div>
     </div>
   )

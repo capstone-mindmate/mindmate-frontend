@@ -8,7 +8,7 @@ import {
 } from './modalUserProfile'
 import YellowInputBox from '../inputs/yellowInputBox'
 import GrayInputBox from '../inputs/grayInputBox'
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 interface ModalComponentProps {
   modalType: string
@@ -25,6 +25,10 @@ const ModalComponent = ({
   isOpen = false,
   onClose = () => {},
 }: ModalComponentProps) => {
+  const [showDetails, setShowDetails] = useState(false)
+  const matchedInfoRef = useRef<HTMLDivElement>(null)
+  const [matchedInfoHeight, setMatchedInfoHeight] = useState(0)
+
   useEffect(() => {
     if (isOpen) {
       const scrollbarWidth =
@@ -34,11 +38,18 @@ const ModalComponent = ({
       document.body.style.overflow = 'hidden'
     }
 
+    if (showDetails && matchedInfoRef.current) {
+      const height = matchedInfoRef.current.scrollHeight
+      setMatchedInfoHeight(height)
+    } else {
+      setMatchedInfoHeight(0)
+    }
+
     return () => {
       document.body.style.paddingRight = ''
       document.body.style.overflow = ''
     }
-  }, [isOpen])
+  }, [isOpen, showDetails])
 
   const modalStyles = {
     container: css`
@@ -111,12 +122,63 @@ const ModalComponent = ({
       margin: 12px 0;
     `,
 
+    matchedInfoContainer: css`
+      width: 100%;
+      height: 0px;
+      overflow: hidden;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 12px 0;
+      transition: all 0.3s ease-in-out;
+    `,
+
     modalHeaderText: css`
       font-size: 18px;
       font-weight: bold;
       line-height: 1.4;
       text-align: center;
       color: #000000;
+    `,
+
+    matchedInfo: css`
+      height: 0;
+      overflow: hidden;
+      transition: all 0.3s ease-in-out;
+
+      &.expanded {
+        height: auto;
+        min-height: 200px;
+      }
+    `,
+    detailsContent: css`
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 12px 0;
+      opacity: 0;
+      transform: translateY(20px);
+      visibility: hidden;
+      transition: all 0.3s ease-in-out;
+    `,
+    visible: css`
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      visibility: visible !important;
+    `,
+    profileContent: css`
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.3s ease-in-out;
+
+      &.hidden {
+        opacity: 0;
+        transform: translateY(-20px);
+        visibility: hidden;
+      }
     `,
   }
 
@@ -207,14 +269,61 @@ const ModalComponent = ({
               다른 사람과 매칭을 시도해보세요!
             </p>
           </div>
-          <div className="modal-body">
-            <ModalMatchingFailureUserProfile
-              profileImage=""
-              name="건드리면 짖는댕"
-              department="소프트웨어학과"
-              makeDate="03월 24일 18:52"
-            />
+
+          <div className="modal-body" css={modalStyles.modalBody}>
+            <div css={[modalStyles.profileContent]}>
+              <ModalMatchingFailureUserProfile
+                profileImage=""
+                name="건드리면 짖는댕"
+                department="소프트웨어학과"
+                onBackClick={() => {
+                  showDetails ? setShowDetails(false) : setShowDetails(true)
+                }}
+                showDetails={showDetails}
+              />
+            </div>
+
+            <div
+              ref={matchedInfoRef}
+              css={css`
+                ${modalStyles.matchedInfo}
+                height: ${matchedInfoHeight}px;
+              `}
+            >
+              <div
+                css={[
+                  modalStyles.detailsContent,
+                  showDetails && modalStyles.visible,
+                ]}
+              >
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value="진로 고민 들어주세요"
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={true}
+                />
+
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value="저 아주대 앞에서 붕어빵 팔아도 될까요? 친구들이 저 알아보면 어떻게 하죠???? 그건 두려운데 ㅠㅠ"
+                  height={0}
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={false}
+                />
+
+                <GrayInputBox
+                  placeholder="상대방에게 전달하고 싶은 메시지를 입력해주세요"
+                  value=""
+                  height={100}
+                  onChange={() => {}}
+                  activeState={true}
+                />
+              </div>
+            </div>
           </div>
+
           <div className="modal-footer">
             <div className="confirm-btn" css={modalStyles.confirmBtn}>
               <BrownRectButton

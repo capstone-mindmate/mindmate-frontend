@@ -10,6 +10,7 @@ interface IconProps {
   strokeWidth?: number
   alertCount?: number
   fontSize?: number
+  onClick?: () => void
 }
 
 const iconStyle = css`
@@ -59,6 +60,7 @@ export const BackIcon: React.FC<IconProps> = ({
   color = '#000000',
   className = '',
   strokeWidth = 2,
+  onClick,
 }) => (
   <div className="icon-container" css={containerStyle}>
     <svg
@@ -69,6 +71,7 @@ export const BackIcon: React.FC<IconProps> = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       css={iconStyle}
+      onClick={onClick}
     >
       <path
         d="M15 6L9.3535  11.6464C9.15829 11.8417 9.15829 12.1583 9.35355 12.3536L15 18"
