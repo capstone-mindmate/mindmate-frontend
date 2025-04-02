@@ -6,7 +6,7 @@ exports[`Icon Snapshots > AlarmIcon matches snapshot 1`] = `
     class="icon-container css-1dts2m6"
   >
     <svg
-      class="alarm-icon css-jj5gyw"
+      class="alarm-icon css-122o3m0"
       fill="none"
       height="24"
       viewBox="0 0 24 24"
@@ -31,7 +31,7 @@ exports[`Icon Snapshots > SearchIcon with custom props matches snapshot 1`] = `
     class="icon-container css-1dts2m6"
   >
     <svg
-      class="search-icon css-jj5gyw"
+      class="search-icon css-122o3m0"
       fill="none"
       height="32"
       viewBox="0 0 24 24"
