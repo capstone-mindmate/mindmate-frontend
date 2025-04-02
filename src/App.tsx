@@ -23,6 +23,7 @@ import HomeCategoryButton from './components/home/homeCategoryButton.tsx'
 import ModalComponent from './components/modal/modalComponent'
 import InfoBox from './components/mypage/InfoBox'
 import MatchingGraph from './components/mypage/MatchingGraph'
+import PointHistory from './components/point/pointHistory'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -503,6 +504,27 @@ function App() {
               isOpen={isModalOpen}
             />
           )}
+        </div>
+
+        <div
+          className="pointHistory"
+          style={{ width: '375px', margin: '10px 0 100px 0' }}
+        >
+          <PointHistory
+            historyName="포인트 충전"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+          />
+
+          <PointHistory
+            historyName="포인트 사용"
+            historyDate="2025-01-16"
+            historyPoint={1000}
+            historyBalance={0}
+            historyType="use"
+          />
         </div>
 
         <div className="navigation" style={{ width: '50%' }}>
