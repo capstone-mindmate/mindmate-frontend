@@ -28,25 +28,6 @@ const getTextareaStyle = (isTitle: boolean, height: number) => css`
   overflow-y: auto;
   font-family: inherit;
   box-sizing: border-box;
-
-  /* 스크롤바 스타일링 */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #d9d9d9;
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #c0c0c0;
-  }
 `
 
 const inputBoxStyle = {

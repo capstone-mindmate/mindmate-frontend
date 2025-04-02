@@ -25,7 +25,7 @@ const getTextareaStyle = (isTitle: boolean, height: number) => css`
   transition: border-color 0.2s ease;
   color: #150c06;
   resize: none;
-  overflow-y: hidden;
+  overflow-y: auto;
   font-family: inherit;
   box-sizing: border-box;
 `
@@ -42,30 +42,36 @@ const inputBoxStyle = {
 const YellowInputBox: React.FC<YellowInputBoxProps> = ({
   placeholder,
   onChange,
-  value = '',
+  value: externalValue = '',
   activeState = true,
   height = 42,
   isTitle = false,
 }) => {
+  const [value, setValue] = useState(externalValue)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const adjustHeight = () => {
     const textarea = textareaRef.current
     if (textarea) {
-      textarea.style.height = 'auto' // 높이를 초기화
-      textarea.style.height = `${textarea.scrollHeight}px` // 스크롤 높이로 설정
+      textarea.style.height = 'auto'
+      textarea.style.height = `${textarea.scrollHeight}px`
     }
   }
 
-  // 초기 렌더링과 value 변경시 높이 조정
   useEffect(() => {
     adjustHeight()
-  }, [value])
+    setValue(externalValue)
+  }, [externalValue])
+
+  useEffect(() => {
+    adjustHeight()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value
-    onChange?.(newValue)
     adjustHeight()
+    setValue(newValue)
+    onChange?.(newValue)
   }
 
   return (
