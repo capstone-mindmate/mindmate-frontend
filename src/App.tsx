@@ -452,7 +452,14 @@ function App() {
             />
 
             <BrownRoundButton
-              buttonText="채팅종료 모달 열기"
+              buttonText="채팅종료 모달 열기 (디자인 필요)"
+              onActiveChange={() => {
+                handleOpenModal('채팅종료')
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="랜덤매칭 실패 (디자인 필요)"
               onActiveChange={() => {
                 handleOpenModal('채팅종료')
               }}
