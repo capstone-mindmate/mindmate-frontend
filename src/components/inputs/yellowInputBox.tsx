@@ -12,7 +12,7 @@ interface YellowInputBoxProps {
 }
 
 const getTextareaStyle = (isTitle: boolean, height: number) => css`
-  width: calc(100% - 24px);
+  width: 100%;
   min-height: ${height > 0 ? `${height}px` : 'auto'};
   border: 1px solid #f0daa9;
   outline: none;
