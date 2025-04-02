@@ -4,6 +4,7 @@ import { CoinIcon, CloseIcon } from '../icon/iconComponents'
 import BrownRectButton from '../buttons/brownRectButton'
 import { ModalMatchingUserProfile } from './modalUserProfile'
 import YellowInputBox from '../inputs/yellowInputBox'
+import GrayInputBox from '../inputs/grayInputBox'
 interface ModalComponentProps {
   modalType: string
   buttonText: string
@@ -115,6 +116,14 @@ const ModalComponent = ({
               onChange={() => {}}
               activeState={false}
               isTitle={false}
+            />
+
+            <GrayInputBox
+              placeholder="상대방에게 전달하고 싶은 메시지를 입력해주세요"
+              value=""
+              height={100}
+              onChange={() => {}}
+              activeState={true}
             />
           </div>
           <div className="modal-footer">
