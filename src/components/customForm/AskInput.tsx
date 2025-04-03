@@ -27,11 +27,13 @@ const askInputStyles = {
 
     &::placeholder {
       color: #a3a3a3;
+      transition: all 0.3s ease;
     }
 
     &:focus {
       outline: none;
       border-color: #f0daa9;
+      transition: all 0.3s ease;
     }
   `,
   closeButton: (hasValue: boolean) => css`
