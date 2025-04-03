@@ -24,6 +24,7 @@ import ModalComponent from './components/modal/modalComponent'
 import InfoBox from './components/mypage/InfoBox'
 import MatchingGraph from './components/mypage/MatchingGraph'
 import PointHistory from './components/point/pointHistory'
+import Bubble from './components/chat/Bubble'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -36,6 +37,23 @@ const iconListStyles = css`
   align-items: center;
   justify-content: center;
   gap: 10px;
+`
+
+const bubbleContainerStyles = css`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 375px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  margin: 20px 0;
+`
+
+const chatContainerStyles = css`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 `
 
 const handleInputChange = (value: string) => {
@@ -100,6 +118,61 @@ function App() {
           paddingTop: '70px', // TopBar 높이만큼 여백 추가
         }}
       >
+        <div css={bubbleContainerStyles}>
+          <Bubble
+            isMe={false}
+            profileImage="public/image.png"
+            timestamp="오후 3:42"
+            showTime={true}
+          >
+            아주대 앞에서 붕어빵 팔면 부자될까요?
+          </Bubble>
+
+          <Bubble isMe={true} timestamp="오후 3:43" showTime={true}>
+            저는 주로 한번에 5개는 먹어요
+          </Bubble>
+
+          <Bubble
+            isMe={false}
+            profileImage="public/image.png"
+            timestamp="오후 3:44"
+            showTime={true}
+          >
+            진짜 괜찮겠죠?,,ㅜ
+          </Bubble>
+
+          <Bubble isMe={true} timestamp="오후 3:45" showTime={true}>
+            최대 가로 길이는 이 말풍선 길이입니다
+          </Bubble>
+
+          <Bubble
+            isMe={false}
+            profileImage="public/image.png"
+            timestamp="오후 3:46"
+            showTime={true}
+          >
+            최대 가로 길이는 이 말풍선 길이입니다
+          </Bubble>
+
+          <Bubble
+            isMe={false}
+            timestamp="오후 3:46"
+            showTime={true}
+            isContinuous={true}
+          >
+            혹시 실례가 안된다면 한번에 붕어빵 몇개나 드시는지 궁금해요 꼭..
+          </Bubble>
+
+          <Bubble
+            isMe={true}
+            isLastMessage={true}
+            isRead={true}
+            isContinuous={false}
+          >
+            읽지 않음 상태도 표시됩니다
+          </Bubble>
+        </div>
+
         {/* InfoBox 컴포넌트 테스트 */}
         <div>
           <InfoBox averageScore={4.6} coins={500} matchCount={3} />
