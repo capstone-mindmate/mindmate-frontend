@@ -27,6 +27,8 @@ import PointHistory from './components/point/pointHistory'
 import Bubble from './components/chat/Bubble'
 import CustomFormBubbleSend from './components/chat/CustomFormBubbleSend'
 import CustomFormBubbleReceive from './components/chat/CustomFormBubbleReceive'
+import AskInput from './components/customForm/AskInput'
+import AnswerInput from './components/customForm/AnswerInput'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -254,7 +256,6 @@ function App() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'c햣enter',
-            height: '100%',
             paddingTop: '70px', // TopBar 높이만큼 여백 추가
           }}
         >
@@ -757,6 +758,24 @@ function App() {
               historyBalance={0}
               historyType="use"
             />
+          </div>
+
+          <div
+            className="customFormContent"
+            style={{
+              width: '375px',
+              padding: '30px 0',
+              marginBottom: '100px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '3rem',
+            }}
+          >
+            <AskInput
+              placeHolder="질문을 입력해주세요"
+              onCloseBtnClick={() => {}}
+            />
+            <AnswerInput title="한 직업을 평생 할 수 있다고 생각하시나요?" />
           </div>
 
           <div className="navigation" style={{ width: '50%' }}>
