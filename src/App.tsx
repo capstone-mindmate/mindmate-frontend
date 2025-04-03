@@ -28,6 +28,9 @@ import Bubble from './components/chat/Bubble'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
+import EmoticonComponent, {
+  EmoticonType,
+} from './components/emoticon/Emoticon.tsx'
 
 const iconListStyles = css`
   width: 100%;
@@ -50,12 +53,6 @@ const bubbleContainerStyles = css`
   margin: 20px 0;
 `
 
-const chatContainerStyles = css`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`
-
 const handleInputChange = (value: string) => {
   console.log('input 박스 값 변경되는가?? : ', value)
 }
@@ -63,6 +60,8 @@ const handleInputChange = (value: string) => {
 function App() {
   const [count, setCount] = useState(0)
   const { showToast } = useToast()
+  const [selectedEmoticon, setSelectedEmoticon] =
+    useState<EmoticonType>('normal')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalType, setModalType] = useState<
     '매칭신청' | '매칭실패' | '채팅종료'
@@ -97,6 +96,30 @@ function App() {
     setIsModalOpen(true)
   }
 
+  // 이모티콘 클릭 핸들러
+  const handleEmoticonClick = (type: EmoticonType) => {
+    setSelectedEmoticon(type)
+    showToast(`${type} 이모티콘 선택됨`, 'success')
+  }
+
+  // 모든 이모티콘 타입 배열
+  const allEmoticonTypes: EmoticonType[] = [
+    'normal',
+    'love',
+    'music',
+    'sad',
+    'angry',
+    'couple',
+    'default',
+    'talking',
+    'thumbsUp',
+    'student',
+    'graduate',
+    'hoodie',
+    'study',
+    'thanks',
+  ]
+
   return (
     <>
       <GlobalStyles />
@@ -107,6 +130,118 @@ function App() {
         actionText="등록"
         onActionClick={handleAction}
       />
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '70px 20px 50px',
+        }}
+      >
+        {/* 이모티콘 테스트 섹션 */}
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '480px',
+            padding: '20px',
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            marginBottom: '30px',
+          }}
+        >
+          <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
+            이모티콘 테스트
+          </h2>
+
+          {/* 이모티콘 그리드 */}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '15px',
+              justifyContent: 'center',
+              marginBottom: '20px',
+            }}
+          >
+            {allEmoticonTypes.map((type) => (
+              <div key={type} style={{ textAlign: 'center' }}>
+                <EmoticonComponent
+                  type={type}
+                  size="small"
+                  onClick={() => handleEmoticonClick(type)}
+                  alt={`${type} 이모티콘`}
+                />
+                <div style={{ fontSize: '12px', marginTop: '5px' }}>{type}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* 선택된 이모티콘 */}
+          <div
+            style={{
+              marginTop: '20px',
+              padding: '15px',
+              borderTop: '1px solid #eee',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <p style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+              선택된 이모티콘:
+            </p>
+            <EmoticonComponent
+              type={selectedEmoticon}
+              size="large"
+              alt={`선택된 ${selectedEmoticon} 이모티콘`}
+            />
+            <p style={{ marginTop: '10px' }}>{selectedEmoticon}</p>
+          </div>
+        </div>
+
+        {/* 기존 버블 컨테이너 */}
+        <div css={bubbleContainerStyles}>
+          <Bubble
+            isMe={false}
+            profileImage="public/image.png"
+            timestamp="오후 3:42"
+            showTime={true}
+          >
+            이모티콘을 보내드릴게요!
+          </Bubble>
+
+          <Bubble
+            isMe={false}
+            profileImage="public/image.png"
+            timestamp="오후 3:42"
+            showTime={false}
+            isContinuous={true}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '5px',
+              }}
+            >
+              <EmoticonComponent
+                type={selectedEmoticon}
+                size="large"
+                inChat={true}
+                alt={`${selectedEmoticon} 이모티콘`}
+              />
+            </div>
+          </Bubble>
+
+          <Bubble isMe={true} timestamp="오후 3:43" showTime={true}>
+            감사합니다!
+          </Bubble>
+        </div>
+
+        {/* 여기서부터는 기존 코드... */}
+      </div>
 
       <div
         style={{

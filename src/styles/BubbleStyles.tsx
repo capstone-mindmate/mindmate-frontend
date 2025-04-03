@@ -2,12 +2,13 @@ import styled from '@emotion/styled'
 
 interface BubbleContainerProps {
   isMe: boolean
+  isEmoticon?: boolean
 }
 
 export const BubbleContainer = styled.div<BubbleContainerProps>`
   display: inline-block;
-  max-width: 64.2%;
-  padding: 10px 18px;
+  max-width: ${(props) => (props.isEmoticon ? 'none' : '64.2%')};
+  padding: ${(props) => (props.isEmoticon ? '0px' : '10px 18px')};
   margin: 0;
   border-radius: ${(props) =>
     props.isMe ? '15px 15px 0 15px' : '15px 15px 15px 0'};
@@ -16,7 +17,8 @@ export const BubbleContainer = styled.div<BubbleContainerProps>`
   font-size: 14px;
   line-height: 1.2;
   color: #000000;
-  background-color: ${(props) => (props.isMe ? '#FEECC4' : '#E8E8E8')};
+  background-color: ${(props) =>
+    props.isEmoticon ? 'none' : props.isMe ? '#FEECC4' : '#E8E8E8'};
   position: relative;
   word-break: break-word;
 `
@@ -24,11 +26,19 @@ export const BubbleContainer = styled.div<BubbleContainerProps>`
 export const BubbleWrapper = styled.div<{
   isMe: boolean
   isContinuous?: boolean
+  isEmoticon?: boolean
 }>`
   display: flex;
   width: 100%;
   justify-content: ${(props) => (props.isMe ? 'flex-end' : 'flex-start')};
-  margin: ${(props) => (props.isContinuous ? '0px 0px 10px 0px' : '10px 0px')};
+  margin: ${(props) => {
+    if (props.isContinuous) {
+      // 이모티콘이면서 연속된 메시지인 경우 위쪽 마진 줄이기
+      return props.isEmoticon ? '0px 0px 10px 0px' : '0px 0px 10px 0px'
+    }
+    // 일반 메시지일 경우 기본 마진 유지
+    return '10px 0px'
+  }};
   align-items: flex-start;
 `
 
@@ -65,9 +75,15 @@ export const ReadStatus = styled.span`
   margin: 0 4px;
 `
 
-export const MessageContainer = styled.div<{ isMe: boolean }>`
+export const MessageContainer = styled.div<{
+  isMe: boolean
+  isEmoticon?: boolean
+}>`
   display: flex;
   flex-direction: ${(props) => (props.isMe ? 'row-reverse' : 'row')};
   align-items: flex-end;
-  width: ${(props) => (props.isMe ? '100%' : 'calc(100% - 44px)')};
+  width: ${(props) => {
+    if (props.isEmoticon) return 'auto'
+    return props.isMe ? '100%' : 'calc(100% - 44px)'
+  }};
 `
