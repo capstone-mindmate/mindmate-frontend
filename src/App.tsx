@@ -26,6 +26,7 @@ import MatchingGraph from './components/mypage/MatchingGraph'
 import PointHistory from './components/point/pointHistory'
 import Bubble from './components/chat/Bubble'
 import CustomFormBubbleSend from './components/chat/CustomFormBubbleSend'
+import CustomFormBubbleReceive from './components/chat/CustomFormBubbleReceive'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -313,6 +314,13 @@ function App() {
 
             <CustomFormBubbleSend
               isMe={true}
+              isLastMessage={true}
+              isRead={true}
+              isContinuous={false}
+            />
+
+            <CustomFormBubbleReceive
+              isMe={false}
               isLastMessage={true}
               isRead={true}
               isContinuous={false}
