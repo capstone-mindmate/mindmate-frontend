@@ -27,6 +27,7 @@ import PointHistory from './components/point/pointHistory'
 import Bubble from './components/chat/Bubble'
 import CustomFormBubbleSend from './components/chat/CustomFormBubbleSend'
 import CustomFormBubbleReceive from './components/chat/CustomFormBubbleReceive'
+import AskInput from './components/customForm/AskInput'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
@@ -756,6 +757,16 @@ function App() {
               historyPoint={1000}
               historyBalance={0}
               historyType="use"
+            />
+          </div>
+
+          <div
+            className="customFormContent"
+            style={{ width: '375px', padding: '30px 0' }}
+          >
+            <AskInput
+              placeHolder="질문을 입력해주세요"
+              onCloseBtnClick={() => {}}
             />
           </div>
 
