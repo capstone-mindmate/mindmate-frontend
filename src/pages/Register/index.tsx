@@ -1,11 +1,16 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
 import DepartmentAndAdmission from './steps/DepartmentAndAdmission'
+import NickNameAndProfile from './steps/NickNameAndProfile'
+import InitialCategorySetting from './steps/InitialCategorySetting'
 
 // 회원 상태 타입 신규(NEW) 재방문(REVISITING)
 type UserStatus = 'NEW' | 'REVISITING'
 
-type RegisterStep = 'DEPARTMENT_AND_ADMISSION'
+type RegisterStep =
+  | 'DEPARTMENT_AND_ADMISSION'
+  | 'NICKNAME_AND_PROFILE'
+  | 'INITIAL_CATEGORY_SETTING'
 
 const Register = () => {
   const [currentStep, setCurrentStep] = useState<RegisterStep>(
@@ -34,7 +39,11 @@ const Register = () => {
   }
 
   const goToPrevStep = () => {
-    const stepOrder: RegisterStep[] = ['DEPARTMENT_AND_ADMISSION']
+    const stepOrder: RegisterStep[] = [
+      'DEPARTMENT_AND_ADMISSION',
+      'NICKNAME_AND_PROFILE',
+      'INITIAL_CATEGORY_SETTING',
+    ]
 
     const currentIndex = stepOrder.indexOf(currentStep)
     if (currentIndex > 0) {
@@ -61,6 +70,10 @@ const Register = () => {
     switch (currentStep) {
       case 'DEPARTMENT_AND_ADMISSION':
         return <DepartmentAndAdmission />
+      case 'NICKNAME_AND_PROFILE':
+        return <NickNameAndProfile />
+      case 'INITIAL_CATEGORY_SETTING':
+        return <InitialCategorySetting />
     }
   }
 
