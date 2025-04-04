@@ -28,6 +28,7 @@ import CustomFormBubbleReceive from '../../components/chat/CustomFormBubbleRecei
 import ChatBar from '../../components/chat/ChatBar'
 import AskInput from '../../components/customForm/AskInput'
 import AnswerInput from '../../components/customForm/AnswerInput'
+import TagReview from '../../components/review/TagReview.tsx'
 import EmoticonComponent, {
   EmoticonType,
 } from '../../components/emoticon/Emoticon.tsx'
@@ -58,6 +59,16 @@ const bubbleContainerStyles = css`
   border-radius: 10px;
   margin: 20px 0;
 `
+
+// TagReview 테스트 데이터
+const reviewTags = [
+  { icon: '⚡', text: '응답이 빨라요', count: 12 },
+  { icon: '🤝', text: '신뢰할 수 있는 대화였어요', count: 9 },
+  { icon: '❤️', text: '공감을 잘해줘요', count: 8 },
+  { icon: '☕', text: '편안한 분위기에서 이야기할 수 있었어요', count: 6 },
+  { icon: '🎯', text: '솔직하고 현실적인 조언을 해줘요', count: 3 },
+  { icon: '💡', text: '새로운 관점을 제시해줘요', count: 1 },
+]
 
 const handleInputChange = (value: string) => {
   console.log('input 박스 값 변경되는가?? : ', value)
@@ -145,6 +156,12 @@ function App() {
             padding: '70px 20px 50px',
           }}
         >
+          {/* TagReview 컴포넌트 테스트 */}
+          <div
+            style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
+          >
+            <TagReview tags={reviewTags} />
+          </div>
           {/* 이모티콘 테스트 섹션 */}
           <div
             style={{
@@ -243,8 +260,6 @@ function App() {
               감사합니다!
             </Bubble>
           </div>
-
-          {/* 여기서부터는 기존 코드... */}
         </div>
 
         <div
