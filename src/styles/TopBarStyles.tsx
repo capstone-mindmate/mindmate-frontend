@@ -9,7 +9,7 @@ export const TopBarContainer = styled.div`
   align-items: center;
   background-color: #ffffff;
   border-bottom: 1px solid #eeeeee;
-  position: sticky; /* fixed 대신 sticky 사용 */
+  position: sticky;
   top: 0;
   z-index: 5000;
 `
