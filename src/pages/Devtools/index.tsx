@@ -1,43 +1,43 @@
-import './devtools.css'
-import * as IconComponents from '../../components/icon/iconComponents.tsx'
-import { GlobalStyles } from '../../../styles/GlobalStyles.tsx'
-import NavigationComponent from '../../components/navigation/navigationComponent.tsx'
+import '../../App.css'
+import * as IconComponents from '../../components/icon/iconComponents'
+import NavigationComponent from '../../components/navigation/navigationComponent'
 import { useToast } from '../../components/toast/ToastProvider.tsx'
 import TopBar from '../../components/topbar/Topbar.tsx'
-import Frame from '../../components/frame/Frame.tsx'
+import Frame from '../../components/frame/Frame'
 import TitleInputBox from '../../components/inputs/titleInputBox.tsx'
-import CategoryButton from '../../components/buttons/categoryButton.tsx'
-import ConfirmButton from '../../components/buttons/confirmButton.tsx'
-import BrownRoundButton from '../../components/buttons/brownRoundButton.tsx'
-import YellowRoundButton from '../../components/buttons/yellowRoundButton.tsx'
-import FilterButton from '../../components/buttons/filterButton.tsx'
-import FloatingButton from '../../components/buttons/floatingButton.tsx'
-import PurchaseButton from '../../components/buttons/purchaseButton.tsx'
-import {
-  ReportButton,
-  ReportItem,
-} from '../../components/buttons/reportButton.tsx'
-import ReviewButton from '../../components/buttons/reviewButton.tsx'
-import ProgressBar from '../../components/buttons/progressBar.tsx'
-import BrownRectButton from '../../components/buttons/brownRectButton.tsx'
-import CardNewsComponent from '../../components/home/cardNewsComponent.tsx'
+import CategoryButton from '../../components/buttons/categoryButton'
+import ConfirmButton from '../../components/buttons/confirmButton'
+import BrownRoundButton from '../../components/buttons/brownRoundButton'
+import YellowRoundButton from '../../components/buttons/yellowRoundButton'
+import FilterButton from '../../components/buttons/filterButton'
+import FloatingButton from '../../components/buttons/floatingButton'
+import PurchaseButton from '../../components/buttons/purchaseButton'
+import { ReportButton, ReportItem } from '../../components/buttons/reportButton'
+import ReviewButton from '../../components/buttons/reviewButton'
+import ProgressBar from '../../components/buttons/progressBar'
+import BrownRectButton from '../../components/buttons/brownRectButton'
+import CardNewsComponent from '../../components/home/cardNewsComponent'
 import HomeCategoryButton from '../../components/home/homeCategoryButton.tsx'
-import ModalComponent from '../../components/modal/modalComponent.tsx'
-import InfoBox from '../../components/mypage/InfoBox.tsx'
-import MatchingGraph from '../../components/mypage/MatchingGraph.tsx'
-import PointHistory from '../../components/point/pointHistory.tsx'
-import Bubble from '../../components/chat/Bubble.tsx'
-import CustomFormBubbleSend from '../../components/chat/CustomFormBubbleSend.tsx'
-import CustomFormBubbleReceive from '../../components/chat/CustomFormBubbleReceive.tsx'
-import AskInput from '../../components/customForm/AskInput.tsx'
-import AnswerInput from '../../components/customForm/AnswerInput.tsx'
-/** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react'
-import { useState } from 'react'
+import ModalComponent from '../../components/modal/modalComponent'
+import InfoBox from '../../components/mypage/InfoBox'
+import MatchingGraph from '../../components/mypage/MatchingGraph'
+import PointHistory from '../../components/point/pointHistory'
+import Bubble from '../../components/chat/Bubble'
+import CustomFormBubbleSend from '../../components/chat/CustomFormBubbleSend'
+import CustomFormBubbleReceive from '../../components/chat/CustomFormBubbleReceive'
+import ChatBar from '../../components/chat/ChatBar'
+import AskInput from '../../components/customForm/AskInput'
+import AnswerInput from '../../components/customForm/AnswerInput'
 import EmoticonComponent, {
   EmoticonType,
 } from '../../components/emoticon/Emoticon.tsx'
+import React, { useState } from 'react'
 
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react'
+
+// styles 경로 변환
+import { GlobalStyles } from '../../../styles/GlobalStyles'
 const iconListStyles = css`
   width: 100%;
   display: flex;
@@ -63,7 +63,7 @@ const handleInputChange = (value: string) => {
   console.log('input 박스 값 변경되는가?? : ', value)
 }
 
-function Devtools() {
+function App() {
   const [count, setCount] = useState(0)
   const { showToast } = useToast()
   const [selectedEmoticon, setSelectedEmoticon] =
@@ -137,7 +137,6 @@ function Devtools() {
           actionText="등록"
           onActionClick={handleAction}
         />
-
         <div
           style={{
             display: 'flex',
@@ -158,10 +157,6 @@ function Devtools() {
               marginBottom: '30px',
             }}
           >
-            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
-              이모티콘 테스트
-            </h2>
-
             {/* 이모티콘 그리드 */}
             <div
               style={{
@@ -779,7 +774,7 @@ function Devtools() {
             />
             <AnswerInput title="한 직업을 평생 할 수 있다고 생각하시나요?" />
           </div>
-
+          <ChatBar onSendMessage={(msg) => console.log('보낸 메시지:', msg)} />
           <div className="navigation" style={{ width: '50%' }}>
             <div style={{ paddingBottom: '60px' }}>
               <NavigationComponent />
@@ -791,4 +786,4 @@ function Devtools() {
   )
 }
 
-export default Devtools
+export default App

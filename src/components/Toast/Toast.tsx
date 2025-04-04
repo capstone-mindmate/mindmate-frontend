@@ -5,7 +5,7 @@ import {
   MessageText,
   CloseButton,
 } from '../../styles/ToastStyles.tsx'
-import { ToastType } from '../toast/ToastProvider.tsx'
+import { ToastType } from './ToastProvider.tsx'
 import {
   InfoIcon,
   ErrorIcon,
@@ -29,7 +29,6 @@ const getTypeColor = (type: ToastType): string => {
       return '#1B5BFE'
   }
 }
-
 
 // 토스트 타입별 아이콘 컴포넌트
 const ToastIcon = ({ type }: { type: ToastType }) => {

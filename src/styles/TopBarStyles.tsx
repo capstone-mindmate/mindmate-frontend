@@ -9,7 +9,9 @@ export const TopBarContainer = styled.div`
   align-items: center;
   background-color: #ffffff;
   border-bottom: 1px solid #eeeeee;
-  position: relative;
+  position: sticky; /* fixed 대신 sticky 사용 */
+  top: 0;
+  z-index: 5000;
 `
 
 // 페이지 제목 스타일 (body2_re)
