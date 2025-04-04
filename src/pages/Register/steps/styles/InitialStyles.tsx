@@ -39,8 +39,8 @@ export const RegisterSubTitle = styled.p`
 export const RegisterInputContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 24px;
+  gap: 24px;
+  margin-top: 48px;
 `
 
 export const RegisterImageContainer = styled.div``
@@ -49,4 +49,8 @@ export const RegisterImage = css``
 
 export const RegisterCategoryContainer = styled.div``
 
-export const RegisterConfirmButtonContainer = styled.div``
+export const RegisterConfirmButtonContainer = styled.div`
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+`

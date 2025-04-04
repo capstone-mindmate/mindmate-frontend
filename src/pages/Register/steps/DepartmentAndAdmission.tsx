@@ -4,9 +4,10 @@ import {
   RegisterTitle,
   RegisterTitleContainer,
   RegisterInputContainer,
+  RegisterConfirmButtonContainer,
 } from './styles/InitialStyles'
 import TitleSelectBox from '../../../components/inputs/titleSelectBox'
-
+import BrownRectButton from '../../../components/buttons/brownRectButton'
 const handleInputChange = (value: string) => {}
 
 const DepartmentAndAdmission = () => {
@@ -34,6 +35,10 @@ const DepartmentAndAdmission = () => {
           options={['2020', '2021', '2022']}
         />
       </RegisterInputContainer>
+
+      <RegisterConfirmButtonContainer>
+        <BrownRectButton buttonText="다음" onClick={() => {}} />
+      </RegisterConfirmButtonContainer>
     </RegisterContainer>
   )
 }
