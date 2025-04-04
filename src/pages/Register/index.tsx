@@ -3,8 +3,15 @@ import { useState, useEffect } from 'react'
 import DepartmentAndAdmission from './steps/DepartmentAndAdmission'
 import NickNameAndProfile from './steps/NickNameAndProfile'
 import InitialCategorySetting from './steps/InitialCategorySetting'
-
-import { RegisterContainer, RegisterStepContainer } from './style'
+import {
+  RegisterContainer,
+  RegisterStepContainer,
+  StepIndicatorContainer,
+  StepDot,
+  RegisterNavBar,
+  RootContainer,
+} from './style'
+import { BackIcon } from '../../components/icon/iconComponents'
 
 // 회원 상태 타입 신규(NEW) 재방문(REVISITING)
 type UserStatus = 'NEW' | 'REVISITING'
@@ -13,6 +20,22 @@ type RegisterStep =
   | 'DEPARTMENT_AND_ADMISSION'
   | 'NICKNAME_AND_PROFILE'
   | 'INITIAL_CATEGORY_SETTING'
+
+const StepIndicator = ({ currentStep }: { currentStep: RegisterStep }) => {
+  const steps: RegisterStep[] = [
+    'DEPARTMENT_AND_ADMISSION',
+    'NICKNAME_AND_PROFILE',
+    'INITIAL_CATEGORY_SETTING',
+  ]
+
+  return (
+    <StepIndicatorContainer>
+      {steps.map((step, index) => (
+        <StepDot key={step} isActive={currentStep === step} />
+      ))}
+    </StepIndicatorContainer>
+  )
+}
 
 const Register = () => {
   const [currentStep, setCurrentStep] = useState<RegisterStep>(
@@ -80,9 +103,16 @@ const Register = () => {
   }
 
   return (
-    <RegisterContainer>
-      <RegisterStepContainer>{renderStep()}</RegisterStepContainer>
-    </RegisterContainer>
+    <RootContainer>
+      <RegisterContainer>
+        <RegisterNavBar>
+          <BackIcon />
+          <StepIndicator currentStep={currentStep} />
+        </RegisterNavBar>
+
+        <RegisterStepContainer>{renderStep()}</RegisterStepContainer>
+      </RegisterContainer>
+    </RootContainer>
   )
 }
 
