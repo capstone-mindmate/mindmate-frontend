@@ -1,11 +1,70 @@
 /** @jsxImportSource @emotion/react */
-import { useNavigate } from 'react-router-dom'
-// import { registerStyles } from './styles'
+import { useState, useEffect } from 'react'
+import DepartmentAndAdmission from './steps/DepartmentAndAdmission'
+
+// 회원 상태 타입 신규(NEW) 재방문(REVISITING)
+type UserStatus = 'NEW' | 'REVISITING'
+
+type RegisterStep = 'DEPARTMENT_AND_ADMISSION'
 
 const Register = () => {
-  //   const navigate = useNavigate()
+  const [currentStep, setCurrentStep] = useState<RegisterStep>(
+    'DEPARTMENT_AND_ADMISSION'
+  )
+  // 사용자 상태 확인 신규인지 재방문 인지 <- 백이랑 얘기
+  const [userStatus, setUserStatus] = useState<UserStatus>('NEW')
 
-  return <div>Register</div>
+  // 회원가입 데이터 상태 관리
+  const [registerData, setRegisterData] = useState({
+    // 추가하기
+  })
+
+  // 다음 단계로 이동하는 함수
+  const goToNextStep = (data?: any) => {
+    const stepOrder: RegisterStep[] = ['DEPARTMENT_AND_ADMISSION']
+
+    const currentIndex = stepOrder.indexOf(currentStep)
+    if (currentIndex < stepOrder.length - 1) {
+      // 데이터가 있으면 상태 업데이트
+      if (data) {
+        setRegisterData((prev) => ({ ...prev, ...data }))
+      }
+      setCurrentStep(stepOrder[currentIndex + 1])
+    }
+  }
+
+  const goToPrevStep = () => {
+    const stepOrder: RegisterStep[] = ['DEPARTMENT_AND_ADMISSION']
+
+    const currentIndex = stepOrder.indexOf(currentStep)
+    if (currentIndex > 0) {
+      setCurrentStep(stepOrder[currentIndex - 1])
+    }
+  }
+
+  // 회원 상태에 따른 시작 화면 설정
+  useEffect(() => {
+    switch (userStatus) {
+      case 'NEW':
+        setCurrentStep('DEPARTMENT_AND_ADMISSION')
+        break
+      case 'REVISITING':
+        // 홈화면으로 보내
+        break
+      default:
+        setCurrentStep('DEPARTMENT_AND_ADMISSION')
+    }
+  }, [userStatus])
+
+  // 현재 단계에 따른 컴포넌트 렌더링
+  const renderStep = () => {
+    switch (currentStep) {
+      case 'DEPARTMENT_AND_ADMISSION':
+        return <DepartmentAndAdmission />
+    }
+  }
+
+  return <div>{renderStep()}</div>
 }
 
 export default Register
