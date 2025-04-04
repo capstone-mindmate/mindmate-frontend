@@ -4,6 +4,8 @@ import DepartmentAndAdmission from './steps/DepartmentAndAdmission'
 import NickNameAndProfile from './steps/NickNameAndProfile'
 import InitialCategorySetting from './steps/InitialCategorySetting'
 
+import { RegisterContainer, RegisterStepContainer } from './style'
+
 // 회원 상태 타입 신규(NEW) 재방문(REVISITING)
 type UserStatus = 'NEW' | 'REVISITING'
 
@@ -77,7 +79,11 @@ const Register = () => {
     }
   }
 
-  return <div>{renderStep()}</div>
+  return (
+    <RegisterContainer>
+      <RegisterStepContainer>{renderStep()}</RegisterStepContainer>
+    </RegisterContainer>
+  )
 }
 
 export default Register
