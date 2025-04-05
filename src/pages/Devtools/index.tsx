@@ -29,6 +29,7 @@ import ChatBar from '../../components/chat/ChatBar'
 import AskInput from '../../components/customForm/AskInput'
 import AnswerInput from '../../components/customForm/AnswerInput'
 import TagReview from '../../components/review/TagReview.tsx'
+import DetailReview from '../../components/review/DetailReview'
 import EmoticonComponent, {
   EmoticonType,
 } from '../../components/emoticon/Emoticon.tsx'
@@ -161,6 +162,31 @@ function App() {
             style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
           >
             <TagReview tags={reviewTags} />
+          </div>
+
+          {/* DetailReview 컴포넌트 테스트 */}
+          <div
+            style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
+          >
+            <DetailReview
+              reviews={[
+                {
+                  profileImage: '/public/image.png',
+                  username: '건들면 짖는댕',
+                  rating: 4.0,
+                  date: '25.03.28',
+                  content: '응답이 엄청 빨랐어요! 대화 재밌었어요 ㅎ ㅎ',
+                },
+                {
+                  profileImage: '/public/image copy.png',
+                  username: '말하고 싶어라',
+                  rating: 3.5,
+                  date: '25.03.28',
+                  content: '공감 천재세요',
+                },
+              ]}
+              onViewAllClick={() => console.log('전체보기 클릭됨')}
+            />
           </div>
           {/* 이모티콘 테스트 섹션 */}
           <div
