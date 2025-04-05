@@ -30,6 +30,7 @@ import AskInput from '../../components/customForm/AskInput'
 import AnswerInput from '../../components/customForm/AnswerInput'
 import TagReview from '../../components/review/TagReview.tsx'
 import DetailReview from '../../components/review/DetailReview'
+import Star from '../../components/review/Star.tsx'
 import EmoticonComponent, {
   EmoticonType,
 } from '../../components/emoticon/Emoticon.tsx'
@@ -85,6 +86,9 @@ function App() {
     '매칭신청' | '매칭실패' | '채팅종료'
   >('매칭신청')
 
+  // 별점 상태
+  const [selectedRating, setSelectedRating] = useState(4)
+
   const handleBackClick = () => {
     showToast('뒤로가기 버튼이 클릭되었습니다', 'info')
   }
@@ -118,6 +122,12 @@ function App() {
   const handleEmoticonClick = (type: EmoticonType) => {
     setSelectedEmoticon(type)
     showToast(`${type} 이모티콘 선택됨`, 'success')
+  }
+
+  // 별점 변경 핸들러
+  const handleRatingChange = (rating: number) => {
+    setSelectedRating(rating)
+    showToast(`${rating}점을 선택하셨습니다`, 'info')
   }
 
   // 모든 이모티콘 타입 배열
@@ -157,6 +167,30 @@ function App() {
             padding: '70px 20px 50px',
           }}
         >
+          {/* Star 컴포넌트 테스트 */}
+          <div
+            style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
+          >
+            <h2
+              style={{
+                fontFamily: 'Pretendard, sans-serif',
+                fontWeight: 'bold',
+                fontSize: '18px',
+                marginBottom: '20px',
+              }}
+            >
+              별점 컴포넌트
+            </h2>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '15px',
+              }}
+            >
+              <Star 별점={selectedRating} onChange={handleRatingChange} />
+            </div>
+          </div>
           {/* TagReview 컴포넌트 테스트 */}
           <div
             style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
