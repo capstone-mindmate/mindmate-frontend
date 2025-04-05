@@ -10,7 +10,11 @@ import TitleSelectBox from '../../../components/inputs/titleSelectBox'
 import BrownRectButton from '../../../components/buttons/brownRectButton'
 import { useState, useEffect } from 'react'
 
-const DepartmentAndAdmission = () => {
+const DepartmentAndAdmission = ({
+  goToNextStep,
+}: {
+  goToNextStep: () => void
+}) => {
   const [isEnabled, setIsEnabled] = useState(false)
   const [selectedDepartment, setSelectedDepartment] = useState('')
   const [selectedYear, setSelectedYear] = useState('')
@@ -25,6 +29,12 @@ const DepartmentAndAdmission = () => {
 
   const handleYearChange = (value: string) => {
     setSelectedYear(value)
+  }
+
+  const handleNextStep = () => {
+    if (isEnabled) {
+      goToNextStep()
+    }
   }
 
   return (
@@ -56,7 +66,7 @@ const DepartmentAndAdmission = () => {
         <BrownRectButton
           isEnabled={isEnabled}
           buttonText="다음"
-          onActiveChange={() => {}}
+          onActiveChange={handleNextStep}
         />
       </RegisterConfirmButtonContainer>
     </RegisterContainer>

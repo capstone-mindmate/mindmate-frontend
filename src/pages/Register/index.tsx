@@ -51,7 +51,11 @@ const Register = () => {
 
   // 다음 단계로 이동하는 함수
   const goToNextStep = (data?: any) => {
-    const stepOrder: RegisterStep[] = ['DEPARTMENT_AND_ADMISSION']
+    const stepOrder: RegisterStep[] = [
+      'DEPARTMENT_AND_ADMISSION',
+      'NICKNAME_AND_PROFILE',
+      'INITIAL_CATEGORY_SETTING',
+    ]
 
     const currentIndex = stepOrder.indexOf(currentStep)
     if (currentIndex < stepOrder.length - 1) {
@@ -94,9 +98,9 @@ const Register = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 'DEPARTMENT_AND_ADMISSION':
-        return <DepartmentAndAdmission />
+        return <DepartmentAndAdmission goToNextStep={goToNextStep} />
       case 'NICKNAME_AND_PROFILE':
-        return <NickNameAndProfile />
+        return <NickNameAndProfile goToNextStep={goToNextStep} />
       case 'INITIAL_CATEGORY_SETTING':
         return <InitialCategorySetting />
     }
