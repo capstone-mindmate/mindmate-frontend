@@ -31,6 +31,8 @@ import AnswerInput from '../../components/customForm/AnswerInput'
 import TagReview from '../../components/review/TagReview.tsx'
 import DetailReview from '../../components/review/DetailReview'
 import Star from '../../components/review/Star.tsx'
+import StudentSupportLink from '../../components/home/StudentSupportLink'
+import ProfileEdit from '../../components/mypage/ProfileEdit'
 import EmoticonComponent, {
   EmoticonType,
 } from '../../components/emoticon/Emoticon.tsx'
@@ -130,6 +132,11 @@ function App() {
     showToast(`${rating}점을 선택하셨습니다`, 'info')
   }
 
+  // 프로필 편집 핸들러
+  const handleProfileEdit = () => {
+    showToast('프로필 편집 버튼이 클릭되었습니다', 'info')
+  }
+
   // 모든 이모티콘 타입 배열
   const allEmoticonTypes: EmoticonType[] = [
     'normal',
@@ -150,7 +157,7 @@ function App() {
 
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-      <div style={{ width: '767px;' }}>
+      <div style={{ width: '767px' }}>
         <GlobalStyles />
         <TopBar
           title="타이틀 입력"
@@ -167,6 +174,29 @@ function App() {
             padding: '70px 20px 50px',
           }}
         >
+          <div>
+            <StudentSupportLink />
+          </div>
+          {/* ProfileEdit 컴포넌트 테스트 */}
+          <div
+            style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
+          >
+            <h2
+              style={{
+                fontFamily: 'Pretendard, sans-serif',
+                fontWeight: 'bold',
+                fontSize: '18px',
+                marginBottom: '20px',
+              }}
+            >
+              프로필 편집 컴포넌트
+            </h2>
+            <ProfileEdit
+              profileImage="/public/image.png"
+              username="행복한 돌멩이"
+              onEditClick={handleProfileEdit}
+            />
+          </div>
           {/* Star 컴포넌트 테스트 */}
           <div
             style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
