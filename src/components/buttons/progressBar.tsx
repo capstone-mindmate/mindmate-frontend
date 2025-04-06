@@ -12,7 +12,7 @@ interface ProgressBarProps {
 const containerStyle = css`
   position: relative;
   width: 100%;
-  min-height: 380px;
+  min-height: 300px;
   overflow: hidden;
 `
 
@@ -26,7 +26,7 @@ const sliderWrapperStyle = css`
 
 const slideStyle = (isActive: boolean) => css`
   width: 100%;
-  min-height: 380px;
+  min-height: 300px;
   flex-shrink: 0;
   display: flex;
   justify-content: center;

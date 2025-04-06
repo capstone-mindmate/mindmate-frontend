@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
 import Register from '../pages/Register'
 import Devtools from '../pages/Devtools'
+import OnboardingPage from '../pages/Onboarding/Onboarding'
 
 export const router = createBrowserRouter([
   {
@@ -10,6 +11,10 @@ export const router = createBrowserRouter([
   {
     path: '/devdev',
     element: <Devtools />,
+  },
+  {
+    path: '/onboarding',
+    element: <OnboardingPage />,
   },
   {
     path: '*',
