@@ -31,6 +31,7 @@ import AnswerInput from '../../components/customForm/AnswerInput'
 import TagReview from '../../components/review/TagReview.tsx'
 import DetailReview from '../../components/review/DetailReview'
 import Star from '../../components/review/Star.tsx'
+import StudentSupportLink from '../../components/home/StudentSupportLink'
 import EmoticonComponent, {
   EmoticonType,
 } from '../../components/emoticon/Emoticon.tsx'
@@ -150,7 +151,7 @@ function App() {
 
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-      <div style={{ width: '767px;' }}>
+      <div style={{ width: '767px' }}>
         <GlobalStyles />
         <TopBar
           title="타이틀 입력"
@@ -167,6 +168,9 @@ function App() {
             padding: '70px 20px 50px',
           }}
         >
+          <div>
+            <StudentSupportLink />
+          </div>
           {/* Star 컴포넌트 테스트 */}
           <div
             style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
