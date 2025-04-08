@@ -42,30 +42,35 @@ const InitialCategorySetting = ({
         <RegisterCategoryContainer>
           <CategoryButton
             buttonText="🤯 진로"
+            widthType="half"
             onActiveChange={(isActive) => {
               setSelectedCategory(isActive ? '취업' : '')
             }}
           />
           <CategoryButton
             buttonText="💼 취업"
+            widthType="half"
             onActiveChange={(isActive) => {
               setSelectedCategory(isActive ? '취업' : '')
             }}
           />
           <CategoryButton
             buttonText="📚 학업"
+            widthType="half"
             onActiveChange={(isActive) => {
               setSelectedCategory(isActive ? '취업' : '')
             }}
           />
           <CategoryButton
             buttonText="👥 인간관계"
+            widthType="half"
             onActiveChange={(isActive) => {
               setSelectedCategory(isActive ? '취업' : '')
             }}
           />
           <CategoryButton
             buttonText="💰 경제"
+            widthType="half"
             onActiveChange={(isActive) => {
               setSelectedCategory(isActive ? '취업' : '')
             }}

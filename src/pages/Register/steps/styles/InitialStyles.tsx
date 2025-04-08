@@ -49,6 +49,7 @@ export const RegisterImageContainer = styled.div``
 export const RegisterImage = css``
 
 export const RegisterCategoryContainer = styled.div`
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;

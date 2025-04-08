@@ -8,15 +8,8 @@ interface CategoryButtonProps {
   widthType?: 'default' | 'full' | 'half'
 }
 
-const buttonStyle = (
-  isActive: boolean,
-  widthType: 'default' | 'full' | 'half'
-) => css`
-  width: ${widthType === 'full'
-    ? '100%'
-    : widthType === 'half'
-      ? '48%'
-      : '165px'};
+const buttonStyle = (isActive: boolean) => css`
+  width: 100%;
   height: 68px;
   background-color: ${isActive ? '#FFF9EB' : '#FFFFFF'};
   color: ${isActive ? '#392111' : '#727272'};
@@ -46,8 +39,18 @@ const CategoryButton: React.FC<CategoryButtonProps> = ({
   }
 
   return (
-    <div className="container">
-      <button css={buttonStyle(isActive, widthType)} onClick={handleClick}>
+    <div
+      className="container"
+      style={{
+        width:
+          widthType === 'full'
+            ? '100%'
+            : widthType === 'half'
+              ? '48%'
+              : '165px',
+      }}
+    >
+      <button css={buttonStyle(isActive)} onClick={handleClick}>
         {buttonText}
       </button>
     </div>
