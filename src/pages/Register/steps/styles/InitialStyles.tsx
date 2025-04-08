@@ -39,6 +39,7 @@ export const RegisterSubTitle = styled.p`
 export const RegisterInputContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 24px;
   margin-top: 48px;
 `

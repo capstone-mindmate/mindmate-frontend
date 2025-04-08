@@ -8,7 +8,7 @@ import {
 } from './styles/InitialStyles'
 import BrownRectButton from '../../../components/buttons/brownRectButton'
 import { useState, useEffect } from 'react'
-
+import InitialProfileImageSetting from '../../../components/mypage/InitialProfileImageSetting'
 const NickNameAndProfile = ({ goToNextStep }: { goToNextStep: () => void }) => {
   const [isEnabled, setIsEnabled] = useState(false)
 
@@ -28,7 +28,9 @@ const NickNameAndProfile = ({ goToNextStep }: { goToNextStep: () => void }) => {
         </RegisterTitle>
       </RegisterTitleContainer>
 
-      <RegisterInputContainer></RegisterInputContainer>
+      <RegisterInputContainer>
+        <InitialProfileImageSetting onImageChange={() => {}} />
+      </RegisterInputContainer>
 
       <RegisterConfirmButtonContainer>
         <BrownRectButton
