@@ -48,7 +48,12 @@ export const RegisterImageContainer = styled.div``
 
 export const RegisterImage = css``
 
-export const RegisterCategoryContainer = styled.div``
+export const RegisterCategoryContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 10px;
+`
 
 export const RegisterConfirmButtonContainer = styled.div`
   position: absolute;

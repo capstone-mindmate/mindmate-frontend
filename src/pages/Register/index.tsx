@@ -102,7 +102,7 @@ const Register = () => {
       case 'NICKNAME_AND_PROFILE':
         return <NickNameAndProfile goToNextStep={goToNextStep} />
       case 'INITIAL_CATEGORY_SETTING':
-        return <InitialCategorySetting />
+        return <InitialCategorySetting goToNextStep={goToNextStep} />
     }
   }
 
@@ -110,7 +110,7 @@ const Register = () => {
     <RootContainer>
       <RegisterContainer>
         <RegisterNavBar>
-          <BackIcon />
+          <BackIcon onClick={goToPrevStep} />
           <StepIndicator currentStep={currentStep} />
         </RegisterNavBar>
 

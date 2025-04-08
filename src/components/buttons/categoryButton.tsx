@@ -5,10 +5,18 @@ import { useState } from 'react'
 interface CategoryButtonProps {
   buttonText: string
   onActiveChange?: (isActive: boolean) => void
+  widthType?: 'default' | 'full' | 'half'
 }
 
-const buttonStyle = (isActive: boolean) => css`
-  width: 165px;
+const buttonStyle = (
+  isActive: boolean,
+  widthType: 'default' | 'full' | 'half'
+) => css`
+  width: ${widthType === 'full'
+    ? '100%'
+    : widthType === 'half'
+      ? '48%'
+      : '165px'};
   height: 68px;
   background-color: ${isActive ? '#FFF9EB' : '#FFFFFF'};
   color: ${isActive ? '#392111' : '#727272'};
@@ -27,6 +35,7 @@ const buttonStyle = (isActive: boolean) => css`
 const CategoryButton: React.FC<CategoryButtonProps> = ({
   buttonText,
   onActiveChange,
+  widthType = 'default',
 }) => {
   const [isActive, setIsActive] = useState(false)
 
@@ -38,7 +47,7 @@ const CategoryButton: React.FC<CategoryButtonProps> = ({
 
   return (
     <div className="container">
-      <button css={buttonStyle(isActive)} onClick={handleClick}>
+      <button css={buttonStyle(isActive, widthType)} onClick={handleClick}>
         {buttonText}
       </button>
     </div>
