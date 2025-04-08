@@ -13,12 +13,6 @@ const styles = {
     flex-direction: column;
     gap: 16px;
   `,
-  title: css`
-    font-size: 16px;
-    font-weight: 500;
-    color: #150c06;
-    margin: 0;
-  `,
   imageContainer: css`
     width: 110px;
     height: 110px;
