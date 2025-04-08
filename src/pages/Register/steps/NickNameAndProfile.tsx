@@ -9,6 +9,7 @@ import {
 import BrownRectButton from '../../../components/buttons/brownRectButton'
 import { useState, useEffect } from 'react'
 import InitialProfileImageSetting from '../../../components/mypage/InitialProfileImageSetting'
+import TitleInputBox from '../../../components/inputs/titleInputBox'
 const NickNameAndProfile = ({ goToNextStep }: { goToNextStep: () => void }) => {
   const [isEnabled, setIsEnabled] = useState(false)
 
@@ -30,6 +31,11 @@ const NickNameAndProfile = ({ goToNextStep }: { goToNextStep: () => void }) => {
 
       <RegisterInputContainer>
         <InitialProfileImageSetting onImageChange={() => {}} />
+        <TitleInputBox
+          placeholder="닉네임을 입력해주세요"
+          onChange={() => {}}
+          titleText="닉네임"
+        />
       </RegisterInputContainer>
 
       <RegisterConfirmButtonContainer>
