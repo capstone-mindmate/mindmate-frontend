@@ -11,17 +11,30 @@ import {
 import BrownRectButton from '../../../components/buttons/brownRectButton'
 import { useState, useEffect } from 'react'
 import CategoryButton from '../../../components/buttons/categoryButton'
+
 const InitialCategorySetting = ({
   goToNextStep,
 }: {
   goToNextStep: () => void
 }) => {
   const [isEnabled, setIsEnabled] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+
+  useEffect(() => {
+    setIsEnabled(selectedCategories.length > 0)
+  }, [selectedCategories])
 
   const handleNextStep = () => {
     if (isEnabled) {
       goToNextStep()
+    }
+  }
+
+  const handleCategoryToggle = (category: string, isActive: boolean) => {
+    if (isActive) {
+      setSelectedCategories((prev) => [...prev, category])
+    } else {
+      setSelectedCategories((prev) => prev.filter((item) => item !== category))
     }
   }
 
@@ -44,35 +57,35 @@ const InitialCategorySetting = ({
             buttonText="🤯 진로"
             widthType="half"
             onActiveChange={(isActive) => {
-              setSelectedCategory(isActive ? '취업' : '')
+              handleCategoryToggle('진로', isActive)
             }}
           />
           <CategoryButton
             buttonText="💼 취업"
             widthType="half"
             onActiveChange={(isActive) => {
-              setSelectedCategory(isActive ? '취업' : '')
+              handleCategoryToggle('취업', isActive)
             }}
           />
           <CategoryButton
             buttonText="📚 학업"
             widthType="half"
             onActiveChange={(isActive) => {
-              setSelectedCategory(isActive ? '취업' : '')
+              handleCategoryToggle('학업', isActive)
             }}
           />
           <CategoryButton
             buttonText="👥 인간관계"
             widthType="half"
             onActiveChange={(isActive) => {
-              setSelectedCategory(isActive ? '취업' : '')
+              handleCategoryToggle('인간관계', isActive)
             }}
           />
           <CategoryButton
             buttonText="💰 경제"
             widthType="half"
             onActiveChange={(isActive) => {
-              setSelectedCategory(isActive ? '취업' : '')
+              handleCategoryToggle('경제', isActive)
             }}
           />
         </RegisterCategoryContainer>
