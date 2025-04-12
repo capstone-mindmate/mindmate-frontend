@@ -1,11 +1,12 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface CategoryButtonProps {
   buttonText: string
   onActiveChange?: (isActive: boolean) => void
-  widthType?: 'default' | 'full' | 'half'
+  widthType: 'full' | 'half'
+  initialActive?: boolean
 }
 
 const buttonStyle = (isActive: boolean) => css`
@@ -28,9 +29,14 @@ const buttonStyle = (isActive: boolean) => css`
 const CategoryButton: React.FC<CategoryButtonProps> = ({
   buttonText,
   onActiveChange,
-  widthType = 'default',
+  widthType = 'full',
+  initialActive = false,
 }) => {
-  const [isActive, setIsActive] = useState(false)
+  const [isActive, setIsActive] = useState(initialActive)
+
+  useEffect(() => {
+    setIsActive(initialActive)
+  }, [initialActive])
 
   const handleClick = () => {
     const newActiveState = !isActive
@@ -40,19 +46,19 @@ const CategoryButton: React.FC<CategoryButtonProps> = ({
 
   return (
     <div
-      className="container"
-      style={{
-        width:
-          widthType === 'full'
-            ? '100%'
-            : widthType === 'half'
-              ? '48%'
-              : '165px',
-      }}
+      css={[
+        buttonStyle(isActive),
+        widthType === 'half'
+          ? css`
+              width: 48%;
+            `
+          : css`
+              width: 100%;
+            `,
+      ]}
+      onClick={handleClick}
     >
-      <button css={buttonStyle(isActive)} onClick={handleClick}>
-        {buttonText}
-      </button>
+      {buttonText}
     </div>
   )
 }

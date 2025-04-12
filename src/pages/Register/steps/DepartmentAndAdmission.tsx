@@ -10,14 +10,22 @@ import TitleSelectBox from '../../../components/inputs/titleSelectBox'
 import BrownRectButton from '../../../components/buttons/brownRectButton'
 import { useState, useEffect } from 'react'
 
+interface DepartmentAndAdmissionProps {
+  goToNextStep: (data?: any) => void
+  initialData?: any
+}
+
 const DepartmentAndAdmission = ({
   goToNextStep,
-}: {
-  goToNextStep: () => void
-}) => {
+  initialData = {},
+}: DepartmentAndAdmissionProps) => {
   const [isEnabled, setIsEnabled] = useState(false)
-  const [selectedDepartment, setSelectedDepartment] = useState('')
-  const [selectedYear, setSelectedYear] = useState('')
+  const [selectedDepartment, setSelectedDepartment] = useState(
+    initialData.department || ''
+  )
+  const [selectedYear, setSelectedYear] = useState(
+    initialData.admissionYear || ''
+  )
 
   useEffect(() => {
     setIsEnabled(selectedDepartment !== '' && selectedYear !== '')
@@ -33,7 +41,10 @@ const DepartmentAndAdmission = ({
 
   const handleNextStep = () => {
     if (isEnabled) {
-      goToNextStep()
+      goToNextStep({
+        department: selectedDepartment,
+        admissionYear: selectedYear,
+      })
     }
   }
 
@@ -53,12 +64,14 @@ const DepartmentAndAdmission = ({
           onChange={handleDepartmentChange}
           titleText="학과"
           options={['학과1', '학과2', '학과3']}
+          initialValue={selectedDepartment}
         />
         <TitleSelectBox
           placeholder="입학년도를 선택해주세요"
           onChange={handleYearChange}
           titleText="입학년도"
           options={['2020', '2021', '2022']}
+          initialValue={selectedYear}
         />
       </RegisterInputContainer>
 

@@ -1,8 +1,10 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import DepartmentAndAdmission from './steps/DepartmentAndAdmission'
 import NickNameAndProfile from './steps/NickNameAndProfile'
 import InitialCategorySetting from './steps/InitialCategorySetting'
+import FinalConfirmation from './steps/FinalConfirmation'
 import {
   RegisterContainer,
   RegisterStepContainer,
@@ -20,12 +22,18 @@ type RegisterStep =
   | 'DEPARTMENT_AND_ADMISSION'
   | 'NICKNAME_AND_PROFILE'
   | 'INITIAL_CATEGORY_SETTING'
+  | 'FINAL_CONFIRMATION'
+
+// 로컬 스토리지 키
+const REGISTER_DATA_KEY = 'register_data'
+const REGISTER_STEP_KEY = 'register_step'
 
 const StepIndicator = ({ currentStep }: { currentStep: RegisterStep }) => {
   const steps: RegisterStep[] = [
     'DEPARTMENT_AND_ADMISSION',
     'NICKNAME_AND_PROFILE',
     'INITIAL_CATEGORY_SETTING',
+    'FINAL_CONFIRMATION',
   ]
 
   return (
@@ -38,16 +46,34 @@ const StepIndicator = ({ currentStep }: { currentStep: RegisterStep }) => {
 }
 
 const Register = () => {
-  const [currentStep, setCurrentStep] = useState<RegisterStep>(
-    'DEPARTMENT_AND_ADMISSION'
-  )
+  const location = useLocation()
+
+  // 로컬 스토리지에서 이전 데이터 불러오기
+  const getInitialStep = (): RegisterStep => {
+    const savedStep = localStorage.getItem(REGISTER_STEP_KEY)
+    return (savedStep as RegisterStep) || 'DEPARTMENT_AND_ADMISSION'
+  }
+
+  const getInitialData = () => {
+    const savedData = localStorage.getItem(REGISTER_DATA_KEY)
+    return savedData ? JSON.parse(savedData) : {}
+  }
+
+  const [currentStep, setCurrentStep] = useState<RegisterStep>(getInitialStep())
   // 사용자 상태 확인 신규인지 재방문 인지 <- 백이랑 얘기
   const [userStatus, setUserStatus] = useState<UserStatus>('NEW')
 
   // 회원가입 데이터 상태 관리
-  const [registerData, setRegisterData] = useState({
-    // 추가하기
-  })
+  const [registerData, setRegisterData] = useState(getInitialData())
+
+  // 데이터나 단계가 변경될 때 로컬 스토리지에 저장
+  useEffect(() => {
+    localStorage.setItem(REGISTER_DATA_KEY, JSON.stringify(registerData))
+  }, [registerData])
+
+  useEffect(() => {
+    localStorage.setItem(REGISTER_STEP_KEY, currentStep)
+  }, [currentStep])
 
   // 다음 단계로 이동하는 함수
   const goToNextStep = (data?: any) => {
@@ -55,13 +81,15 @@ const Register = () => {
       'DEPARTMENT_AND_ADMISSION',
       'NICKNAME_AND_PROFILE',
       'INITIAL_CATEGORY_SETTING',
+      'FINAL_CONFIRMATION',
     ]
 
     const currentIndex = stepOrder.indexOf(currentStep)
     if (currentIndex < stepOrder.length - 1) {
       // 데이터가 있으면 상태 업데이트
       if (data) {
-        setRegisterData((prev) => ({ ...prev, ...data }))
+        const updatedData = { ...registerData, ...data }
+        setRegisterData(updatedData)
       }
       setCurrentStep(stepOrder[currentIndex + 1])
     }
@@ -72,6 +100,7 @@ const Register = () => {
       'DEPARTMENT_AND_ADMISSION',
       'NICKNAME_AND_PROFILE',
       'INITIAL_CATEGORY_SETTING',
+      'FINAL_CONFIRMATION',
     ]
 
     const currentIndex = stepOrder.indexOf(currentStep)
@@ -84,25 +113,60 @@ const Register = () => {
   useEffect(() => {
     switch (userStatus) {
       case 'NEW':
-        setCurrentStep('DEPARTMENT_AND_ADMISSION')
+        // 로컬 스토리지에 저장된 단계가 없으면 처음 단계로 설정
+        if (!localStorage.getItem(REGISTER_STEP_KEY)) {
+          setCurrentStep('DEPARTMENT_AND_ADMISSION')
+        }
         break
       case 'REVISITING':
         // 홈화면으로 보내
         break
       default:
-        setCurrentStep('DEPARTMENT_AND_ADMISSION')
+        if (!localStorage.getItem(REGISTER_STEP_KEY)) {
+          setCurrentStep('DEPARTMENT_AND_ADMISSION')
+        }
     }
   }, [userStatus])
 
-  // 현재 단계에 따른 컴포넌트 렌더링
+  // 페이지를 새로고침하거나 다른 페이지에서 돌아왔을 때 데이터와 단계 복원
+  useEffect(() => {
+    // 개인정보 동의서 페이지에서 돌아왔을 때 처리
+    if (location.state && location.state.fromPrivacy) {
+      // 이미 로컬 스토리지에서 불러왔기 때문에 여기서는 추가 처리가 필요없음
+    }
+  }, [location])
+
+  // 현재 단계에 따른 컴포넌트 렌더링 (이전 데이터 전달)
   const renderStep = () => {
     switch (currentStep) {
       case 'DEPARTMENT_AND_ADMISSION':
-        return <DepartmentAndAdmission goToNextStep={goToNextStep} />
+        return (
+          <DepartmentAndAdmission
+            goToNextStep={goToNextStep}
+            initialData={registerData}
+          />
+        )
       case 'NICKNAME_AND_PROFILE':
-        return <NickNameAndProfile goToNextStep={goToNextStep} />
+        return (
+          <NickNameAndProfile
+            goToNextStep={goToNextStep}
+            initialData={registerData}
+          />
+        )
       case 'INITIAL_CATEGORY_SETTING':
-        return <InitialCategorySetting goToNextStep={goToNextStep} />
+        return (
+          <InitialCategorySetting
+            goToNextStep={goToNextStep}
+            initialData={registerData}
+          />
+        )
+      case 'FINAL_CONFIRMATION':
+        return (
+          <FinalConfirmation
+            goToNextStep={goToNextStep}
+            initialData={registerData}
+          />
+        )
     }
   }
 

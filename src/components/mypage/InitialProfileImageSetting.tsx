@@ -1,10 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
-import { useState, useRef, ChangeEvent } from 'react'
+import { useState, useRef, ChangeEvent, useEffect } from 'react'
 import { CameraIcon } from '../../components/icon/iconComponents'
 
 interface InitialProfileImageSettingProps {
   onImageChange?: (file: File) => void
+  initialImage?: string
 }
 
 const styles = {
@@ -87,9 +88,18 @@ const DefaultProfileIcon = () => (
 
 const InitialProfileImageSetting = ({
   onImageChange,
+  initialImage,
 }: InitialProfileImageSettingProps) => {
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    initialImage || null
+  )
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (initialImage) {
+      setImagePreview(initialImage)
+    }
+  }, [initialImage])
 
   const handleImageClick = () => {
     fileInputRef.current?.click()
@@ -114,7 +124,11 @@ const InitialProfileImageSetting = ({
     <div css={styles.container}>
       <div css={styles.imageContainer} onClick={handleImageClick}>
         {imagePreview ? (
-          <img src={imagePreview} css={styles.profileImage} />
+          <img
+            src={imagePreview}
+            alt="프로필 이미지"
+            css={styles.profileImage}
+          />
         ) : (
           <div css={styles.defaultProfile}>
             <DefaultProfileIcon />

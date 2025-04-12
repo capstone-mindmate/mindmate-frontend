@@ -12,13 +12,19 @@ import BrownRectButton from '../../../components/buttons/brownRectButton'
 import { useState, useEffect } from 'react'
 import CategoryButton from '../../../components/buttons/categoryButton'
 
+interface InitialCategorySettingProps {
+  goToNextStep: (data?: any) => void
+  initialData?: any
+}
+
 const InitialCategorySetting = ({
   goToNextStep,
-}: {
-  goToNextStep: () => void
-}) => {
-  const [isEnabled, setIsEnabled] = useState(false)
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  initialData = {},
+}: InitialCategorySettingProps) => {
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initialData.categories || []
+  )
+  const [isEnabled, setIsEnabled] = useState(selectedCategories.length > 0)
 
   useEffect(() => {
     setIsEnabled(selectedCategories.length > 0)
@@ -26,7 +32,9 @@ const InitialCategorySetting = ({
 
   const handleNextStep = () => {
     if (isEnabled) {
-      goToNextStep()
+      goToNextStep({
+        categories: selectedCategories,
+      })
     }
   }
 
@@ -36,6 +44,10 @@ const InitialCategorySetting = ({
     } else {
       setSelectedCategories((prev) => prev.filter((item) => item !== category))
     }
+  }
+
+  const isCategorySelected = (category: string) => {
+    return selectedCategories.includes(category)
   }
 
   return (
@@ -56,6 +68,7 @@ const InitialCategorySetting = ({
           <CategoryButton
             buttonText="🤯 진로"
             widthType="half"
+            initialActive={isCategorySelected('진로')}
             onActiveChange={(isActive) => {
               handleCategoryToggle('진로', isActive)
             }}
@@ -63,6 +76,7 @@ const InitialCategorySetting = ({
           <CategoryButton
             buttonText="💼 취업"
             widthType="half"
+            initialActive={isCategorySelected('취업')}
             onActiveChange={(isActive) => {
               handleCategoryToggle('취업', isActive)
             }}
@@ -70,6 +84,7 @@ const InitialCategorySetting = ({
           <CategoryButton
             buttonText="📚 학업"
             widthType="half"
+            initialActive={isCategorySelected('학업')}
             onActiveChange={(isActive) => {
               handleCategoryToggle('학업', isActive)
             }}
@@ -77,6 +92,7 @@ const InitialCategorySetting = ({
           <CategoryButton
             buttonText="👥 인간관계"
             widthType="half"
+            initialActive={isCategorySelected('인간관계')}
             onActiveChange={(isActive) => {
               handleCategoryToggle('인간관계', isActive)
             }}
@@ -84,6 +100,7 @@ const InitialCategorySetting = ({
           <CategoryButton
             buttonText="💰 경제"
             widthType="half"
+            initialActive={isCategorySelected('경제')}
             onActiveChange={(isActive) => {
               handleCategoryToggle('경제', isActive)
             }}

@@ -11,9 +11,21 @@ import { useState, useEffect } from 'react'
 import InitialProfileImageSetting from '../../../components/mypage/InitialProfileImageSetting'
 import TitleInputBox from '../../../components/inputs/titleInputBox'
 
-const NickNameAndProfile = ({ goToNextStep }: { goToNextStep: () => void }) => {
+interface NickNameAndProfileProps {
+  goToNextStep: (data?: any) => void
+  initialData?: any
+}
+
+const NickNameAndProfile = ({
+  goToNextStep,
+  initialData = {},
+}: NickNameAndProfileProps) => {
   const [isEnabled, setIsEnabled] = useState(false)
-  const [userNickName, setUserNickName] = useState('')
+  const [userNickName, setUserNickName] = useState(initialData.nickname || '')
+  const [profileImage, setProfileImage] = useState<File | null>(null)
+  useEffect(() => {
+    setIsEnabled(userNickName !== '')
+  }, [])
 
   useEffect(() => {
     setIsEnabled(userNickName !== '')
@@ -23,9 +35,19 @@ const NickNameAndProfile = ({ goToNextStep }: { goToNextStep: () => void }) => {
     setUserNickName(value)
   }
 
+  const handleImageChange = (file: File) => {
+    setProfileImage(file)
+  }
+
   const handleNextStep = () => {
     if (isEnabled) {
-      goToNextStep()
+      const updatedData: any = { nickname: userNickName }
+
+      if (profileImage) {
+        updatedData.profileImage = profileImage
+      }
+
+      goToNextStep(updatedData)
     }
   }
 
@@ -40,11 +62,15 @@ const NickNameAndProfile = ({ goToNextStep }: { goToNextStep: () => void }) => {
       </RegisterTitleContainer>
 
       <RegisterInputContainer>
-        <InitialProfileImageSetting onImageChange={() => {}} />
+        <InitialProfileImageSetting
+          onImageChange={handleImageChange}
+          initialImage={initialData.profileImageUrl}
+        />
         <TitleInputBox
           placeholder="닉네임을 입력해주세요"
           onChange={handleNickNameChange}
           titleText="닉네임"
+          initialValue={userNickName}
         />
       </RegisterInputContainer>
 

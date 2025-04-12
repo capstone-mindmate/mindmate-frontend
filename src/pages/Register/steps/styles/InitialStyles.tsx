@@ -61,3 +61,18 @@ export const RegisterConfirmButtonContainer = styled.div`
   bottom: 50px;
   width: 100%;
 `
+
+export const RegisterAgreementContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  bottom: 156px;
+`
+
+export const RegisterAgreement = styled.div`
+  width: 100%;
+`
