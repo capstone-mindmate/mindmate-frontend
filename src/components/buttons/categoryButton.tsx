@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState, useEffect } from 'react'
-
+import { media } from '../../styles/breakpoints'
 interface CategoryButtonProps {
   buttonText: string
   onActiveChange?: (isActive: boolean) => void
@@ -51,6 +51,10 @@ const CategoryButton: React.FC<CategoryButtonProps> = ({
         widthType === 'half'
           ? css`
               width: 48%;
+
+              ${media.mobileSmall} {
+                width: 46%;
+              }
             `
           : css`
               width: 100%;

@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { css } from '@emotion/react'
+import { media } from '../../../../styles/breakpoints'
 
 export const RegisterContainer = styled.div`
   width: 100%;
@@ -8,11 +9,10 @@ export const RegisterContainer = styled.div`
   flex-direction: column;
   position: relative;
 
-  @media (max-width: 479px) {
+  ${media.mobileBig} {
     width: 100%;
   }
 `
-
 export const RegisterTitleContainer = styled.div`
   display: flex;
   flex-direction: column;
