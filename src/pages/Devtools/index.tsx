@@ -29,6 +29,10 @@ import ChatBar from '../../components/chat/ChatBar'
 import AskInput from '../../components/customForm/AskInput'
 import AnswerInput from '../../components/customForm/AnswerInput'
 import TagReview from '../../components/review/TagReview.tsx'
+import DetailReview from '../../components/review/DetailReview'
+import Star from '../../components/review/Star.tsx'
+import StudentSupportLink from '../../components/home/StudentSupportLink'
+import ProfileEdit from '../../components/mypage/ProfileEdit'
 import EmoticonComponent, {
   EmoticonType,
 } from '../../components/emoticon/Emoticon.tsx'
@@ -84,6 +88,9 @@ function App() {
     '매칭신청' | '매칭실패' | '채팅종료'
   >('매칭신청')
 
+  // 별점 상태
+  const [selectedRating, setSelectedRating] = useState(4)
+
   const handleBackClick = () => {
     showToast('뒤로가기 버튼이 클릭되었습니다', 'info')
   }
@@ -119,6 +126,17 @@ function App() {
     showToast(`${type} 이모티콘 선택됨`, 'success')
   }
 
+  // 별점 변경 핸들러
+  const handleRatingChange = (rating: number) => {
+    setSelectedRating(rating)
+    showToast(`${rating}점을 선택하셨습니다`, 'info')
+  }
+
+  // 프로필 편집 핸들러
+  const handleProfileEdit = () => {
+    showToast('프로필 편집 버튼이 클릭되었습니다', 'info')
+  }
+
   // 모든 이모티콘 타입 배열
   const allEmoticonTypes: EmoticonType[] = [
     'normal',
@@ -139,7 +157,7 @@ function App() {
 
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-      <div style={{ width: '767px;' }}>
+      <div style={{ width: '767px' }}>
         <GlobalStyles />
         <TopBar
           title="타이틀 입력"
@@ -156,11 +174,83 @@ function App() {
             padding: '70px 20px 50px',
           }}
         >
+          <div>
+            <StudentSupportLink />
+          </div>
+          {/* ProfileEdit 컴포넌트 테스트 */}
+          <div
+            style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
+          >
+            <h2
+              style={{
+                fontFamily: 'Pretendard, sans-serif',
+                fontWeight: 'bold',
+                fontSize: '18px',
+                marginBottom: '20px',
+              }}
+            >
+              프로필 편집 컴포넌트
+            </h2>
+            <ProfileEdit
+              profileImage="/public/image.png"
+              username="행복한 돌멩이"
+              onEditClick={handleProfileEdit}
+            />
+          </div>
+          {/* Star 컴포넌트 테스트 */}
+          <div
+            style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
+          >
+            <h2
+              style={{
+                fontFamily: 'Pretendard, sans-serif',
+                fontWeight: 'bold',
+                fontSize: '18px',
+                marginBottom: '20px',
+              }}
+            >
+              별점 컴포넌트
+            </h2>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '15px',
+              }}
+            >
+              <Star 별점={selectedRating} onChange={handleRatingChange} />
+            </div>
+          </div>
           {/* TagReview 컴포넌트 테스트 */}
           <div
             style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
           >
             <TagReview tags={reviewTags} />
+          </div>
+
+          {/* DetailReview 컴포넌트 테스트 */}
+          <div
+            style={{ width: '100%', maxWidth: '480px', marginBottom: '30px' }}
+          >
+            <DetailReview
+              reviews={[
+                {
+                  profileImage: '/public/image.png',
+                  username: '건들면 짖는댕',
+                  rating: 4.0,
+                  date: '25.03.28',
+                  content: '응답이 엄청 빨랐어요! 대화 재밌었어요 ㅎ ㅎ',
+                },
+                {
+                  profileImage: '/public/image copy.png',
+                  username: '말하고 싶어라',
+                  rating: 3.5,
+                  date: '25.03.28',
+                  content: '공감 천재세요',
+                },
+              ]}
+              onViewAllClick={() => console.log('전체보기 클릭됨')}
+            />
           </div>
           {/* 이모티콘 테스트 섹션 */}
           <div
