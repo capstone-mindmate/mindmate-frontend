@@ -3,7 +3,7 @@ import Register from '../pages/Register'
 import Devtools from '../pages/Devtools'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
-
+import Matching from '../pages/Matching'
 export const router = createBrowserRouter([
   {
     path: '/register',
@@ -20,6 +20,10 @@ export const router = createBrowserRouter([
   {
     path: '/onboarding',
     element: <OnboardingPage />,
+  },
+  {
+    path: '/matching',
+    element: <Matching />,
   },
   {
     path: '*',
