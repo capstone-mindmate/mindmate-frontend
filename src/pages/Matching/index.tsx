@@ -12,6 +12,10 @@ import {
   MatchingTopBar,
   IconList,
   TopBarTitle,
+  CategoryContainer,
+  CategoryItem,
+  TopFixedContent,
+  CategoryItemText,
 } from './style'
 import NavigationComponent from '../../components/navigation/navigationComponent'
 
@@ -21,15 +25,42 @@ const Matching = () => {
   return (
     <RootContainer>
       <MatchingContainer>
-        <MatchingTopBar>
-          <TopBarTitle>매칭하기</TopBarTitle>
+        <TopFixedContent>
+          <MatchingTopBar>
+            <TopBarTitle>매칭하기</TopBarTitle>
+            <IconList>
+              <SearchIcon color="#392111" />
+              <ListIcon color="#392111" />
+              <PlusIcon color="#392111" />
+            </IconList>
+          </MatchingTopBar>
 
-          <IconList>
-            <SearchIcon />
-            <ListIcon />
-            <PlusIcon />
-          </IconList>
-        </MatchingTopBar>
+          <CategoryContainer>
+            <CategoryItem className="selected">
+              <CategoryItemText>전체</CategoryItemText>
+            </CategoryItem>
+            <CategoryItem>
+              <CategoryItemText>진로</CategoryItemText>
+            </CategoryItem>
+            <CategoryItem>
+              <CategoryItemText>취업</CategoryItemText>
+            </CategoryItem>
+            <CategoryItem>
+              <CategoryItemText>학업</CategoryItemText>
+            </CategoryItem>
+            <CategoryItem>
+              <CategoryItemText>인간관계</CategoryItemText>
+            </CategoryItem>
+            <CategoryItem>
+              <CategoryItemText>경제</CategoryItemText>
+            </CategoryItem>
+            <CategoryItem>
+              <CategoryItemText>기타</CategoryItemText>
+            </CategoryItem>
+          </CategoryContainer>
+        </TopFixedContent>
+
+        <div style={{ height: '1000px' }}></div>
       </MatchingContainer>
       <NavigationComponent />
     </RootContainer>
