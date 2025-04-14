@@ -1,7 +1,7 @@
 import '../../App.css'
 import * as IconComponents from '../../components/icon/iconComponents'
 import NavigationComponent from '../../components/navigation/navigationComponent'
-import { useToast } from '../../components/toast/ToastProvider.tsx'
+import { useToast } from '../../components/Toast/ToastProvider.tsx'
 import TopBar from '../../components/topbar/Topbar.tsx'
 import Frame from '../../components/frame/Frame'
 import TitleInputBox from '../../components/inputs/titleInputBox.tsx'
