@@ -1,8 +1,19 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { RootContainer, MatchingContainer } from './style'
-import NavigationComponent from '../../components/Navigation/NavigationComponent'
+import {
+  SearchIcon,
+  ListIcon,
+  PlusIcon,
+} from '../../components/icon/iconComponents'
+import {
+  RootContainer,
+  MatchingContainer,
+  MatchingTopBar,
+  IconList,
+  TopBarTitle,
+} from './style'
+import NavigationComponent from '../../components/navigation/navigationComponent'
 
 const Matching = () => {
   const location = useLocation()
@@ -10,8 +21,17 @@ const Matching = () => {
   return (
     <RootContainer>
       <MatchingContainer>
-        <NavigationComponent />
+        <MatchingTopBar>
+          <TopBarTitle>매칭하기</TopBarTitle>
+
+          <IconList>
+            <SearchIcon />
+            <ListIcon />
+            <PlusIcon />
+          </IconList>
+        </MatchingTopBar>
       </MatchingContainer>
+      <NavigationComponent />
     </RootContainer>
   )
 }
