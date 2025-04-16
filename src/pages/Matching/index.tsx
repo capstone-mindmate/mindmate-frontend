@@ -59,8 +59,6 @@ const Matching = () => {
             </CategoryItem>
           </CategoryContainer>
         </TopFixedContent>
-
-        <div style={{ height: '1000px' }}></div>
       </MatchingContainer>
       <NavigationComponent />
     </RootContainer>
