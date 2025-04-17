@@ -2,17 +2,37 @@ import styled from '@emotion/styled'
 import { css } from '@emotion/react'
 
 // 탑바 컨테이너 스타일
-export const TopBarContainer = styled.div<{ showBorder: boolean }>`
+export const TopBarContainer = styled.div<{
+  showBorder: boolean
+  isFixed: boolean
+}>`
   width: 100%;
+  max-width: inherit; // 부모 요소의 max-width 상속
   height: 56px;
   display: flex;
   align-items: center;
   background-color: #ffffff;
   border-bottom: ${(props) =>
     props.showBorder ? '1px solid #eeeeee' : 'none'};
-  position: sticky;
-  top: 0;
-  z-index: 5000;
+
+  // isFixed 속성으로 포지셔닝 제어
+  ${(props) =>
+    props.isFixed
+      ? css`
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          margin: 0 auto; // 중앙 정렬
+          z-index: 5000;
+        `
+      : css`
+          position: relative;
+          z-index: 1;
+        `}
+
+  // 고정 상태일 때 트랜지션 효과 추가 (그림자 제거)
+  transition: background-color 0.2s ease;
 `
 
 // 페이지 제목 스타일 (body2_re)
@@ -76,7 +96,7 @@ export const TopBarActionButton = styled.button<{ isDisabled: boolean }>`
   }}
 `
 
-// 왼쪽 컨텐츠 스타일 ( 4/16 새로 추가)
+// 왼쪽 컨텐츠 스타일
 export const TopBarLeftContent = styled.div`
   position: absolute;
   left: 24px;
@@ -89,7 +109,7 @@ export const TopBarLeftContent = styled.div`
   color: #392111;
 `
 
-// 오른쪽 컨텐츠 스타일 ( 4/16 새로 추가)
+// 오른쪽 컨텐츠 스타일
 export const TopBarRightContent = styled.div`
   position: absolute;
   right: 24px;

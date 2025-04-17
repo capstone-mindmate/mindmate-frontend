@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Frame from '../../components/frame/Frame'
 import {
   FrameSlider as FrameSliderContainer,
@@ -30,6 +30,11 @@ const FrameSlider: React.FC<FrameSliderProps> = ({ frames, onFrameClick }) => {
   >('to-left')
   const [animatedFrames, setAnimatedFrames] = useState<string[]>([])
   const [targetIndex, setTargetIndex] = useState<number | null>(null)
+
+  // 스와이프 감지를 위한 ref와 상태값 추가
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const touchStartXRef = useRef<number | null>(null)
+  const touchEndXRef = useRef<number | null>(null)
 
   // 순환 배열을 생성하되 애니메이션 상태도 함께 관리
   const getVisibleFrames = () => {
@@ -72,7 +77,7 @@ const FrameSlider: React.FC<FrameSliderProps> = ({ frames, onFrameClick }) => {
     ]
   }
 
-  // 기본 다음 프레임으로 이동 (애니메이션 효과 포함)
+  // 다음 프레임으로 이동 (오른쪽에서 왼쪽으로 이동)
   const nextFrame = () => {
     if (isTransitioning) return
 
@@ -84,6 +89,25 @@ const FrameSlider: React.FC<FrameSliderProps> = ({ frames, onFrameClick }) => {
     // 애니메이션 완료 후 인덱스 변경
     setTimeout(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % frames.length)
+      setAnimatedFrames([])
+      setIsTransitioning(false)
+    }, 500)
+  }
+
+  // 이전 프레임으로 이동 (왼쪽에서 오른쪽으로 이동)
+  const prevFrame = () => {
+    if (isTransitioning) return
+
+    setIsTransitioning(true)
+    setAnimationDirection('to-right')
+    // 모든 프레임을 애니메이션에 포함
+    setAnimatedFrames(['far-prev', 'prev', 'current', 'next', 'far-next'])
+
+    // 애니메이션 완료 후 인덱스 변경
+    setTimeout(() => {
+      setCurrentIndex(
+        (prevIndex) => (prevIndex - 1 + frames.length) % frames.length
+      )
       setAnimatedFrames([])
       setIsTransitioning(false)
     }, 500)
@@ -132,6 +156,38 @@ const FrameSlider: React.FC<FrameSliderProps> = ({ frames, onFrameClick }) => {
     }
   }
 
+  // 터치 이벤트 핸들러 - 터치 시작
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX
+    touchEndXRef.current = null
+  }
+
+  // 터치 이벤트 핸들러 - 터치 이동
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndXRef.current = e.touches[0].clientX
+  }
+
+  // 터치 이벤트 핸들러 - 터치 종료
+  const handleTouchEnd = () => {
+    if (touchStartXRef.current && touchEndXRef.current) {
+      const diff = touchStartXRef.current - touchEndXRef.current
+      const threshold = 50 // 스와이프로 인식할 최소 이동 거리
+
+      // 왼쪽에서 오른쪽으로 스와이프 (다음 프레임으로 이동, 방향 주의)
+      if (diff < -threshold) {
+        prevFrame() // 왼쪽에서 오른쪽으로 스와이프하면 이전 프레임으로
+      }
+      // 오른쪽에서 왼쪽으로 스와이프 (이전 프레임으로 이동, 방향 주의)
+      else if (diff > threshold) {
+        nextFrame() // 오른쪽에서 왼쪽으로 스와이프하면 다음 프레임으로
+      }
+    }
+
+    // 터치 값 초기화
+    touchStartXRef.current = null
+    touchEndXRef.current = null
+  }
+
   // 자동 슬라이드 효과
   useEffect(() => {
     if (isPaused || isTransitioning) return
@@ -161,8 +217,12 @@ const FrameSlider: React.FC<FrameSliderProps> = ({ frames, onFrameClick }) => {
   return (
     <FrameSliderContainer>
       <FrameWrapper
+        ref={wrapperRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {visibleFrames.map((frame) => (
           <div

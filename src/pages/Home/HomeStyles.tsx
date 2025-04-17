@@ -4,7 +4,7 @@ import styled from '@emotion/styled'
 export const LogoText = styled.span`
   font-family: 'Poppins', sans-serif !important;
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 500;
   color: #392111;
 `
 
@@ -21,7 +21,7 @@ export const HomeContainer = styled.div`
 // 컨텐츠 컨테이너
 export const ContentContainer = styled.div`
   width: 100%;
-  max-width: 375px;
+  max-width: 884px;
   box-sizing: border-box;
   margin: 0 auto;
 `
@@ -54,7 +54,7 @@ export const SectionTitleContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 24px 20px 24px;
+  margin: 20px 24px 16px 24px;
 `
 
 // 섹션 타이틀 텍스트
@@ -113,6 +113,5 @@ export const StudentSupportContainer = styled.div`
 
 // 일반 섹션 컨테이너 (추가 테두리나 패딩 없음)
 export const PlainSectionContainer = styled.div`
-  margin: 30px 0 0 0;
-  padding-top: 20px;
+  padding: 20px 0 5px 0;
 `

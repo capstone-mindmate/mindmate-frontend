@@ -24,28 +24,16 @@ export const LinksContainer = styled.div`
   display: flex;
   overflow-x: auto;
   gap: 10px;
-  padding: 4px 0 10px 0; /* 스크롤바 공간 확보 */
-  width: 100%; /* 컨테이너 너비에 맞춤 */
+  width: 100%;
 
-  /* 스크롤바 스타일링 */
+  // 스크롤바를 완전히 숨기는 CSS 추가
   &::-webkit-scrollbar {
-    height: 1.5px;
-    display: block;
+    display: none;
   }
 
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
+  // IE, Edge, Firefox에서도 스크롤바 숨기기
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 `
 
 // 개별 링크 카드

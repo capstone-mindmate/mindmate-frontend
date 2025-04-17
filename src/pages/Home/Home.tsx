@@ -1,6 +1,6 @@
 import React from 'react'
 import TopBar from '../../components/topbar/Topbar'
-import { AlarmIcon } from '../../components/icon/iconComponents'
+import { AlarmIcon, NormalPlusIcon } from '../../components/icon/iconComponents'
 import FrameSlider from './FrameSlider'
 import { frames } from './FrameData'
 import HomeCategoryButton from '../../components/home/homeCategoryButton'
@@ -24,6 +24,7 @@ import {
   PlainSectionContainer,
   LogoText,
 } from './HomeStyles'
+import FloatingButton from '../../components/buttons/floatingButton'
 
 const HomePage = () => {
   // 알람 아이콘 클릭 핸들러
@@ -67,6 +68,7 @@ const HomePage = () => {
             </button>
           }
           showBorder={false}
+          isFixed={true}
         />
         <FrameSlider frames={frames} onFrameClick={handleFrameClick} />
         <div>
@@ -80,7 +82,15 @@ const HomePage = () => {
             <HomeCategoryButton buttonText="경제고민" emoji="💰" />
           </HomeCategoryContainer>
         </div>
-
+        <div className="floatingList">
+          <FloatingButton
+            buttonIcon={<NormalPlusIcon color="#ffffff" />}
+            buttonText="글쓰기"
+            onActiveChange={(isActive) => {
+              console.log('버튼 상태 : ', isActive)
+            }}
+          />
+        </div>
         {/* 추천 이모티콘 섹션 */}
         <SectionContainer>
           <SectionTitleContainer>
