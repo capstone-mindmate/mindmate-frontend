@@ -4,6 +4,8 @@ import Devtools from '../pages/Devtools'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
 import Matching from '../pages/Matching'
+import HomePage from '../pages/Home/Home.tsx'
+
 export const router = createBrowserRouter([
   {
     path: '/register',
@@ -24,6 +26,10 @@ export const router = createBrowserRouter([
   {
     path: '/matching',
     element: <Matching />,
+  },
+  {
+    path: '/home',
+    element: <HomePage />,
   },
   {
     path: '*',
