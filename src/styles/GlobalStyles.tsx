@@ -2,10 +2,11 @@ import { Global, css } from '@emotion/react'
 
 const globalStyles = css`
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
   * {
     font-family:
-      'Pretendard Variable',
+      ㄴ 'Pretendard Variable',
       -apple-system,
       BlinkMacSystemFont,
       system-ui,

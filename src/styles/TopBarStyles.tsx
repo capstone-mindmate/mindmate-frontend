@@ -2,13 +2,14 @@ import styled from '@emotion/styled'
 import { css } from '@emotion/react'
 
 // 탑바 컨테이너 스타일
-export const TopBarContainer = styled.div`
+export const TopBarContainer = styled.div<{ showBorder: boolean }>`
   width: 100%;
   height: 56px;
   display: flex;
   align-items: center;
   background-color: #ffffff;
-  border-bottom: 1px solid #eeeeee;
+  border-bottom: ${(props) =>
+    props.showBorder ? '1px solid #eeeeee' : 'none'};
   position: sticky;
   top: 0;
   z-index: 5000;
@@ -31,6 +32,10 @@ export const TopBarBackButton = styled.button`
   cursor: pointer;
   position: absolute;
   left: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     opacity: 0.8;
@@ -43,6 +48,7 @@ export const TopBarActionButton = styled.button<{ isDisabled: boolean }>`
   border: none;
   position: absolute;
   right: 24px;
+  padding: 0;
 
   ${(props) => {
     if (props.isDisabled) {
@@ -68,4 +74,40 @@ export const TopBarActionButton = styled.button<{ isDisabled: boolean }>`
       `
     }
   }}
+`
+
+// 왼쪽 컨텐츠 스타일 ( 4/16 새로 추가)
+export const TopBarLeftContent = styled.div`
+  position: absolute;
+  left: 24px;
+  display: flex;
+  align-items: center;
+
+  /* 텍스트일 경우 스타일 */
+  font-size: 16px;
+  font-weight: 700;
+  color: #392111;
+`
+
+// 오른쪽 컨텐츠 스타일 ( 4/16 새로 추가)
+export const TopBarRightContent = styled.div`
+  position: absolute;
+  right: 24px;
+  display: flex;
+  align-items: center;
+
+  /* 아이콘 버튼 스타일링 */
+  button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 `

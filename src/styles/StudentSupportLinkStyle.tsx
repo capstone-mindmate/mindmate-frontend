@@ -5,8 +5,7 @@ export const StudentSupportContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 767px; /* 부모 컨테이너의 너비에 맞춤 */
-  padding: 16px;
+  margin: 30px 24px 40px 24px;
   background-color: #ffffff;
   box-sizing: border-box; /* 패딩을 너비에 포함 */
 `
