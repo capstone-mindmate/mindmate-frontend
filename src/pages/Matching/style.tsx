@@ -23,6 +23,7 @@ export const TopFixedContent = styled.div`
   left: 0;
   right: 0;
   z-index: 100;
+  background-color: #ffffff;
 `
 
 export const MatchingTopBar = styled.div`
@@ -87,8 +88,12 @@ export const CategoryItemText = styled.p`
 
 export const CategoryDetailContainer = styled.div`
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: row;
   gap: 6px;
+  margin-top: 16px;
+`
+
+export const MatchItemsContainer = styled.div`
+  width: 100%;
 `

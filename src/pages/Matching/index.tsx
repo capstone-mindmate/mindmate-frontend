@@ -17,11 +17,14 @@ import {
   TopFixedContent,
   CategoryItemText,
   CategoryDetailContainer,
+  MatchItemsContainer,
 } from './style'
 import NavigationComponent from '../../components/navigation/navigationComponent'
 import BrownRoundButton from '../../components/buttons/brownRoundButton'
 import YellowRoundButton from '../../components/buttons/yellowRoundButton'
 import NormalSelectButton from '../../components/buttons/normalSelectButton'
+import MatchItem from '../../components/matching/matchItem'
+
 const Matching = () => {
   const location = useLocation()
 
@@ -85,6 +88,16 @@ const Matching = () => {
             />
           </CategoryDetailContainer>
         </TopFixedContent>
+
+        <MatchItemsContainer>
+          <MatchItem
+            department="소프트웨어학과"
+            title="소프트웨어학과 소개"
+            description="소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다."
+            matchType="리스너"
+            category="진로"
+          />
+        </MatchItemsContainer>
       </MatchingContainer>
       <NavigationComponent />
     </RootContainer>
