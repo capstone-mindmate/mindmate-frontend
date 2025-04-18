@@ -15,6 +15,10 @@ export const MatchingContainer = styled.div`
   position: relative;
   padding: 0 24px;
   box-sizing: border-box;
+
+  ${media.mobileBig} {
+    width: 100%;
+  }
 `
 
 export const TopFixedContent = styled.div`
@@ -22,6 +26,11 @@ export const TopFixedContent = styled.div`
   top: 0;
   z-index: 100;
   background-color: #ffffff;
+
+  ${media.mobileBig} {
+    left: 20px;
+    right: 20px;
+  }
 `
 
 export const MatchingTopBar = styled.div`
