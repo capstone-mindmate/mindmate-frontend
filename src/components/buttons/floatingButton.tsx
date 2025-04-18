@@ -21,13 +21,14 @@ const buttonStyle = css`
   padding: 10px 14px;
   border-radius: 100px;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 500;
   line-height: 1.4;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  gap: 6px;
   &:hover {
     transform: scale(1.03);
   }

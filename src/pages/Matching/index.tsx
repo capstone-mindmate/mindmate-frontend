@@ -5,6 +5,7 @@ import {
   SearchIcon,
   ListIcon,
   PlusIcon,
+  SendIcon,
 } from '../../components/icon/iconComponents'
 import {
   RootContainer,
@@ -24,7 +25,8 @@ import BrownRoundButton from '../../components/buttons/brownRoundButton'
 import YellowRoundButton from '../../components/buttons/yellowRoundButton'
 import NormalSelectButton from '../../components/buttons/normalSelectButton'
 import MatchItem from '../../components/matching/matchItem'
-import MatchType from '../../components/matching/matchType'
+import FloatingButton from '../../components/buttons/floatingButton'
+
 const Matching = () => {
   const location = useLocation()
 
@@ -172,6 +174,13 @@ const Matching = () => {
           />
         </MatchItemsContainer>
       </MatchingContainer>
+      <FloatingButton
+        buttonIcon={<SendIcon color="#ffffff" width={24} height={24} />}
+        buttonText="랜덤매칭"
+        onActiveChange={(isActive) => {
+          console.log('버튼 상태 : ', isActive)
+        }}
+      />
       <NavigationComponent />
     </RootContainer>
   )
