@@ -37,7 +37,6 @@ import EmoticonComponent, {
   EmoticonType,
 } from '../../components/emoticon/Emoticon.tsx'
 import React, { useState } from 'react'
-
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 
@@ -879,6 +878,7 @@ function App() {
             />
             <AnswerInput title="한 직업을 평생 할 수 있다고 생각하시나요?" />
           </div>
+
           <ChatBar onSendMessage={(msg) => console.log('보낸 메시지:', msg)} />
           <div className="navigation" style={{ width: '50%' }}>
             <div style={{ paddingBottom: '60px' }}>
