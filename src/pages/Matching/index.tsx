@@ -175,7 +175,7 @@ const Matching = () => {
         </MatchItemsContainer>
       </MatchingContainer>
       <FloatingButton
-        buttonIcon={<SendIcon color="#ffffff" width={24} height={24} />}
+        buttonIcon={<SendIcon color="#ffffff" width={18} height={18} />}
         buttonText="랜덤매칭"
         onActiveChange={(isActive) => {
           console.log('버튼 상태 : ', isActive)

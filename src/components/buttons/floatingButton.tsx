@@ -11,7 +11,7 @@ interface FloatingButtonProps {
 const buttonStyle = css`
   position: fixed;
   bottom: 100px;
-  right: 80px;
+  right: 24px;
   z-index: 5;
   width: auto;
   height: 44px;
