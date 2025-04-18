@@ -10,7 +10,7 @@ export const TagReviewContainer = styled.div`
 export const TagReviewTitle = styled.h2`
   font-family: 'Pretendard', sans-serif;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 12px;
 `
 
