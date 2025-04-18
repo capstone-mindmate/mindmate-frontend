@@ -84,3 +84,11 @@ export const CategoryItemText = styled.p`
   line-height: 1.4;
   margin: 0;
 `
+
+export const CategoryDetailContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+`

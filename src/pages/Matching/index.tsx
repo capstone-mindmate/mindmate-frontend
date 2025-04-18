@@ -16,9 +16,12 @@ import {
   CategoryItem,
   TopFixedContent,
   CategoryItemText,
+  CategoryDetailContainer,
 } from './style'
 import NavigationComponent from '../../components/navigation/navigationComponent'
-
+import BrownRoundButton from '../../components/buttons/brownRoundButton'
+import YellowRoundButton from '../../components/buttons/yellowRoundButton'
+import NormalSelectButton from '../../components/buttons/normalSelectButton'
 const Matching = () => {
   const location = useLocation()
 
@@ -58,6 +61,29 @@ const Matching = () => {
               <CategoryItemText>기타</CategoryItemText>
             </CategoryItem>
           </CategoryContainer>
+
+          <CategoryDetailContainer>
+            <NormalSelectButton
+              options={['소프트웨어학과', '미디어학과']}
+              onChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <BrownRoundButton
+              buttonText="리스너"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+
+            <YellowRoundButton
+              buttonText="스피커"
+              onActiveChange={(isActive) => {
+                console.log('버튼 상태 : ', isActive)
+              }}
+            />
+          </CategoryDetailContainer>
         </TopFixedContent>
       </MatchingContainer>
       <NavigationComponent />
