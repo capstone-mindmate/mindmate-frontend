@@ -1,8 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { useState } from 'react'
+import MatchType from './matchType'
 
-import BrownRectButton from '../buttons/brownRectButton'
+import Category from './category'
 
 interface MatchItemProps {
   department: string
@@ -10,10 +11,11 @@ interface MatchItemProps {
   description: string
   matchType: string
   category: string
+  borderSet: boolean
 }
 
 const matchItemStyle = {
-  container: css`
+  container: (borderSet: boolean) => css`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -21,6 +23,8 @@ const matchItemStyle = {
     width: 100%;
     height: 100%;
     padding: 20px 0;
+    cursor: pointer;
+    border-bottom: ${borderSet ? '1px solid #E6E6E6' : 'none'};
   `,
 
   infoWrapper: css`
@@ -69,9 +73,10 @@ const MatchItem = ({
   description,
   matchType,
   category,
+  borderSet,
 }: MatchItemProps) => {
   return (
-    <div className="container" css={matchItemStyle.container}>
+    <div className="container" css={matchItemStyle.container(borderSet)}>
       <div className="infoWrapper" css={matchItemStyle.infoWrapper}>
         <div className="department">
           <p css={matchItemStyle.department}>{department}</p>
@@ -86,10 +91,10 @@ const MatchItem = ({
         </div>
       </div>
 
-      <div
-        className="categoryWrapper"
-        css={matchItemStyle.categoryWrapper}
-      ></div>
+      <div className="categoryWrapper" css={matchItemStyle.categoryWrapper}>
+        <MatchType matchType={matchType} />
+        <Category category={category} />
+      </div>
     </div>
   )
 }

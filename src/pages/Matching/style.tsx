@@ -18,10 +18,8 @@ export const MatchingContainer = styled.div`
 `
 
 export const TopFixedContent = styled.div`
-  position: sticky;
+  position: fixed;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 100;
   background-color: #ffffff;
 `
@@ -96,4 +94,10 @@ export const CategoryDetailContainer = styled.div`
 
 export const MatchItemsContainer = styled.div`
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  padding-top: 140px;
+  padding-bottom: 90px;
 `

@@ -24,7 +24,7 @@ import BrownRoundButton from '../../components/buttons/brownRoundButton'
 import YellowRoundButton from '../../components/buttons/yellowRoundButton'
 import NormalSelectButton from '../../components/buttons/normalSelectButton'
 import MatchItem from '../../components/matching/matchItem'
-
+import MatchType from '../../components/matching/matchType'
 const Matching = () => {
   const location = useLocation()
 
@@ -96,6 +96,79 @@ const Matching = () => {
             description="소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다."
             matchType="리스너"
             category="진로"
+            borderSet={true}
+          />
+
+          <MatchItem
+            department="미디어학과"
+            title="ㅁㄴㅇㄹㅁㄴㅇㄹ"
+            description="ㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹ"
+            matchType="스피커"
+            category="경제"
+            borderSet={false}
+          />
+
+          <MatchItem
+            department="소프트웨어학과"
+            title="소프트웨어학과 소개"
+            description="소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다."
+            matchType="리스너"
+            category="진로"
+            borderSet={true}
+          />
+
+          <MatchItem
+            department="소프트웨어학과"
+            title="소프트웨어학과 소개"
+            description="소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다."
+            matchType="리스너"
+            category="진로"
+            borderSet={true}
+          />
+
+          <MatchItem
+            department="소프트웨어학과"
+            title="소프트웨어학과 소개"
+            description="소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다."
+            matchType="리스너"
+            category="진로"
+            borderSet={true}
+          />
+
+          <MatchItem
+            department="소프트웨어학과"
+            title="소프트웨어학과 소개"
+            description="소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다."
+            matchType="리스너"
+            category="진로"
+            borderSet={true}
+          />
+
+          <MatchItem
+            department="소프트웨어학과"
+            title="소프트웨어학과 소개"
+            description="소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다."
+            matchType="리스너"
+            category="진로"
+            borderSet={true}
+          />
+
+          <MatchItem
+            department="소프트웨어학과"
+            title="소프트웨어학과 소개"
+            description="소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다."
+            matchType="리스너"
+            category="진로"
+            borderSet={true}
+          />
+
+          <MatchItem
+            department="소프트웨어학과"
+            title="소프트웨어학과 소개"
+            description="소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다."
+            matchType="리스너"
+            category="진로"
+            borderSet={true}
           />
         </MatchItemsContainer>
       </MatchingContainer>
