@@ -26,6 +26,8 @@ import YellowRoundButton from '../../components/buttons/yellowRoundButton'
 import NormalSelectButton from '../../components/buttons/normalSelectButton'
 import MatchItem from '../../components/matching/matchItem'
 import RandomMatchingSelector from '../../components/matching/floating'
+import ModalComponent from '../../components/modal/modalComponent'
+import { css } from '@emotion/react'
 
 // 더미 데이터. API 연동 후 삭제 예정 - 2025-04-19 석지원
 const matchItemsData = [
@@ -37,6 +39,9 @@ const matchItemsData = [
     matchType: '리스너',
     category: '진로',
     borderSet: true,
+    username: '행복한 돌멩이',
+    profileImage: '/public/image.png',
+    makeDate: '04월 19일 15:30',
   },
   {
     id: 2,
@@ -46,6 +51,9 @@ const matchItemsData = [
     matchType: '스피커',
     category: '경제',
     borderSet: true,
+    username: '건들면 짖는댕',
+    profileImage: '/public/image.png',
+    makeDate: '04월 19일 14:20',
   },
   {
     id: 3,
@@ -55,6 +63,9 @@ const matchItemsData = [
     matchType: '리스너',
     category: '취업',
     borderSet: true,
+    username: '말하고 싶어라',
+    profileImage: '/public/image copy.png',
+    makeDate: '04월 18일 22:15',
   },
   {
     id: 4,
@@ -64,6 +75,9 @@ const matchItemsData = [
     matchType: '스피커',
     category: '진로',
     borderSet: true,
+    username: '마인드메이트',
+    profileImage: '/public/image copy 2.png',
+    makeDate: '04월 18일 18:05',
   },
   {
     id: 5,
@@ -73,6 +87,9 @@ const matchItemsData = [
     matchType: '리스너',
     category: '학업',
     borderSet: true,
+    username: '소프트웨어천재',
+    profileImage: '/public/image.png',
+    makeDate: '04월 17일 13:40',
   },
   {
     id: 6,
@@ -83,6 +100,9 @@ const matchItemsData = [
     matchType: '스피커',
     category: '인간관계',
     borderSet: true,
+    username: '프론트엔드 개발자',
+    profileImage: '/public/image copy.png',
+    makeDate: '04월 17일 10:30',
   },
   {
     id: 7,
@@ -92,6 +112,9 @@ const matchItemsData = [
     matchType: '리스너',
     category: '학업',
     borderSet: true,
+    username: '미디어 마니아',
+    profileImage: '/public/image copy 2.png',
+    makeDate: '04월 16일 21:45',
   },
   {
     id: 8,
@@ -101,6 +124,9 @@ const matchItemsData = [
     matchType: '스피커',
     category: '경제',
     borderSet: true,
+    username: '경제적 자유',
+    profileImage: '/public/image.png',
+    makeDate: '04월 16일 16:20',
   },
   {
     id: 9,
@@ -110,6 +136,9 @@ const matchItemsData = [
     matchType: '리스너',
     category: '취업',
     borderSet: false,
+    username: '취업준비중',
+    profileImage: '/public/image copy.png',
+    makeDate: '04월 15일 14:10',
   },
 ]
 
@@ -123,6 +152,12 @@ const Matching = () => {
   const [isSpeakerActive, setIsSpeakerActive] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('전체')
   const [filteredItems, setFilteredItems] = useState(matchItemsData)
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<
+    (typeof matchItemsData)[0] | null
+  >(null)
+  const [messageToSend, setMessageToSend] = useState('')
 
   useEffect(() => {
     let filtered = matchItemsData
@@ -168,6 +203,68 @@ const Matching = () => {
 
   const handleSpeakerSelect = () => {
     // 스피커 랜덤 매칭 호출
+  }
+
+  const handleOpenModal = (item: (typeof matchItemsData)[0]) => {
+    setSelectedItem(item)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setMessageToSend('')
+  }
+
+  // 메시지 입력 핸들러
+  const handleMessageChange = (value: string) => {
+    setMessageToSend(value)
+  }
+
+  // 매칭 신청 처리 핸들러
+  const handleMatchingRequest = () => {
+    if (selectedItem) {
+      console.log('매칭 신청:', {
+        ...selectedItem,
+        message: messageToSend,
+      })
+      // 매칭 신청 로직 추가 (API 호출 등)
+      setIsModalOpen(false)
+      setMessageToSend('')
+    }
+  }
+
+  // MatchItem을 클릭할 때 모달을 열기 위한 핸들러
+  const handleMatchItemClick = (item: (typeof matchItemsData)[0]) => {
+    handleOpenModal(item)
+  }
+
+  // 커스텀 모달 컴포넌트 - 모달 컴포넌트 구현 방식에 따라 props 전달 방식이 달라질 수 있음
+  const renderModal = () => {
+    if (!isModalOpen || !selectedItem) return null
+
+    return (
+      <ModalComponent
+        modalType="매칭신청"
+        buttonText="매칭 신청하기"
+        buttonClick={handleMatchingRequest}
+        onClose={handleCloseModal}
+        isOpen={isModalOpen}
+        userProfileProps={{
+          profileImage: selectedItem.profileImage,
+          name: selectedItem.username,
+          department: selectedItem.department,
+          makeDate: selectedItem.makeDate,
+        }}
+        matchingInfoProps={{
+          title: selectedItem.title,
+          description: selectedItem.description,
+        }}
+        messageProps={{
+          onMessageChange: handleMessageChange,
+          messageValue: messageToSend,
+        }}
+      />
+    )
   }
 
   return (
@@ -257,6 +354,7 @@ const Matching = () => {
                 matchType={item.matchType}
                 category={item.category}
                 borderSet={index < filteredItems.length - 1}
+                onClick={() => handleMatchItemClick(item)}
               />
             ))
           ) : (
@@ -281,6 +379,8 @@ const Matching = () => {
         />
       </FloatingButtonContainer>
       <NavigationComponent />
+
+      {renderModal()}
     </RootContainer>
   )
 }

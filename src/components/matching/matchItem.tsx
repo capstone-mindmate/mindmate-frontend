@@ -12,6 +12,7 @@ interface MatchItemProps {
   matchType: string
   category: string
   borderSet: boolean
+  onClick: () => void
 }
 
 const matchItemStyle = {
@@ -81,9 +82,14 @@ const MatchItem = ({
   matchType,
   category,
   borderSet,
+  onClick,
 }: MatchItemProps) => {
   return (
-    <div className="container" css={matchItemStyle.container(borderSet)}>
+    <div
+      className="container"
+      css={matchItemStyle.container(borderSet)}
+      onClick={onClick}
+    >
       <div className="infoWrapper" css={matchItemStyle.infoWrapper}>
         <div className="department">
           <p css={matchItemStyle.department}>{department}</p>
