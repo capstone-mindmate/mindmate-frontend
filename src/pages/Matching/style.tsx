@@ -110,3 +110,18 @@ export const MatchItemsContainer = styled.div`
   padding-top: 140px;
   padding-bottom: 90px;
 `
+
+export const FloatingButtonContainer = styled.div`
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 90px;
+`
+
+export const HiddenButtons = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+`

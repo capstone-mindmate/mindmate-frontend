@@ -55,6 +55,13 @@ const matchItemStyle = {
     font-size: 14px;
     font-weight: 400;
     line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     margin: 0;
     color: #727272;
   `,
