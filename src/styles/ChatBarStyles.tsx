@@ -1,19 +1,37 @@
 import styled from '@emotion/styled'
 
+export const WrapperStyle = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`
+
 export const ChatBarContainer = styled.div`
   position: sticky;
   bottom: 0;
-  padding: 20px 0px;
+  padding: 15px 0px;
   background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 3000;
   width: 100%;
+  border-top: 1px solid #eee;
+  box-sizing: border-box;
 
   @media all and (max-width: 767px) {
     padding: 10px 15px;
   }
+`
+
+export const ControlsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 767px;
+  margin: 0 auto;
+  gap: 10px;
+  padding: 0 15px;
 `
 
 export const InputContainer = styled.div`
@@ -21,6 +39,7 @@ export const InputContainer = styled.div`
   width: 100%;
   position: relative;
   align-items: center;
+  box-sizing: border-box;
 
   @media all and (max-width: 767px) {
     max-width: 100%;
@@ -30,7 +49,7 @@ export const InputContainer = styled.div`
 export const StyledInput = styled.input`
   width: 100%;
   padding: 12px 45px 12px 15px;
-  border: 1px solid #ffffff;
+  border: 1px solid #eeeeee;
   border-radius: 24px;
   font-family: 'Pretendard', sans-serif;
   font-weight: 400;
@@ -46,8 +65,13 @@ export const StyledInput = styled.input`
   }
 `
 
+export const IconWrapper = styled.div`
+  cursor: pointer;
+`
+
 interface IconButtonProps {
   position: 'left' | 'right'
+  disabled?: boolean
 }
 
 export const IconButton = styled.button<IconButtonProps>`
@@ -57,12 +81,13 @@ export const IconButton = styled.button<IconButtonProps>`
   height: 32px;
   border: none;
   background: none;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0;
   z-index: 2;
+  opacity: ${(props) => (props.disabled ? 0.5 : 1)};
 
   svg {
     width: 24px;
@@ -70,6 +95,6 @@ export const IconButton = styled.button<IconButtonProps>`
   }
 
   &:active {
-    opacity: 0.7;
+    opacity: ${(props) => (props.disabled ? 0.5 : 0.7)};
   }
 `

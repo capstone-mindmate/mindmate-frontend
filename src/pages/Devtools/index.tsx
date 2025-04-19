@@ -43,6 +43,8 @@ import { css } from '@emotion/react'
 
 // styles 경로 변환
 import { GlobalStyles } from '../../../styles/GlobalStyles'
+import CoinBox from '../../components/coin/CoinBox.tsx'
+import Magazine from '../../components/magazine/Magazine.tsx'
 const iconListStyles = css`
   width: 100%;
   display: flex;
@@ -155,9 +157,36 @@ function App() {
     'thanks',
   ]
 
+  const magazineItems = [
+    {
+      id: 1,
+      title: '친구 사이에도 거리두기가 필요해',
+      detail: '인간관계 때문에 고민중이라면 읽어보세요 👀',
+      imageSrc: 'public/image.png',
+    },
+    {
+      id: 2,
+      title: '익명 대화 뜻밖의 현실조언',
+      detail: '인간관계 때문에 고민중이라면 필독👀',
+      imageSrc: 'public/image.png',
+    },
+    {
+      id: 3,
+      title: '친구 사이에도 거리두기가 필요해',
+      detail: '인간관계 때문에 고민중이라면 필독👀',
+      imageSrc: 'public/image.png',
+    },
+    {
+      id: 4,
+      title: '친구 사이에도 거리두기가 필요해',
+      detail: '인간관계 때문에 고민중이라면 필독👀',
+      imageSrc: 'public/image.png',
+    },
+  ]
+
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-      <div style={{ width: '767px' }}>
+      <div style={{ width: '100%' }}>
         <GlobalStyles />
         <TopBar
           title="타이틀 입력"
@@ -166,6 +195,19 @@ function App() {
           actionText="등록"
           onActionClick={handleAction}
         />
+        <CoinBox coinCount={500} />
+        <div
+          style={{
+            margin: '0 24px',
+          }}
+        >
+          <Magazine
+            title="콘텐츠 모음"
+            items={magazineItems}
+            onItemClick={(item) => console.log('클릭된 아이템:', item)}
+            onBackClick={() => console.log('뒤로가기 클릭')}
+          />
+        </div>
         <div
           style={{
             display: 'flex',
@@ -879,11 +921,9 @@ function App() {
             />
             <AnswerInput title="한 직업을 평생 할 수 있다고 생각하시나요?" />
           </div>
-
           <div className="initial">
             <InitialProfileImageSetting />
           </div>
-
           <ChatBar onSendMessage={(msg) => console.log('보낸 메시지:', msg)} />
           <div className="navigation" style={{ width: '50%' }}>
             <div style={{ paddingBottom: '60px' }}>
