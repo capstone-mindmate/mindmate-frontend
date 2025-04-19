@@ -43,6 +43,7 @@ import { css } from '@emotion/react'
 // styles 경로 변환
 import { GlobalStyles } from '../../../styles/GlobalStyles'
 import CoinBox from '../../components/coin/CoinBox.tsx'
+import Magazine from '../../components/magazine/Magazine.tsx'
 const iconListStyles = css`
   width: 100%;
   display: flex;
@@ -155,6 +156,33 @@ function App() {
     'thanks',
   ]
 
+  const magazineItems = [
+    {
+      id: 1,
+      title: '친구 사이에도 거리두기가 필요해',
+      detail: '인간관계 때문에 고민중이라면 읽어보세요 👀',
+      imageSrc: 'public/image.png',
+    },
+    {
+      id: 2,
+      title: '익명 대화 뜻밖의 현실조언',
+      detail: '인간관계 때문에 고민중이라면 필독👀',
+      imageSrc: 'public/image.png',
+    },
+    {
+      id: 3,
+      title: '친구 사이에도 거리두기가 필요해',
+      detail: '인간관계 때문에 고민중이라면 필독👀',
+      imageSrc: 'public/image.png',
+    },
+    {
+      id: 4,
+      title: '친구 사이에도 거리두기가 필요해',
+      detail: '인간관계 때문에 고민중이라면 필독👀',
+      imageSrc: 'public/image.png',
+    },
+  ]
+
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
       <div style={{ width: '100%' }}>
@@ -167,6 +195,18 @@ function App() {
           onActionClick={handleAction}
         />
         <CoinBox coinCount={500} />
+        <div
+          style={{
+            margin: '0 24px',
+          }}
+        >
+          <Magazine
+            title="콘텐츠 모음"
+            items={magazineItems}
+            onItemClick={(item) => console.log('클릭된 아이템:', item)}
+            onBackClick={() => console.log('뒤로가기 클릭')}
+          />
+        </div>
         <div
           style={{
             display: 'flex',
