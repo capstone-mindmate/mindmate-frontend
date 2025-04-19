@@ -5,7 +5,7 @@ import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
 import Matching from '../pages/Matching'
 import ChatTest from '../pages/ChatTest/ChatTest'
-
+import RegisterChatRoom from '../pages/Matching/registerChatRoom'
 export const router = createBrowserRouter([
   {
     path: '/register',
@@ -26,6 +26,10 @@ export const router = createBrowserRouter([
   {
     path: '/matching',
     element: <Matching />,
+  },
+  {
+    path: '/matching/register',
+    element: <RegisterChatRoom />,
   },
   {
     path: '*',
