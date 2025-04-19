@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   SearchIcon,
   ListIcon,
@@ -143,7 +143,7 @@ const matchItemsData = [
 ]
 
 const Matching = () => {
-  const location = useLocation()
+  const navigate = useNavigate()
 
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
     null
@@ -276,7 +276,10 @@ const Matching = () => {
             <IconList>
               <SearchIcon color="#392111" />
               <ListIcon color="#392111" />
-              <PlusIcon color="#392111" />
+              <PlusIcon
+                color="#392111"
+                onClick={() => navigate('/matching/register')}
+              />
             </IconList>
           </MatchingTopBar>
 
@@ -366,7 +369,7 @@ const Matching = () => {
                 color: '#888',
               }}
             >
-              조건에 맞는 매칭 항목이 없습니다.
+              매칭방이 없습니다.
             </div>
           )}
         </MatchItemsContainer>
