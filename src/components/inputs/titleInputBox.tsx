@@ -21,6 +21,9 @@ const getInputStyle = (isFocused: boolean, isCompleted: boolean) => css`
   background-color: #ffffff;
   transition: border-color 0.2s ease;
   color: #150c06;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
 `
 
 const inputBoxStyle = {

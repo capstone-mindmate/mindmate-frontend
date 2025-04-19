@@ -1,14 +1,16 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
-import { useState } from 'react'
-
+import { useState, useEffect } from 'react'
+import { media } from '../../styles/breakpoints'
 interface CategoryButtonProps {
   buttonText: string
   onActiveChange?: (isActive: boolean) => void
+  widthType: 'full' | 'half'
+  initialActive?: boolean
 }
 
 const buttonStyle = (isActive: boolean) => css`
-  width: 165px;
+  width: 100%;
   height: 68px;
   background-color: ${isActive ? '#FFF9EB' : '#FFFFFF'};
   color: ${isActive ? '#392111' : '#727272'};
@@ -27,8 +29,14 @@ const buttonStyle = (isActive: boolean) => css`
 const CategoryButton: React.FC<CategoryButtonProps> = ({
   buttonText,
   onActiveChange,
+  widthType = 'full',
+  initialActive = false,
 }) => {
-  const [isActive, setIsActive] = useState(false)
+  const [isActive, setIsActive] = useState(initialActive)
+
+  useEffect(() => {
+    setIsActive(initialActive)
+  }, [initialActive])
 
   const handleClick = () => {
     const newActiveState = !isActive
@@ -37,10 +45,24 @@ const CategoryButton: React.FC<CategoryButtonProps> = ({
   }
 
   return (
-    <div className="container">
-      <button css={buttonStyle(isActive)} onClick={handleClick}>
-        {buttonText}
-      </button>
+    <div
+      css={[
+        buttonStyle(isActive),
+        widthType === 'half'
+          ? css`
+              width: 48%;
+
+              ${media.mobileSmall} {
+                width: 46%;
+              }
+            `
+          : css`
+              width: 100%;
+            `,
+      ]}
+      onClick={handleClick}
+    >
+      {buttonText}
     </div>
   )
 }
