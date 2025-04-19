@@ -42,6 +42,7 @@ import { css } from '@emotion/react'
 
 // styles 경로 변환
 import { GlobalStyles } from '../../../styles/GlobalStyles'
+import CoinBox from '../../components/coin/CoinBox.tsx'
 const iconListStyles = css`
   width: 100%;
   display: flex;
@@ -156,7 +157,7 @@ function App() {
 
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-      <div style={{ width: '767px' }}>
+      <div style={{ width: '100%' }}>
         <GlobalStyles />
         <TopBar
           title="타이틀 입력"
@@ -165,6 +166,7 @@ function App() {
           actionText="등록"
           onActionClick={handleAction}
         />
+        <CoinBox coinCount={500} />
         <div
           style={{
             display: 'flex',
