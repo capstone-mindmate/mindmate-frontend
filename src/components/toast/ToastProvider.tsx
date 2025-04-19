@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react'
-import Toast from './Toast.tsx'
-import { ToastsContainer } from '../../styles/ToastStyles.tsx'
+import Toast from './Toast'
+import { ToastsContainer } from '../../styles/ToastStyles'
 
 // 토스트 타입 정의
 export type ToastType = 'info' | 'error' | 'warning' | 'success'
