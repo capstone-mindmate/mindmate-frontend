@@ -4,6 +4,8 @@ import Devtools from '../pages/Devtools'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
 import Matching from '../pages/Matching'
+import ChatTest from '../pages/ChatTest/ChatTest'
+
 export const router = createBrowserRouter([
   {
     path: '/register',
@@ -29,5 +31,9 @@ export const router = createBrowserRouter([
     path: '*',
     // element: <div>404 Not Found</div>
     element: <Devtools />,
+  },
+  {
+    path: '/chat-test',
+    element: <ChatTest />,
   },
 ])
