@@ -4,6 +4,9 @@ import Devtools from '../pages/Devtools'
 import ChatTest from '../pages/ChatTest/ChatTest'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
+import Matching from '../pages/Matching'
+import HomePage from '../pages/Home/Home.tsx'
+import MyPage from '../pages/Mypage/Mypage.tsx'
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +24,18 @@ export const router = createBrowserRouter([
   {
     path: '/onboarding',
     element: <OnboardingPage />,
+  },
+  {
+    path: '/matching',
+    element: <Matching />,
+  },
+  {
+    path: '/home',
+    element: <HomePage />,
+  },
+  {
+    path: '/mypage',
+    element: <MyPage />,
   },
   {
     path: '*',

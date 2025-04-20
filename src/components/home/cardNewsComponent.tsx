@@ -11,7 +11,7 @@ interface CardNewsComponentProps {
 const containerStyle = css`
   display: flex;
   flex-direction: column;
-  width: 250px;
+  width: 200px;
   cursor: pointer;
 `
 

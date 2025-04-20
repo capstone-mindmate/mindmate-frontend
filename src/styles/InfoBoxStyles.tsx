@@ -11,7 +11,11 @@ export const InfoBoxContainer = styled.div`
   color: #392111;
   width: 100%;
   max-width: 350px;
-  margin: 0 24px;
+
+  @media (max-width: 480px) {
+    max-width: 325px;
+    padding: 8px 0px;
+  }
 `
 
 // 각 섹션 컨테이너
@@ -67,4 +71,8 @@ export const Divider = styled.div`
   width: 1px;
   background-color: #c1bfbe;
   margin: 20px 10px;
+
+  @media (max-width: 480px) {
+    margin: 20px 0px;
+  }
 `
