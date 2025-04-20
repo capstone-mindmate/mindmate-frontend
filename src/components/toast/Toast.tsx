@@ -5,7 +5,7 @@ import {
   MessageText,
   CloseButton,
 } from '../../styles/ToastStyles.tsx'
-import { ToastType } from './ToastProvider.tsx'
+import { ToastType } from './ToastProvider'
 import {
   InfoIcon,
   ErrorIcon,
