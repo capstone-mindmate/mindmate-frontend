@@ -159,6 +159,8 @@ const Matching = () => {
   >(null)
   const [messageToSend, setMessageToSend] = useState('')
 
+  const [isMatchFailure, setIsMatchFailure] = useState(false)
+
   useEffect(() => {
     let filtered = matchItemsData
 
@@ -215,6 +217,14 @@ const Matching = () => {
     setMessageToSend('')
   }
 
+  const handleOpenMatchFailureModal = () => {
+    setIsMatchFailure(true)
+  }
+
+  const handleCloseMatchFailureModal = () => {
+    setIsMatchFailure(false)
+  }
+
   // 메시지 입력 핸들러
   const handleMessageChange = (value: string) => {
     setMessageToSend(value)
@@ -262,6 +272,34 @@ const Matching = () => {
         messageProps={{
           onMessageChange: handleMessageChange,
           messageValue: messageToSend,
+        }}
+      />
+    )
+  }
+
+  const renderMatchFailure = () => {
+    if (!isMatchFailure) return null
+
+    return (
+      <ModalComponent
+        modalType="매칭실패"
+        buttonText="닫기"
+        buttonClick={handleCloseMatchFailureModal}
+        onClose={handleCloseMatchFailureModal}
+        isOpen={isMatchFailure}
+        userProfileProps={{
+          profileImage: '',
+          name: '서버한테 전달 받기',
+          department: '서버한테 전달 받기',
+          makeDate: '서버한테 전달 받기',
+        }}
+        matchingInfoProps={{
+          title: '서버한테 전달 받기',
+          description: '서버한테 전달 받기',
+        }}
+        messageProps={{
+          onMessageChange: handleMessageChange,
+          messageValue: '서버한테 전달 받기',
         }}
       />
     )
@@ -381,9 +419,11 @@ const Matching = () => {
           speakerHandler={handleSpeakerSelect}
         />
       </FloatingButtonContainer>
+
       <NavigationComponent />
 
       {renderModal()}
+      {renderMatchFailure()}
     </RootContainer>
   )
 }

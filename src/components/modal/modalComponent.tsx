@@ -301,9 +301,9 @@ const ModalComponent = ({
           <div className="modal-body" css={modalStyles.modalBody}>
             <div css={[modalStyles.profileContent]}>
               <ModalMatchingFailureUserProfile
-                profileImage=""
-                name="건드리면 짖는댕"
-                department="소프트웨어학과"
+                profileImage={userProfileProps.profileImage}
+                name={userProfileProps.name}
+                department={userProfileProps.department}
                 onBackClick={() => {
                   showDetails ? setShowDetails(false) : setShowDetails(true)
                 }}
@@ -326,7 +326,7 @@ const ModalComponent = ({
               >
                 <YellowInputBox
                   placeholder="메시지를 입력해주세요"
-                  value="진로 고민 들어주세요"
+                  value={matchingInfoProps.title}
                   onChange={() => {}}
                   activeState={false}
                   isTitle={true}
@@ -334,7 +334,7 @@ const ModalComponent = ({
 
                 <YellowInputBox
                   placeholder="메시지를 입력해주세요"
-                  value="저 아주대 앞에서 붕어빵 팔아도 될까요? 친구들이 저 알아보면 어떻게 하죠???? 그건 두려운데 ㅠㅠ"
+                  value={matchingInfoProps.description}
                   height={0}
                   onChange={() => {}}
                   activeState={false}
@@ -343,10 +343,10 @@ const ModalComponent = ({
 
                 <GrayInputBox
                   placeholder="상대방에게 전달하고 싶은 메시지를 입력해주세요"
-                  value=""
+                  value={messageProps.messageValue}
                   height={100}
                   onChange={() => {}}
-                  activeState={true}
+                  activeState={false}
                 />
               </div>
             </div>
