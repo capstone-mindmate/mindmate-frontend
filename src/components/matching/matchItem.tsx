@@ -26,6 +26,8 @@ const matchItemStyle = {
     padding: 20px 0;
     cursor: pointer;
     border-bottom: ${borderSet ? '1px solid #E6E6E6' : 'none'};
+    padding: 20px 24px;
+    box-sizing: border-box;
   `,
 
   infoWrapper: css`

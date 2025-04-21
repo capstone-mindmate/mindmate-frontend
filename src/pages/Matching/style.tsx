@@ -14,7 +14,6 @@ export const MatchingContainer = styled.div`
   width: 478px;
   height: 100%;
   position: relative;
-  padding: 0 24px;
   box-sizing: border-box;
 
   ${media.mobileBig} {
@@ -29,8 +28,7 @@ export const TopFixedContent = styled.div`
   background-color: #ffffff;
 
   ${media.mobileBig} {
-    left: 20px;
-    right: 20px;
+    width: 100%;
   }
 `
 
@@ -41,6 +39,8 @@ export const MatchingTopBar = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  padding: 0 24px;
+  box-sizing: border-box;
 `
 
 export const IconList = styled.div`
@@ -81,6 +81,7 @@ export const CategoryItem = styled.div`
   cursor: pointer;
   color: #afafaf;
   cursor: selecte;
+  box-sizing: border-box;
   &.selected {
     box-shadow: inset 0 -2px 0 #392111;
     color: #392111;
@@ -100,6 +101,7 @@ export const CategoryDetailContainer = styled.div`
   flex-direction: row;
   gap: 6px;
   margin-top: 16px;
+  padding: 0 24px;
 `
 
 export const MatchItemsContainer = styled.div`
