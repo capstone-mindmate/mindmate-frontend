@@ -15,12 +15,16 @@ const registerStyles = {
   categoryBox: css`
     width: 100%;
     margin-top: 12px;
+    padding: 0 24px;
+    box-sizing: border-box;
   `,
   inputChatRoomInfo: css`
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin-top: 24px;
+    padding: 0 24px;
+    box-sizing: border-box;
   `,
   categorySelect: css`
     border: none;
@@ -35,12 +39,16 @@ const registerStyles = {
     flex-direction: row;
     gap: 8px;
     margin-top: 12px;
+    padding: 0 24px;
+    box-sizing: border-box;
   `,
   positionSetting: css`
     display: flex;
     flex-direction: row;
     gap: 8px;
     margin-top: 12px;
+    padding: 0 24px;
+    box-sizing: border-box;
   `,
   titleText: css`
     font-size: 16px;
@@ -49,6 +57,8 @@ const registerStyles = {
     color: #393939;
     margin: 0;
     margin-top: 24px;
+    padding: 0 24px;
+    box-sizing: border-box;
   `,
 }
 
