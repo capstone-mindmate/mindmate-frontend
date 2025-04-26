@@ -7,6 +7,7 @@ import PersonalInformationDocument from '../pages/Register/steps/PersonalInforma
 import Matching from '../pages/Matching'
 import HomePage from '../pages/Home/Home.tsx'
 import MyPage from '../pages/Mypage/Mypage.tsx'
+import Review from '../pages/Review/ReviewPage.tsx'
 
 export const router = createBrowserRouter([
   {
@@ -45,5 +46,9 @@ export const router = createBrowserRouter([
   {
     path: '/chat-test',
     element: <ChatTest />,
+  },
+  {
+    path: '/review',
+    element: <Review />,
   },
 ])
