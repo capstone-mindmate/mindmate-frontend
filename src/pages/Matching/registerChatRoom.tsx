@@ -107,7 +107,7 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
   return (
     <RootContainer>
       <TopBar title="매칭방 만들기" showBackButton actionText="등록" />
-      <MatchingContainer>
+      <MatchingContainer style={{ paddingTop: '57px' }}>
         <div className="categoryBox" css={registerStyles.categoryBox}>
           <select
             name="category"

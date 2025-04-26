@@ -25,7 +25,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
     <RootContainer>
       <TopBar title="매칭방 목록" showBackButton actionText="" />
       <MatchingContainer>
-        <TopFixedContent>
+        <TopFixedContent fixedType="matched">
           <CategoryContainer>
             <CategoryItem
               className={selectedCategory === '전체' ? 'selected' : ''}

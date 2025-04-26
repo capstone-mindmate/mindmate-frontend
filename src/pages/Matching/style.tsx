@@ -21,9 +21,9 @@ export const MatchingContainer = styled.div`
   }
 `
 
-export const TopFixedContent = styled.div`
+export const TopFixedContent = styled.div<{ fixedType: 'normal' | 'matched' }>`
   position: fixed;
-  top: 0;
+  ${({ fixedType }) => (fixedType === 'normal' ? 'top: 0;' : 'top: 57px;')}
   z-index: 100;
   background-color: #ffffff;
 

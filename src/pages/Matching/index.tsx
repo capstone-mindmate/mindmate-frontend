@@ -308,7 +308,7 @@ const Matching = () => {
   return (
     <RootContainer>
       <MatchingContainer>
-        <TopFixedContent>
+        <TopFixedContent fixedType="normal">
           <MatchingTopBar>
             <TopBarTitle>매칭하기</TopBarTitle>
             <IconList>
