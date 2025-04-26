@@ -313,7 +313,10 @@ const Matching = () => {
             <TopBarTitle>매칭하기</TopBarTitle>
             <IconList>
               <SearchIcon color="#392111" />
-              <ListIcon color="#392111" />
+              <ListIcon
+                color="#392111"
+                onClick={() => navigate('/matching/matched')}
+              />
               <PlusIcon
                 color="#392111"
                 onClick={() => navigate('/matching/register')}

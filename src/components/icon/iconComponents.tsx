@@ -284,8 +284,14 @@ export const ListIcon: React.FC<IconProps> = ({
   color = '#000000',
   className = '',
   strokeWidth = 2,
+  onClick,
 }) => (
-  <div className="icon-container" css={containerStyle}>
+  <div
+    className="icon-container"
+    css={containerStyle}
+    onClick={onClick}
+    style={{ cursor: 'pointer' }}
+  >
     <svg
       className={'list-icon ' + className}
       width={width}
