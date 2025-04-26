@@ -384,7 +384,7 @@ const Matching = () => {
           </CategoryDetailContainer>
         </TopFixedContent>
 
-        <MatchItemsContainer>
+        <MatchItemsContainer pageType="normal">
           {filteredItems.length > 0 ? (
             filteredItems.map((item, index) => (
               <MatchItem

@@ -22,6 +22,7 @@ export const MatchingContainer = styled.div`
 `
 
 export const TopFixedContent = styled.div<{ fixedType: 'normal' | 'matched' }>`
+  width: 478px;
   position: fixed;
   ${({ fixedType }) => (fixedType === 'normal' ? 'top: 0;' : 'top: 57px;')}
   z-index: 100;
@@ -104,13 +105,15 @@ export const CategoryDetailContainer = styled.div`
   padding: 0 24px;
 `
 
-export const MatchItemsContainer = styled.div`
+export const MatchItemsContainer = styled.div<{
+  pageType: 'normal' | 'matched'
+}>`
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 4px;
   align-items: flex-start;
-  padding-top: 140px;
+  padding-top: ${({ pageType }) => (pageType === 'normal' ? '140px' : '101px')};
   padding-bottom: 90px;
 `
 
@@ -127,4 +130,22 @@ export const HiddenButtons = styled.div`
   gap: 12px;
   align-items: center;
   justify-content: center;
+`
+
+export const MatchedInfoCategoryContainer = styled.div`
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #afafaf;
+  cursor: selecte;
+  box-sizing: border-box;
+  &.selected {
+    box-shadow: inset 0 -2px 0 #392111;
+    color: #392111;
+    cursor: default;
+  }
 `
