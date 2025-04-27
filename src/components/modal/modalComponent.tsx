@@ -150,6 +150,24 @@ const ModalComponent = ({
       margin: 12px 0;
     `,
 
+    modalBodyApplication: css`
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 32px 0;
+    `,
+
+    modalBodyCancel: css`
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 32px 0;
+    `,
+
     matchedInfoContainer: css`
       width: 100%;
       height: 0px;
@@ -168,6 +186,7 @@ const ModalComponent = ({
       line-height: 1.4;
       text-align: center;
       color: #000000;
+      margin: 0;
     `,
 
     matchedInfo: css`
@@ -207,6 +226,11 @@ const ModalComponent = ({
         transform: translateY(-20px);
         visibility: hidden;
       }
+    `,
+
+    modalFooter: css`
+      width: 100%;
+      margin-top: 20px;
     `,
   }
 
@@ -299,6 +323,208 @@ const ModalComponent = ({
           </div>
 
           <div className="modal-body" css={modalStyles.modalBody}>
+            <div css={[modalStyles.profileContent]}>
+              <ModalMatchingFailureUserProfile
+                profileImage={userProfileProps.profileImage}
+                name={userProfileProps.name}
+                department={userProfileProps.department}
+                onBackClick={() => {
+                  showDetails ? setShowDetails(false) : setShowDetails(true)
+                }}
+                showDetails={showDetails}
+              />
+            </div>
+
+            <div
+              ref={matchedInfoRef}
+              css={css`
+                ${modalStyles.matchedInfo}
+                height: ${matchedInfoHeight}px;
+              `}
+            >
+              <div
+                css={[
+                  modalStyles.detailsContent,
+                  showDetails && modalStyles.visible,
+                ]}
+              >
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value={matchingInfoProps.title}
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={true}
+                />
+
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value={matchingInfoProps.description}
+                  height={0}
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={false}
+                />
+
+                <GrayInputBox
+                  placeholder="상대방에게 전달하고 싶은 메시지를 입력해주세요"
+                  value={messageProps.messageValue}
+                  height={100}
+                  onChange={() => {}}
+                  activeState={false}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={() => onClose()}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  } else if (modalType === '매칭하기') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>
+              해당 신청자와
+              <br />
+              매칭을 진행하시겠습니까?
+            </p>
+          </div>
+
+          <div className="modal-body" css={modalStyles.modalBodyApplication}>
+            <div css={[modalStyles.profileContent]}>
+              <ModalMatchingUserProfile
+                profileImage={userProfileProps.profileImage}
+                name={userProfileProps.name}
+                department={userProfileProps.department}
+                makeDate={userProfileProps.makeDate}
+              />
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={() => onClose()}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  } else if (modalType === '매칭성사') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>
+              매칭이 성사되었습니다 💌
+              <br />
+              지금 바로 대화를 시작해보세요
+            </p>
+          </div>
+
+          <div className="modal-body" css={modalStyles.modalBody}>
+            <div css={[modalStyles.profileContent]}>
+              <ModalMatchingFailureUserProfile
+                profileImage={userProfileProps.profileImage}
+                name={userProfileProps.name}
+                department={userProfileProps.department}
+                onBackClick={() => {
+                  showDetails ? setShowDetails(false) : setShowDetails(true)
+                }}
+                showDetails={showDetails}
+              />
+            </div>
+
+            <div
+              ref={matchedInfoRef}
+              css={css`
+                ${modalStyles.matchedInfo}
+                height: ${matchedInfoHeight}px;
+              `}
+            >
+              <div
+                css={[
+                  modalStyles.detailsContent,
+                  showDetails && modalStyles.visible,
+                ]}
+              >
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value={matchingInfoProps.title}
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={true}
+                />
+
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value={matchingInfoProps.description}
+                  height={0}
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={false}
+                />
+
+                <GrayInputBox
+                  placeholder="상대방에게 전달하고 싶은 메시지를 입력해주세요"
+                  value={messageProps.messageValue}
+                  height={100}
+                  onChange={() => {}}
+                  activeState={false}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={() => onClose()}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  } else if (modalType == '매칭취소') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>매칭을 취소하시겠습니까?</p>
+          </div>
+
+          <div className="modal-body" css={modalStyles.modalBodyCancel}>
             <div css={[modalStyles.profileContent]}>
               <ModalMatchingFailureUserProfile
                 profileImage={userProfileProps.profileImage}

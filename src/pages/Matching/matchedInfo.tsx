@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import TopBar from '../../components/topbar/Topbar'
 import { css } from '@emotion/react'
 
@@ -14,7 +14,9 @@ import {
   MatchItemsContainer,
 } from './style'
 import MatchItem from '../../components/matching/matchItem'
-const matchItemsData = [
+import ModalComponent from '../../components/modal/modalComponent'
+
+const myCreatedMatchingRooms = [
   {
     id: 1,
     department: '소프트웨어학과',
@@ -26,6 +28,7 @@ const matchItemsData = [
     username: '행복한 돌멩이',
     profileImage: '/public/image.png',
     makeDate: '04월 19일 15:30',
+    applicationCount: 3,
   },
   {
     id: 2,
@@ -38,7 +41,11 @@ const matchItemsData = [
     username: '건들면 짖는댕',
     profileImage: '/public/image.png',
     makeDate: '04월 19일 14:20',
+    applicationCount: 1,
   },
+]
+
+const appliedMatchingRooms = [
   {
     id: 3,
     department: '소프트웨어학과',
@@ -48,22 +55,104 @@ const matchItemsData = [
     category: '취업',
     borderSet: true,
     username: '말하고 싶어라',
-    profileImage: '/public/image copy.png',
+    profileImage: '/public/image.png',
     makeDate: '04월 18일 22:15',
+    applicationCount: 0,
+    applicationStatus: '대기중',
+  },
+  {
+    id: 4,
+    department: '컴퓨터공학과',
+    title: '인턴 경험 공유',
+    description: '인턴 경험에 대해 공유하고 싶습니다.',
+    matchType: '스피커',
+    category: '취업',
+    borderSet: true,
+    username: '코딩마스터',
+    profileImage: '/public/image.png',
+    makeDate: '04월 17일 18:45',
+    applicationCount: 0,
+    applicationStatus: '수락됨',
   },
 ]
 
 interface MatchedInfoProps {}
 
 const MatchedInfo = ({}: MatchedInfoProps) => {
+  const navigate = useNavigate()
   const [selectedCategory, setSelectedCategory] = useState('내가 만든 매칭방')
+  const [matchingRooms, setMatchingRooms] = useState<any[]>([])
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedApplication, setSelectedApplication] = useState<
+    (typeof appliedMatchingRooms)[0] | null
+  >(null)
+
+  useEffect(() => {
+    if (selectedCategory === '내가 만든 매칭방') {
+      setMatchingRooms(myCreatedMatchingRooms)
+    } else {
+      setMatchingRooms(appliedMatchingRooms)
+    }
+  }, [selectedCategory])
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category)
   }
 
-  const handleMatchItemClick = (item: (typeof matchItemsData)[0]) => {
-    console.log(item)
+  const handleMatchItemClick = (item: any) => {
+    if (selectedCategory === '내가 만든 매칭방') {
+      navigate('/matching/application', { state: { item } })
+    } else {
+      handleOpenModal(item)
+    }
+  }
+
+  const handleOpenModal = (application: (typeof appliedMatchingRooms)[0]) => {
+    setSelectedApplication(application)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
+
+  const handleMatchApplicationClick = (
+    application: (typeof appliedMatchingRooms)[0]
+  ) => {
+    handleOpenModal(application)
+  }
+
+  const handleMatchingCancelRequest = () => {
+    // 여기서 매칭 취소 콜하기
+  }
+
+  const renderModal = () => {
+    if (!isModalOpen || !selectedApplication) return null
+
+    return (
+      <ModalComponent
+        modalType="매칭취소"
+        buttonText="매칭취소"
+        buttonClick={handleMatchingCancelRequest}
+        onClose={handleCloseModal}
+        isOpen={isModalOpen}
+        userProfileProps={{
+          profileImage: selectedApplication.profileImage,
+          name: selectedApplication.username,
+          department: selectedApplication.department,
+          makeDate: selectedApplication.makeDate,
+        }}
+        matchingInfoProps={{
+          title: 'asdf',
+          description: 'asdf',
+        }}
+        messageProps={{
+          onMessageChange: () => {},
+          messageValue: 'asdf',
+        }}
+      />
+    )
   }
 
   return (
@@ -93,33 +182,27 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
         </TopFixedContent>
 
         <MatchItemsContainer pageType="matched">
-          {matchItemsData.length > 0 ? (
-            matchItemsData.map((item, index) => (
-              <MatchItem
-                key={item.id}
-                department={item.department}
-                title={item.title}
-                description={item.description}
-                matchType={item.matchType}
-                category={item.category}
-                borderSet={index < matchItemsData.length - 1}
-                onClick={() => handleMatchItemClick(item)}
-              />
+          {matchingRooms.length > 0 ? (
+            matchingRooms.map((item, index) => (
+              <div key={item.id} style={{ width: '100%' }}>
+                <MatchItem
+                  department={item.department}
+                  title={item.title}
+                  description={item.description}
+                  matchType={item.matchType}
+                  category={item.category}
+                  borderSet={index < matchingRooms.length - 1}
+                  onClick={() => handleMatchItemClick(item)}
+                />
+              </div>
             ))
           ) : (
-            <div
-              css={{
-                padding: '20px',
-                textAlign: 'center',
-                width: '100%',
-                color: '#888',
-              }}
-            >
-              매칭방이 없습니다.
-            </div>
+            <></>
           )}
         </MatchItemsContainer>
       </MatchingContainer>
+
+      {renderModal()}
     </RootContainer>
   )
 }

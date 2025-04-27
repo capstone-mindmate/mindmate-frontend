@@ -149,3 +149,10 @@ export const MatchedInfoCategoryContainer = styled.div`
     cursor: default;
   }
 `
+
+export const ApplicationList = styled.div<{ pageType: 'normal' | 'matched' }>`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 57px;
+`

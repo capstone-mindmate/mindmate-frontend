@@ -1,10 +1,11 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   SearchIcon,
   ListIcon,
   PlusIcon,
+  CloseIcon,
 } from '../../components/icon/iconComponents'
 import {
   RootContainer,
@@ -144,6 +145,7 @@ const matchItemsData = [
 
 const Matching = () => {
   const navigate = useNavigate()
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
     null
@@ -160,6 +162,9 @@ const Matching = () => {
   const [messageToSend, setMessageToSend] = useState('')
 
   const [isMatchFailure, setIsMatchFailure] = useState(false)
+
+  const [isSearchActive, setIsSearchActive] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     let filtered = matchItemsData
@@ -180,8 +185,40 @@ const Matching = () => {
       filtered = filtered.filter((item) => item.category === selectedCategory)
     }
 
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (item) =>
+          item.title.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query) ||
+          item.department.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query)
+      )
+    }
+
     setFilteredItems(filtered)
-  }, [selectedDepartment, isListenerActive, isSpeakerActive, selectedCategory])
+  }, [
+    selectedDepartment,
+    isListenerActive,
+    isSpeakerActive,
+    selectedCategory,
+    searchQuery,
+  ])
+
+  const toggleSearch = () => {
+    setIsSearchActive(!isSearchActive)
+    if (!isSearchActive) {
+      setTimeout(() => {
+        searchInputRef.current?.focus()
+      }, 300)
+    } else {
+      setSearchQuery('')
+    }
+  }
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category)
@@ -225,30 +262,83 @@ const Matching = () => {
     setIsMatchFailure(false)
   }
 
-  // 메시지 입력 핸들러
   const handleMessageChange = (value: string) => {
     setMessageToSend(value)
   }
 
-  // 매칭 신청 처리 핸들러
   const handleMatchingRequest = () => {
     if (selectedItem) {
       console.log('매칭 신청:', {
         ...selectedItem,
         message: messageToSend,
       })
-      // 매칭 신청 로직 추가 (API 호출 등)
       setIsModalOpen(false)
       setMessageToSend('')
     }
   }
 
-  // MatchItem을 클릭할 때 모달을 열기 위한 핸들러
   const handleMatchItemClick = (item: (typeof matchItemsData)[0]) => {
     handleOpenModal(item)
   }
 
-  // 커스텀 모달 컴포넌트 - 모달 컴포넌트 구현 방식에 따라 props 전달 방식이 달라질 수 있음
+  const renderSearchBar = () => {
+    return (
+      <div
+        css={css`
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: ${isSearchActive ? '100%' : '0'};
+          height: 48px;
+          background-color: white;
+          z-index: 1000;
+          display: flex;
+          align-items: center;
+          padding: ${isSearchActive ? '0 16px' : '0'};
+          transition: all 0.3s ease;
+          overflow: hidden;
+          box-sizing: border-box;
+          opacity: ${isSearchActive ? 1 : 0};
+        `}
+      >
+        <input
+          ref={searchInputRef}
+          type="text"
+          placeholder="검색어를 입력하세요"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          css={css`
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 8px 20px;
+            color: #392111;
+            opacity: ${isSearchActive ? 1 : 0};
+            transition: opacity 0.2s ease 0.2s;
+            &::placeholder {
+              color: #aaa;
+            }
+            background-color: whitesmoke;
+            box-sizing: border-box;
+            border-radius: 20px;
+          `}
+        />
+        <div
+          onClick={toggleSearch}
+          css={css`
+            cursor: pointer;
+            margin-left: 12px;
+            opacity: ${isSearchActive ? 1 : 0};
+            transition: opacity 0.2s ease 0.2s;
+          `}
+        >
+          <CloseIcon color="#392111" />
+        </div>
+      </div>
+    )
+  }
+
   const renderModal = () => {
     if (!isModalOpen || !selectedItem) return null
 
@@ -309,10 +399,18 @@ const Matching = () => {
     <RootContainer>
       <MatchingContainer>
         <TopFixedContent fixedType="normal">
+          {renderSearchBar()}
           <MatchingTopBar>
             <TopBarTitle>매칭하기</TopBarTitle>
             <IconList>
-              <SearchIcon color="#392111" />
+              <div
+                onClick={toggleSearch}
+                css={css`
+                  cursor: pointer;
+                `}
+              >
+                <SearchIcon color="#392111" />
+              </div>
               <ListIcon
                 color="#392111"
                 onClick={() => navigate('/matching/matched')}
@@ -410,7 +508,7 @@ const Matching = () => {
                 color: '#888',
               }}
             >
-              매칭방이 없습니다.
+              {searchQuery ? '검색 결과가 없습니다.' : '매칭방이 없습니다.'}
             </div>
           )}
         </MatchItemsContainer>
