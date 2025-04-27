@@ -8,6 +8,9 @@ import ChatTest from '../pages/ChatTest/ChatTest'
 import RegisterChatRoom from '../pages/Matching/registerChatRoom'
 import MatchedInfo from '../pages/Matching/matchedInfo'
 import MatchedApplication from '../pages/Matching/application'
+
+import EmoticonHome from '../pages/Emoticons/emoticonHome'
+
 export const router = createBrowserRouter([
   {
     path: '/register',
@@ -40,6 +43,10 @@ export const router = createBrowserRouter([
   {
     path: '/matching/application',
     element: <MatchedApplication />,
+  },
+  {
+    path: '/emoticons',
+    element: <EmoticonHome />,
   },
   {
     path: '*',
