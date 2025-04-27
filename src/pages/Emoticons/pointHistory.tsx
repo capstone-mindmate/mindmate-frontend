@@ -31,6 +31,86 @@ const PointHistoryPage = () => {
             historyBalance={1000}
             historyType="earn"
             borderTop={false}
+            borderBottom={true}
+          />
+
+          <PointHistory
+            historyName="이모티콘 구매"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+            borderTop={false}
+            borderBottom={true}
+          />
+
+          <PointHistory
+            historyName="이모티콘 구매"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+            borderTop={false}
+            borderBottom={true}
+          />
+
+          <PointHistory
+            historyName="이모티콘 구매"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+            borderTop={false}
+            borderBottom={true}
+          />
+
+          <PointHistory
+            historyName="이모티콘 구매"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+            borderTop={false}
+            borderBottom={true}
+          />
+
+          <PointHistory
+            historyName="이모티콘 구매"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+            borderTop={false}
+            borderBottom={true}
+          />
+
+          <PointHistory
+            historyName="이모티콘 구매"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+            borderTop={false}
+            borderBottom={true}
+          />
+
+          <PointHistory
+            historyName="이모티콘 구매"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+            borderTop={false}
+            borderBottom={true}
+          />
+
+          <PointHistory
+            historyName="이모티콘 구매"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+            borderTop={false}
             borderBottom={false}
           />
         </PointHistoryContainer>
