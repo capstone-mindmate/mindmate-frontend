@@ -91,3 +91,14 @@ export const EmotionWrapper = styled.div`
   justify-content: center;
   align-items: center;
 `
+
+export const TopItemContainer = styled.div`
+  width: 100%;
+  margin-top: 70px;
+`
+
+export const PointHistoryContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`

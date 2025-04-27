@@ -10,6 +10,8 @@ import MatchedInfo from '../pages/Matching/matchedInfo'
 import MatchedApplication from '../pages/Matching/application'
 
 import EmoticonHome from '../pages/Emoticons/emoticonHome'
+import PointPurchase from '../pages/Emoticons/pointPurchase'
+import PointHistory from '../pages/Emoticons/pointHistory'
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +49,14 @@ export const router = createBrowserRouter([
   {
     path: '/emoticons',
     element: <EmoticonHome />,
+  },
+  {
+    path: '/coin',
+    element: <PointPurchase />,
+  },
+  {
+    path: '/coin/history',
+    element: <PointHistory />,
   },
   {
     path: '*',

@@ -2,16 +2,41 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { RootContainer, EmoticonsContainer } from './style'
+import {
+  RootContainer,
+  EmoticonsContainer,
+  TopItemContainer,
+  PointHistoryContainer,
+} from './style'
+import TopBar from '../../components/topbar/Topbar'
+import CoinBox from '../../components/coin/CoinBox'
+import PointHistory from '../../components/point/pointHistory'
 
-const PointHistory = () => {
+const PointHistoryPage = () => {
   const navigate = useNavigate()
 
   return (
     <RootContainer>
-      <EmoticonsContainer></EmoticonsContainer>
+      <TopBar title="코인 사용내역" showBackButton={true} />
+      <EmoticonsContainer>
+        <TopItemContainer>
+          <CoinBox coinCount={500} />
+        </TopItemContainer>
+
+        <PointHistoryContainer>
+          <PointHistory
+            historyName="이모티콘 구매"
+            historyDate="2025-01-17"
+            historyPoint={1000}
+            historyBalance={1000}
+            historyType="earn"
+            borderTop={false}
+            borderBottom={false}
+          />
+        </PointHistoryContainer>
+      </EmoticonsContainer>
     </RootContainer>
   )
 }
 
-export default PointHistory
+export default PointHistoryPage
