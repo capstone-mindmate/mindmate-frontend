@@ -8,9 +8,9 @@ export const CoinBoxContainer = styled.div`
   background-color: #f5f5f5;
   border: 1px solid #d9d9d9;
   border-radius: 8px;
-  width: 90%;
+  width: 100%;
   box-sizing: border-box;
-  margin: 30px auto;
+  margin: 0;
   max-width: 700px;
 `
 
