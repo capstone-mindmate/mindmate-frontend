@@ -1443,6 +1443,44 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.6.1.tgz#13e09a32d7a8b7060fe38304788ebf4197cd2149"
   integrity sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw==
 
+"@tosspayments/brandpay-types@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@tosspayments/brandpay-types/-/brandpay-types-0.2.6.tgz#0a64d6cd4a6be97af374ad6cf0f2d155312d3819"
+  integrity sha512-FY8aOm/2rqtXjYux9ZdNTL6GC5+VNIw8eOQ7TP01dS2uGWSzAtR6uuw9HVsgkmJtSyJgmo97tjmbio5oyeyFlg==
+
+"@tosspayments/payment-widget-sdk@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@tosspayments/payment-widget-sdk/-/payment-widget-sdk-0.12.0.tgz#40aaff2c8ee84be035142d000c07a94530ab3932"
+  integrity sha512-Ll3K2Zh9FdTOtINnO79FdVpeEWvJOfgMHdhUfzUs/QohdbOpT78mRXW9UwexMqBdEAJD/q4NJjOqGA7cFDjsjQ==
+  dependencies:
+    "@tosspayments/payment-widget__types" "1.1.0"
+
+"@tosspayments/payment-widget-types@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@tosspayments/payment-widget-types/-/payment-widget-types-0.0.5.tgz#649f1baf063eaeb59bcd24d6a2064f0841aed9fe"
+  integrity sha512-Daaui9u7aRPzJhw4omJIUAbYBSmNAFNjWWkuUnX9uHxzE3gtjcJHIpGrjlzmCFm+j3ZH4rgyrgv4pkazVYH3OQ==
+
+"@tosspayments/payment-widget__types@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@tosspayments/payment-widget__types/-/payment-widget__types-1.1.0.tgz#8fad48047a8f17b30f2919c57d119b3e5bad8fd3"
+  integrity sha512-1yVQIDNwgjzpm/n8ppsAk3Q0IKha+vOTuRIP6INzL9AkzCsrVjhHr5/eT0fe+tjyekSRL902Uq0TuRyG2sjsWw==
+  dependencies:
+    "@tosspayments/brandpay-types" "^0.2.6"
+    "@tosspayments/payment-widget-types" "^0.0.5"
+    "@tosspayments/payment__types" "^1.68.0"
+
+"@tosspayments/payment__types@^1.68.0":
+  version "1.69.1"
+  resolved "https://registry.yarnpkg.com/@tosspayments/payment__types/-/payment__types-1.69.1.tgz#4cab048465b344cbd621f85a268c4c874d47b028"
+  integrity sha512-QX9WSPiIke9VPch1zA80VFBSu7yKNuv/UnKy1V9B+YkC6sPN+sBcq/sl2fhj5tadTvkuYXDv139iR5TFwU2ayw==
+  dependencies:
+    "@tosspayments/sdk-constants" "^1.2.2"
+
+"@tosspayments/sdk-constants@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@tosspayments/sdk-constants/-/sdk-constants-1.2.2.tgz#7a6e655756982c5c1ebf28d81c57cfe9b7ca423b"
+  integrity sha512-6WxRHaiycSfz8gY9R/+StdkX5bprHyJ/rf2ak+b8YgBorxUwns8Ev+oyViNBmsPoE77RusaVFNv1kuiJpSNoDA==
+
 "@tosspayments/tosspayments-sdk@^2.3.4":
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/@tosspayments/tosspayments-sdk/-/tosspayments-sdk-2.3.4.tgz#f3d0fc3893d680ec93dba5ca80243097d29f666d"
