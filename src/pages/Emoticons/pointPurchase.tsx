@@ -37,7 +37,7 @@ const PointPurchase = () => {
             <EventCointText>런칭 기념, 한정 이벤트!</EventCointText>
             <EventTermText>4/30 ~ 6/30</EventTermText>
           </EventCoinTextWrapper>
-          <EventCoinPurchase coinCount={30} coinPrice={2500} />
+          <EventCoinPurchase coinCount={40} coinPrice={3000} />
         </EventCoinWrapper>
 
         <PurchaseCoinWrapper>
