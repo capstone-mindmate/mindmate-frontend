@@ -32,7 +32,7 @@ export const BoxSection = styled.div`
 export const Button = styled.button<{ disabled?: boolean }>`
   width: 100%;
   height: 48px;
-  background-color: ${(props) => (props.disabled ? '#DDDFE0' : '#3182F6')};
+  background-color: ${(props) => (props.disabled ? '#DDDFE0' : '#392111')};
   color: white;
   font-size: 16px;
   font-weight: bold;

@@ -44,7 +44,7 @@ const PurchaseFail = () => {
 
         <p
           css={css`
-            margin-top: 24px;
+            margin: 0;
             font-size: 16px;
             color: #666;
             text-align: center;
@@ -56,7 +56,6 @@ const PurchaseFail = () => {
         <button
           onClick={handleExit}
           css={css`
-            margin-top: 20px;
             padding: 12px 24px;
             background-color: #392111;
             color: white;
