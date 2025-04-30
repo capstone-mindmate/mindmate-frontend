@@ -11,7 +11,7 @@ export const TopBarContainer = styled.div`
   border-bottom: 1px solid #eeeeee;
   position: fixed;
   top: 0;
-  z-index: 5000;
+  z-index: 99;
 `
 
 // 페이지 제목 스타일 (body2_re)

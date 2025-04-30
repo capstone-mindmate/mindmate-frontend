@@ -1,5 +1,5 @@
 import React from 'react'
-import { BackIcon } from '../icon/iconComponents'
+import { BackIcon, KebabIcon } from '../icon/iconComponents'
 import {
   TopBarContainer,
   TopBarTitle,
@@ -13,6 +13,7 @@ interface TopBarProps {
   showBackButton?: boolean // 뒤로가기 버튼 표시 여부 (기본값: false)
   onBackClick?: () => void // 뒤로가기 버튼 클릭 핸들러
   actionText?: string // 액션 버튼 텍스트 (제공되지 않으면 버튼 미표시)
+  actionIcon?: boolean
   onActionClick?: () => void // 액션 버튼 클릭 핸들러
   isActionDisabled?: boolean // 액션 버튼 비활성화 상태 (기본값: false)
 }
@@ -23,6 +24,7 @@ const TopBar: React.FC<TopBarProps> = ({
   showBackButton = false,
   onBackClick,
   actionText,
+  actionIcon = false,
   onActionClick,
   isActionDisabled = false,
 }) => {
@@ -50,6 +52,15 @@ const TopBar: React.FC<TopBarProps> = ({
           isDisabled={isActionDisabled}
         >
           {actionText}
+        </TopBarActionButton>
+      )}
+      {actionIcon && (
+        <TopBarActionButton
+          onClick={onActionClick}
+          disabled={isActionDisabled}
+          isDisabled={isActionDisabled}
+        >
+          <KebabIcon color="#392111" />
         </TopBarActionButton>
       )}
     </TopBarContainer>

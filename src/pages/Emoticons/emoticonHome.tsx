@@ -64,7 +64,7 @@ const EmoticonHome = () => {
 
   return (
     <RootContainer>
-      <TopBar title="이모티콘 샵" showBackButton={true} />
+      <TopBar title="이모티콘 샵" showBackButton={true} actionIcon={true} />
       <EmoticonsContainer>
         <ProfileContainer>
           <EmoticonProfile
