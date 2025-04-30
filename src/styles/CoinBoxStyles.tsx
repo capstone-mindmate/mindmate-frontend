@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import { CoinIcon } from '../components/icon/iconComponents'
 
 export const CoinBoxContainer = styled.div`
   display: flex;
@@ -32,4 +33,31 @@ export const CoinBoxValue = styled.div`
   svg {
     margin-right: 4px;
   }
+`
+
+export const EventCoinBoxContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 15px;
+  border-radius: 8px;
+  background-color: #fffcf5;
+  border: 1px solid #f0daa9;
+`
+
+export const PriceInfo = styled.div`
+  display: flex;
+  align-items: row;
+  justify-content: center;
+  gap: 4px;
+`
+
+export const CoinBoxCotainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 15px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
 `
