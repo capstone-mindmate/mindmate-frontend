@@ -19,7 +19,7 @@ import EmoticonProfile from '../../components/mypage/emoticonProfile'
 import TopBar from '../../components/topbar/Topbar'
 import Emoticon from '../../components/emoticon/Emoticon'
 import ModalComponent from '../../components/modal/modalComponent'
-
+import BottomSheet from '../../components/bottomSheet/BottomSheet'
 const EmoticonHome = () => {
   const navigate = useNavigate()
 
@@ -27,6 +27,22 @@ const EmoticonHome = () => {
   const [selectedEmoticonType, setSelectedEmoticonType] = useState<
     string | null
   >(null)
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
+
+  const bottomSheetMenuItems = [
+    {
+      text: '코인 구매',
+      onClick: () => {
+        navigate('/coin')
+      },
+    },
+    {
+      text: '코인 사용내역',
+      onClick: () => {
+        navigate('/coin/history')
+      },
+    },
+  ]
 
   const handleEmoticonClick = (type: string) => {
     setSelectedEmoticonType(type)
@@ -64,7 +80,19 @@ const EmoticonHome = () => {
 
   return (
     <RootContainer>
-      <TopBar title="이모티콘 샵" showBackButton={true} actionIcon={true} />
+      <TopBar
+        title="이모티콘 샵"
+        showBackButton={true}
+        actionIcon={true}
+        onActionClick={() => setBottomSheetOpen(true)}
+      />
+
+      <BottomSheet
+        isOpen={bottomSheetOpen}
+        onClose={() => setBottomSheetOpen(false)}
+        menuItems={bottomSheetMenuItems}
+      />
+
       <EmoticonsContainer>
         <ProfileContainer>
           <EmoticonProfile
