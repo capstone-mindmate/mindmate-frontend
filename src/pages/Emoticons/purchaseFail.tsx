@@ -5,8 +5,8 @@ import { css } from '@emotion/react'
 
 import {
   RootContainer,
-  PerchaseResultContainer,
-  PerchaseResultHeaderText,
+  PurchaseResultContainer,
+  PurchaseResultHeaderText,
 } from './style'
 import Emoticon from '../../components/emoticon/Emoticon'
 
@@ -35,10 +35,10 @@ const PurchaseFail = () => {
 
   return (
     <RootContainer>
-      <PerchaseResultContainer>
-        <PerchaseResultHeaderText>
+      <PurchaseResultContainer>
+        <PurchaseResultHeaderText>
           결제에 실패했습니다.
-        </PerchaseResultHeaderText>
+        </PurchaseResultHeaderText>
 
         <Emoticon type="sad" size="xlarge" />
 
@@ -77,7 +77,7 @@ const PurchaseFail = () => {
         >
           나가기
         </button>
-      </PerchaseResultContainer>
+      </PurchaseResultContainer>
     </RootContainer>
   )
 }
