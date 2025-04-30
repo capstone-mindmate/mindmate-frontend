@@ -166,3 +166,22 @@ export const PurchaseCoinList = styled.div`
   margin-top: 12px;
   margin-bottom: 30px;
 `
+
+export const PerchaseResultContainer = styled.div`
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 0;
+  box-sizing: border-box;
+  justify-content: center;
+`
+
+export const PerchaseResultHeaderText = styled.p`
+  color: #000000;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1.5;
+  margin: 0;
+`
