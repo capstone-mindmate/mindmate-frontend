@@ -95,10 +95,74 @@ export const EmotionWrapper = styled.div`
 export const TopItemContainer = styled.div`
   width: 100%;
   margin-top: 70px;
+  margin-bottom: 25px;
 `
 
 export const PointHistoryContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+`
+
+export const EventCoinWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`
+
+export const EventCoinTextWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+`
+
+export const EventCointText = styled.p`
+  color: #000000;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1.55;
+  margin: 0;
+`
+
+export const EventTermText = styled.p`
+  color: #727272;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 0;
+`
+
+export const PurchaseCoinWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 24px;
+`
+
+export const PurchaseCoinTextWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+`
+
+export const PurchaseCoinText = styled.p`
+  color: #000000;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1.55;
+  margin: 0;
+`
+
+export const PurchaseCoinList = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 30px;
 `
