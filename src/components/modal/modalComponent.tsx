@@ -9,6 +9,7 @@ import {
 import YellowInputBox from '../inputs/yellowInputBox'
 import GrayInputBox from '../inputs/grayInputBox'
 import { useEffect, useState, useRef } from 'react'
+import Emoticon, { EmoticonType } from '../emoticon/Emoticon'
 
 interface ModalComponentProps {
   modalType: string
@@ -16,19 +17,24 @@ interface ModalComponentProps {
   buttonClick: () => void
   isOpen: boolean
   onClose: () => void
-  userProfileProps: {
+  userProfileProps?: {
     profileImage: string
     name: string
     department: string
     makeDate: string
   }
-  matchingInfoProps: {
+  matchingInfoProps?: {
     title: string
     description: string
   }
-  messageProps: {
+  messageProps?: {
     onMessageChange: (value: string) => void
     messageValue: string
+  }
+  emoticon?: {
+    type: string
+    size: string
+    price: number
   }
 }
 
@@ -51,6 +57,11 @@ const ModalComponent = ({
   messageProps = {
     onMessageChange: () => {},
     messageValue: '',
+  },
+  emoticon = {
+    type: 'normal',
+    size: 'xlarge',
+    price: 10,
   },
 }: ModalComponentProps) => {
   const [showDetails, setShowDetails] = useState(false)
@@ -148,6 +159,24 @@ const ModalComponent = ({
       flex-direction: column;
       gap: 12px;
       margin: 12px 0;
+    `,
+
+    emoticonContainer: css`
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+    `,
+
+    emoticonPrice: css`
+      margin-top: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     `,
 
     modalBodyApplication: css`
@@ -605,6 +634,46 @@ const ModalComponent = ({
           <div className="modal-header"></div>
           <div className="modal-body"></div>
           <div className="modal-footer"></div>
+        </div>
+      </div>
+    )
+  } else if (modalType === '이모티콘구매') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>
+              이모티콘을 구매하시겠습니까?
+            </p>
+          </div>
+          <div className="modal-body" css={modalStyles.emoticonContainer}>
+            <Emoticon
+              type={emoticon.type as EmoticonType}
+              size={emoticon.size as 'xlarge'}
+            />
+
+            <div css={modalStyles.emoticonPrice}>
+              <CoinIcon color="#392111" width={20} height={20} />
+              <span>{emoticon.price} 코인</span>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={buttonClick}
+              />
+            </div>
+          </div>
         </div>
       </div>
     )
