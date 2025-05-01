@@ -5,11 +5,11 @@ import ChatTest from '../pages/ChatTest/ChatTest'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
 import Matching from '../pages/Matching'
+import HomePage from '../pages/Home/Home.tsx'
 import ChatTest from '../pages/ChatTest/ChatTest'
 import RegisterChatRoom from '../pages/Matching/registerChatRoom'
 import MatchedInfo from '../pages/Matching/matchedInfo'
 import MatchedApplication from '../pages/Matching/application'
-
 import EmoticonHome from '../pages/Emoticons/emoticonHome'
 import PointPurchase from '../pages/Emoticons/pointPurchase'
 import PointHistory from '../pages/Emoticons/pointHistory'
@@ -36,6 +36,10 @@ export const router = createBrowserRouter([
   {
     path: '/matching',
     element: <Matching />,
+  },
+  {
+    path: '/home',
+    element: <HomePage />,
   },
   {
     path: '/matching/register',

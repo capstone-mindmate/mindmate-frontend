@@ -44,7 +44,7 @@ export const TextOverlay = styled.div`
 
 // 제목 텍스트
 export const TitleText = styled.h3`
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
   color: #ffffff;
   margin: 0;

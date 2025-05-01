@@ -11,6 +11,7 @@ import {
 } from '../icon/iconComponents'
 import { useMessageStore } from '../../store/messageStore'
 import { useSocketMessage } from '../../hooks/useSocketMessage'
+import { media } from '../../styles/breakpoints'
 
 interface NavItem {
   path: string
@@ -21,12 +22,16 @@ interface NavItem {
 }
 
 const navigationStyle = {
-  container: css`
-    width: 100%;
+  root: css`
+    width: 478px;
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
+    ${media.tablet} {
+      width: 100%;
+    }
+  `,
+  container: css`
+    width: 100%;
     background: #ffffff;
     boder: none;
     padding: 12px 0;
@@ -115,24 +120,26 @@ const NavigationComponent: React.FC = () => {
   ]
 
   return (
-    <div css={navigationStyle.container}>
-      <nav css={navigationStyle.nav}>
-        {navItems.map((item) => {
-          const isActive = location.pathname === item.path
-          const color = isActive ? '#392111' : '#D9D9D9'
+    <div css={navigationStyle.root}>
+      <div css={navigationStyle.container}>
+        <nav css={navigationStyle.nav}>
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path
+            const color = isActive ? '#392111' : '#D9D9D9'
 
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              css={[navigationStyle.item, isActive && navigationStyle.active]}
-            >
-              {item.icon(color)}
-              <span css={navigationStyle.label}>{item.label}</span>
-            </Link>
-          )
-        })}
-      </nav>
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                css={[navigationStyle.item, isActive && navigationStyle.active]}
+              >
+                {item.icon(color)}
+                <span css={navigationStyle.label}>{item.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
     </div>
   )
 }
