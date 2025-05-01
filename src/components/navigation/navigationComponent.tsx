@@ -78,7 +78,7 @@ const NavigationComponent: React.FC = () => {
       label: '홈',
     },
     {
-      path: '/나중에 정하기',
+      path: '/matching',
       icon: (color) => <AttachmentIcon color={color} />,
       label: '매칭',
     },

@@ -1,10 +1,12 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface YellowRoundButtonProps {
   buttonText: string
   onActiveChange?: (isActive: boolean) => void
+  isControlled?: boolean
+  isActive?: boolean
 }
 
 const buttonStyle = (isActive: boolean) => css`
@@ -28,13 +30,27 @@ const buttonStyle = (isActive: boolean) => css`
 const YellowRoundButton: React.FC<YellowRoundButtonProps> = ({
   buttonText,
   onActiveChange,
+  isControlled = false,
+  isActive: externalIsActive = false,
 }) => {
-  const [isActive, setIsActive] = useState(false)
+  const [internalIsActive, setInternalIsActive] = useState(false)
+
+  const isActive = isControlled ? externalIsActive : internalIsActive
+
+  useEffect(() => {
+    if (isControlled) {
+      setInternalIsActive(externalIsActive)
+    }
+  }, [isControlled, externalIsActive])
 
   const handleClick = () => {
-    const newActiveState = !isActive
-    setIsActive(newActiveState)
-    onActiveChange?.(newActiveState)
+    if (!isControlled) {
+      const newActiveState = !internalIsActive
+      setInternalIsActive(newActiveState)
+      onActiveChange?.(newActiveState)
+    } else {
+      onActiveChange?.(!externalIsActive)
+    }
   }
 
   return (

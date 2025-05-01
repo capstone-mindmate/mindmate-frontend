@@ -9,6 +9,7 @@ import {
 import YellowInputBox from '../inputs/yellowInputBox'
 import GrayInputBox from '../inputs/grayInputBox'
 import { useEffect, useState, useRef } from 'react'
+import Emoticon, { EmoticonType } from '../emoticon/Emoticon'
 
 interface ModalComponentProps {
   modalType: string
@@ -16,6 +17,25 @@ interface ModalComponentProps {
   buttonClick: () => void
   isOpen: boolean
   onClose: () => void
+  userProfileProps?: {
+    profileImage: string
+    name: string
+    department: string
+    makeDate: string
+  }
+  matchingInfoProps?: {
+    title: string
+    description: string
+  }
+  messageProps?: {
+    onMessageChange: (value: string) => void
+    messageValue: string
+  }
+  emoticon?: {
+    type: string
+    size: string
+    price: number
+  }
 }
 
 const ModalComponent = ({
@@ -24,6 +44,25 @@ const ModalComponent = ({
   buttonClick = () => {},
   isOpen = false,
   onClose = () => {},
+  userProfileProps = {
+    profileImage: '',
+    name: '',
+    department: '',
+    makeDate: '',
+  },
+  matchingInfoProps = {
+    title: '',
+    description: '',
+  },
+  messageProps = {
+    onMessageChange: () => {},
+    messageValue: '',
+  },
+  emoticon = {
+    type: 'normal',
+    size: 'xlarge',
+    price: 10,
+  },
 }: ModalComponentProps) => {
   const [showDetails, setShowDetails] = useState(false)
   const matchedInfoRef = useRef<HTMLDivElement>(null)
@@ -122,6 +161,42 @@ const ModalComponent = ({
       margin: 12px 0;
     `,
 
+    emoticonContainer: css`
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+    `,
+
+    emoticonPrice: css`
+      margin-top: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    `,
+
+    modalBodyApplication: css`
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 32px 0;
+    `,
+
+    modalBodyCancel: css`
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 32px 0;
+    `,
+
     matchedInfoContainer: css`
       width: 100%;
       height: 0px;
@@ -140,6 +215,7 @@ const ModalComponent = ({
       line-height: 1.4;
       text-align: center;
       color: #000000;
+      margin: 0;
     `,
 
     matchedInfo: css`
@@ -180,6 +256,11 @@ const ModalComponent = ({
         visibility: hidden;
       }
     `,
+
+    modalFooter: css`
+      width: 100%;
+      margin-top: 20px;
+    `,
   }
 
   if (modalType === '매칭신청') {
@@ -209,16 +290,16 @@ const ModalComponent = ({
           </div>
           <div className="modal-header">
             <ModalMatchingUserProfile
-              profileImage=""
-              name="건드리면 짖는댕"
-              department="소프트웨어학과"
-              makeDate="03월 24일 18:52"
+              profileImage={userProfileProps.profileImage}
+              name={userProfileProps.name}
+              department={userProfileProps.department}
+              makeDate={userProfileProps.makeDate}
             />
           </div>
           <div className="modal-body" css={modalStyles.modalBody}>
             <YellowInputBox
               placeholder="메시지를 입력해주세요"
-              value="진로 고민 들어주세요"
+              value={matchingInfoProps.title}
               onChange={() => {}}
               activeState={false}
               isTitle={true}
@@ -226,7 +307,7 @@ const ModalComponent = ({
 
             <YellowInputBox
               placeholder="메시지를 입력해주세요"
-              value="저 아주대 앞에서 붕어빵 팔아도 될까요? 친구들이 저 알아보면 어떻게 하죠???? 그건 두려운데 ㅠㅠ"
+              value={matchingInfoProps.description}
               height={0}
               onChange={() => {}}
               activeState={false}
@@ -273,9 +354,9 @@ const ModalComponent = ({
           <div className="modal-body" css={modalStyles.modalBody}>
             <div css={[modalStyles.profileContent]}>
               <ModalMatchingFailureUserProfile
-                profileImage=""
-                name="건드리면 짖는댕"
-                department="소프트웨어학과"
+                profileImage={userProfileProps.profileImage}
+                name={userProfileProps.name}
+                department={userProfileProps.department}
                 onBackClick={() => {
                   showDetails ? setShowDetails(false) : setShowDetails(true)
                 }}
@@ -298,7 +379,7 @@ const ModalComponent = ({
               >
                 <YellowInputBox
                   placeholder="메시지를 입력해주세요"
-                  value="진로 고민 들어주세요"
+                  value={matchingInfoProps.title}
                   onChange={() => {}}
                   activeState={false}
                   isTitle={true}
@@ -306,7 +387,7 @@ const ModalComponent = ({
 
                 <YellowInputBox
                   placeholder="메시지를 입력해주세요"
-                  value="저 아주대 앞에서 붕어빵 팔아도 될까요? 친구들이 저 알아보면 어떻게 하죠???? 그건 두려운데 ㅠㅠ"
+                  value={matchingInfoProps.description}
                   height={0}
                   onChange={() => {}}
                   activeState={false}
@@ -315,10 +396,212 @@ const ModalComponent = ({
 
                 <GrayInputBox
                   placeholder="상대방에게 전달하고 싶은 메시지를 입력해주세요"
-                  value=""
+                  value={messageProps.messageValue}
                   height={100}
                   onChange={() => {}}
-                  activeState={true}
+                  activeState={false}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={() => onClose()}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  } else if (modalType === '매칭하기') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>
+              해당 신청자와
+              <br />
+              매칭을 진행하시겠습니까?
+            </p>
+          </div>
+
+          <div className="modal-body" css={modalStyles.modalBodyApplication}>
+            <div css={[modalStyles.profileContent]}>
+              <ModalMatchingUserProfile
+                profileImage={userProfileProps.profileImage}
+                name={userProfileProps.name}
+                department={userProfileProps.department}
+                makeDate={userProfileProps.makeDate}
+              />
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={() => onClose()}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  } else if (modalType === '매칭성사') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>
+              매칭이 성사되었습니다 💌
+              <br />
+              지금 바로 대화를 시작해보세요
+            </p>
+          </div>
+
+          <div className="modal-body" css={modalStyles.modalBody}>
+            <div css={[modalStyles.profileContent]}>
+              <ModalMatchingFailureUserProfile
+                profileImage={userProfileProps.profileImage}
+                name={userProfileProps.name}
+                department={userProfileProps.department}
+                onBackClick={() => {
+                  showDetails ? setShowDetails(false) : setShowDetails(true)
+                }}
+                showDetails={showDetails}
+              />
+            </div>
+
+            <div
+              ref={matchedInfoRef}
+              css={css`
+                ${modalStyles.matchedInfo}
+                height: ${matchedInfoHeight}px;
+              `}
+            >
+              <div
+                css={[
+                  modalStyles.detailsContent,
+                  showDetails && modalStyles.visible,
+                ]}
+              >
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value={matchingInfoProps.title}
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={true}
+                />
+
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value={matchingInfoProps.description}
+                  height={0}
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={false}
+                />
+
+                <GrayInputBox
+                  placeholder="상대방에게 전달하고 싶은 메시지를 입력해주세요"
+                  value={messageProps.messageValue}
+                  height={100}
+                  onChange={() => {}}
+                  activeState={false}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={() => onClose()}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  } else if (modalType == '매칭취소') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>매칭을 취소하시겠습니까?</p>
+          </div>
+
+          <div className="modal-body" css={modalStyles.modalBodyCancel}>
+            <div css={[modalStyles.profileContent]}>
+              <ModalMatchingFailureUserProfile
+                profileImage={userProfileProps.profileImage}
+                name={userProfileProps.name}
+                department={userProfileProps.department}
+                onBackClick={() => {
+                  showDetails ? setShowDetails(false) : setShowDetails(true)
+                }}
+                showDetails={showDetails}
+              />
+            </div>
+
+            <div
+              ref={matchedInfoRef}
+              css={css`
+                ${modalStyles.matchedInfo}
+                height: ${matchedInfoHeight}px;
+              `}
+            >
+              <div
+                css={[
+                  modalStyles.detailsContent,
+                  showDetails && modalStyles.visible,
+                ]}
+              >
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value={matchingInfoProps.title}
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={true}
+                />
+
+                <YellowInputBox
+                  placeholder="메시지를 입력해주세요"
+                  value={matchingInfoProps.description}
+                  height={0}
+                  onChange={() => {}}
+                  activeState={false}
+                  isTitle={false}
+                />
+
+                <GrayInputBox
+                  placeholder="상대방에게 전달하고 싶은 메시지를 입력해주세요"
+                  value={messageProps.messageValue}
+                  height={100}
+                  onChange={() => {}}
+                  activeState={false}
                 />
               </div>
             </div>
@@ -351,6 +634,46 @@ const ModalComponent = ({
           <div className="modal-header"></div>
           <div className="modal-body"></div>
           <div className="modal-footer"></div>
+        </div>
+      </div>
+    )
+  } else if (modalType === '이모티콘구매') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>
+              이모티콘을 구매하시겠습니까?
+            </p>
+          </div>
+          <div className="modal-body" css={modalStyles.emoticonContainer}>
+            <Emoticon
+              type={emoticon.type as EmoticonType}
+              size={emoticon.size as 'xlarge'}
+            />
+
+            <div css={modalStyles.emoticonPrice}>
+              <CoinIcon color="#392111" width={20} height={20} />
+              <span>{emoticon.price} 코인</span>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={buttonClick}
+              />
+            </div>
+          </div>
         </div>
       </div>
     )
