@@ -1,6 +1,7 @@
 import { createBrowserRouter, useParams } from 'react-router-dom'
 import Register from '../pages/Register'
 import Devtools from '../pages/Devtools'
+import ChatTest from '../pages/ChatTest/ChatTest'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
 import Matching from '../pages/Matching'
