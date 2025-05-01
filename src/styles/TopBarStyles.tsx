@@ -24,7 +24,7 @@ export const TopBarContainer = styled.div<{
           left: 0;
           right: 0;
           margin: 0 auto; // 중앙 정렬
-          z-index: 5000;
+          z-index: 999;
         `
       : css`
           position: relative;

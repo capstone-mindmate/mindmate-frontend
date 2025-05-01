@@ -29,6 +29,7 @@ const TopBar: React.FC<TopBarProps> = ({
   showBackButton = false,
   onBackClick,
   actionText,
+  actionIcon = false,
   onActionClick,
   isActionDisabled = false,
   leftContent,
