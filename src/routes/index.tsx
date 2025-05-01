@@ -6,6 +6,10 @@ import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
 import Matching from '../pages/Matching'
 import HomePage from '../pages/Home/Home.tsx'
+
+import MyPage from '../pages/Mypage/Mypage.tsx'
+import Review from '../pages/Review/ReviewPage.tsx'
+
 import ChatTest from '../pages/ChatTest/ChatTest'
 import RegisterChatRoom from '../pages/Matching/registerChatRoom'
 import MatchedInfo from '../pages/Matching/matchedInfo'
@@ -15,6 +19,7 @@ import PointPurchase from '../pages/Emoticons/pointPurchase'
 import PointHistory from '../pages/Emoticons/pointHistory'
 import PurchaseSuccess from '../pages/Emoticons/purchaseSuccess'
 import PurchaseFail from '../pages/Emoticons/purchaseFail'
+
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +45,10 @@ export const router = createBrowserRouter([
   {
     path: '/home',
     element: <HomePage />,
+  },
+  {
+    path: '/mypage',
+    element: <MyPage />,
   },
   {
     path: '/matching/register',
@@ -81,5 +90,9 @@ export const router = createBrowserRouter([
   {
     path: '/chat-test',
     element: <ChatTest />,
+  },
+  {
+    path: '/review',
+    element: <Review />,
   },
 ])

@@ -17,7 +17,7 @@ export const TitleContainer = styled.div`
 export const Title = styled.h2`
   font-family: 'Pretendard', sans-serif;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
   margin: 0;
 `
 
