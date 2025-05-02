@@ -1,7 +1,6 @@
 import { createBrowserRouter, useParams } from 'react-router-dom'
 import Register from '../pages/Register'
 import Devtools from '../pages/Devtools'
-import ChatTest from '../pages/ChatTest/ChatTest'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
 import Matching from '../pages/Matching'
@@ -19,7 +18,6 @@ import PointPurchase from '../pages/Emoticons/pointPurchase'
 import PointHistory from '../pages/Emoticons/pointHistory'
 import PurchaseSuccess from '../pages/Emoticons/purchaseSuccess'
 import PurchaseFail from '../pages/Emoticons/purchaseFail'
-
 
 export const router = createBrowserRouter([
   {

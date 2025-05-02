@@ -69,6 +69,7 @@ const HomePage = () => {
           }
           showBorder={false}
           isFixed={true}
+          title={''}
         />
         <FrameSlider frames={frames} onFrameClick={handleFrameClick} />
         <div>
