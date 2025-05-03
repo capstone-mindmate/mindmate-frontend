@@ -22,20 +22,8 @@ export const MainContainer = styled.div`
   }
 `
 
-export const ProfileImageContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 16px;
-`
-
-export const ProfileInfoContainer = styled.div`
+export const MenuList = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 12px;
-  gap: 24px;
 `

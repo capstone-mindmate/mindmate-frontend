@@ -2,10 +2,19 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-interface WithdrawProps {}
+import { WithdrawContainer, WithdrawText } from './styles/withdrawStyles'
 
-const Withdraw = ({}: WithdrawProps) => {
-  return <></>
+interface WithdrawProps {
+  text: string
+  onClick: () => void
+}
+
+const Withdraw = ({ text, onClick }: WithdrawProps) => {
+  return (
+    <WithdrawContainer>
+      <WithdrawText onClick={onClick}>{text}</WithdrawText>
+    </WithdrawContainer>
+  )
 }
 
 export default Withdraw

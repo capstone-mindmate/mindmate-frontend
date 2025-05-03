@@ -15,9 +15,10 @@ import PointPurchase from '../pages/Emoticons/pointPurchase'
 import PointHistory from '../pages/Emoticons/pointHistory'
 import PurchaseSuccess from '../pages/Emoticons/purchaseSuccess'
 import PurchaseFail from '../pages/Emoticons/purchaseFail'
-import ProfileEdit from '../pages/Profile/ProfileEdit'
-import Profile from '../pages/Profile/Profile.tsx'
-
+import ProfileSetting from '../pages/Profile/ProfileSetting.tsx'
+import ProfileEdit from '../pages/Profile/ProfileEdit.tsx'
+import ChatTest from '../pages/ChatTest/ChatTest'
+import TermsOfUse from '../pages/Register/steps/TermsOfUse'
 export const router = createBrowserRouter([
   {
     path: '/register',
@@ -26,6 +27,14 @@ export const router = createBrowserRouter([
   {
     path: '/register/privacy',
     element: <PersonalInformationDocument />,
+  },
+  {
+    path: '/privacy',
+    element: <PersonalInformationDocument />,
+  },
+  {
+    path: '/terms',
+    element: <TermsOfUse />,
   },
   {
     path: '/devdev',
@@ -88,8 +97,8 @@ export const router = createBrowserRouter([
     element: <Review />,
   },
   {
-    path: '/profile',
-    element: <Profile />,
+    path: '/profile/setting',
+    element: <ProfileSetting />,
   },
   {
     path: '/profile/edit',

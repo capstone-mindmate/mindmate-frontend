@@ -1,11 +1,33 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect, useRef } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
-interface ToggleProps {}
+import {
+  ToggleContainer,
+  ToggleText,
+  ToggleSwitchContainer,
+  ToggleSwitchThumb,
+} from './styles/toggleStyles'
 
-const Toggle = ({}: ToggleProps) => {
-  return <></>
+interface ToggleProps {
+  text: string
+  toggleState: boolean
+  onToggle: () => void
+}
+
+const Toggle = ({ text, toggleState, onToggle }: ToggleProps) => {
+  return (
+    <ToggleContainer>
+      <ToggleText>{text}</ToggleText>
+      <ToggleSwitchContainer
+        isActive={toggleState}
+        onClick={onToggle}
+        role="switch"
+        aria-checked={toggleState}
+      >
+        <ToggleSwitchThumb isActive={toggleState} />
+      </ToggleSwitchContainer>
+    </ToggleContainer>
+  )
 }
 
 export default Toggle

@@ -2,10 +2,24 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-interface LeftRightBoxProps {}
+import {
+  LeftRightBoxContainer,
+  LeftText,
+  RightText,
+} from './styles/leftRightBoxStyles'
 
-const LeftRightBox = ({}: LeftRightBoxProps) => {
-  return <></>
+interface LeftRightBoxProps {
+  leftText: string
+  rightText: string
+}
+
+const LeftRightBox = ({ leftText, rightText }: LeftRightBoxProps) => {
+  return (
+    <LeftRightBoxContainer>
+      <LeftText>{leftText}</LeftText>
+      <RightText>{rightText}</RightText>
+    </LeftRightBoxContainer>
+  )
 }
 
 export default LeftRightBox

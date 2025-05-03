@@ -1,11 +1,19 @@
 import styled from '@emotion/styled'
 import { media } from '../../../styles/breakpoints'
 
-export const RootContainer = styled.div`
+export const LogoutContainer = styled.div`
   width: 100%;
-  height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: left;
   align-items: center;
-  flex-direction: column;
+  padding: 16px 0;
+`
+
+export const LogoutText = styled.div`
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: #c1bfbe;
+  cursor: pointer;
 `

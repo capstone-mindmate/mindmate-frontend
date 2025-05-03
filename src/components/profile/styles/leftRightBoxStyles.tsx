@@ -1,11 +1,25 @@
 import styled from '@emotion/styled'
 import { media } from '../../../styles/breakpoints'
 
-export const RootContainer = styled.div`
+export const LeftRightBoxContainer = styled.div`
   width: 100%;
-  height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  flex-direction: column;
+  padding: 16px 0;
+`
+
+export const LeftText = styled.div`
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #000;
+`
+
+export const RightText = styled.div`
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #000;
 `
