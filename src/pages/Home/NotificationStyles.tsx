@@ -1,4 +1,3 @@
-// src/pages/Notification/NotificationStyles.tsx
 import styled from '@emotion/styled'
 
 // 알림 페이지 컨테이너
