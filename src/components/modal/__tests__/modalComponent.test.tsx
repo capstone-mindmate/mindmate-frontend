@@ -118,4 +118,40 @@ describe('ModalComponent', () => {
       expect(document.body.style.overflow).toBe('')
     })
   })
+
+  describe('신고완료 모달', () => {
+    const reportCompleteProps = {
+      ...defaultProps,
+      modalType: '신고완료',
+      buttonText: '확인',
+    }
+
+    it('신고완료 메시지가 올바르게 렌더링되어야 함', () => {
+      render(<ModalComponent {...reportCompleteProps} />)
+
+      expect(screen.getByText('신고가 완료되었습니다')).toBeInTheDocument()
+      expect(screen.getByText('감사합니다')).toBeInTheDocument()
+    })
+
+    it('확인 버튼 클릭 시 buttonClick이 호출되어야 함', () => {
+      render(<ModalComponent {...reportCompleteProps} />)
+
+      const confirmButton = screen.getByRole('button', { name: '확인' })
+      fireEvent.click(confirmButton)
+      expect(defaultProps.buttonClick).toHaveBeenCalled()
+    })
+  })
+
+  describe('모달 접근성', () => {
+    it('모달이 열렸을 때 배경 스크롤이 비활성화되어야 함', () => {
+      render(<ModalComponent {...defaultProps} />)
+      expect(document.body.style.overflow).toBe('hidden')
+    })
+
+    it('모달이 닫혔을 때 배경 스크롤이 활성화되어야 함', () => {
+      const { unmount } = render(<ModalComponent {...defaultProps} />)
+      unmount()
+      expect(document.body.style.overflow).toBe('')
+    })
+  })
 })
