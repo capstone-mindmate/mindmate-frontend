@@ -98,7 +98,7 @@ test.describe('Report 페이지 테스트', () => {
     )
 
     // 글자 수 카운터는 다른 방식으로 확인
-    // className으로 선택하는 대신 문구 자체를 찾아 확인
+    // CharCounter 컴포넌트에 실제로 표시되는 텍스트 확인
     const charCounter = page.getByText('/1000')
     await expect(charCounter).toBeVisible()
   })
@@ -151,6 +151,34 @@ test.describe('Report 페이지 테스트', () => {
     await expect(reportButton).toHaveCSS('background-color', 'rgb(251, 79, 80)')
     await expect(reportButton).toHaveCSS('color', 'rgb(255, 255, 255)')
     await expect(reportButton).not.toBeDisabled()
+  })
+
+  test('신고 제출 과정에서 모달이 표시된다', async ({ page }) => {
+    // 신고 항목 선택
+    const reportItem = page.getByRole('button', {
+      name: '욕설, 폭언, 비방 및 혐오표현을 사용해요',
+    })
+    await reportItem.click()
+
+    // 상세 내용 입력
+    const textArea = page.locator('textarea')
+    await textArea.fill('테스트 신고 내용입니다.')
+
+    // 신고 버튼 클릭
+    const reportButton = page.getByRole('button', { name: '신고하기' })
+    await reportButton.click()
+
+    // 모달이 표시되는지 확인
+    const modalOverlay = page.locator('[data-testid="modal-overlay"]')
+    await expect(modalOverlay).toBeVisible()
+
+    // 모달 내용 확인
+    const modalHeader = page.getByText('신고가 완료되었습니다')
+    await expect(modalHeader).toBeVisible()
+
+    // 모달 확인 버튼 확인
+    const confirmButton = page.getByRole('button', { name: '확인' })
+    await expect(confirmButton).toBeVisible()
   })
 
   test('뒤로가기 버튼이 작동한다', async ({ page }) => {
