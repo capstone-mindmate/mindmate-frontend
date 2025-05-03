@@ -1,7 +1,6 @@
 import { createBrowserRouter, useParams } from 'react-router-dom'
 import Register from '../pages/Register'
 import Devtools from '../pages/Devtools'
-import ChatTest from '../pages/ChatTest/ChatTest'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
 import Matching from '../pages/Matching'
@@ -18,6 +17,7 @@ import PurchaseSuccess from '../pages/Emoticons/purchaseSuccess'
 import PurchaseFail from '../pages/Emoticons/purchaseFail'
 import ProfileEdit from '../pages/Profile/ProfileEdit'
 import Profile from '../pages/Profile/Profile.tsx'
+
 export const router = createBrowserRouter([
   {
     path: '/register',

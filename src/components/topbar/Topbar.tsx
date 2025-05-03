@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useEffect } from 'react'
+import React, { ReactNode } from 'react'
 import { BackIcon } from '../icon/iconComponents'
 import {
   TopBarContainer,
@@ -11,12 +11,13 @@ import {
 
 // 탑바 컴포넌트 Props 인터페이스
 interface TopBarProps {
-  title?: string
-  showBackButton?: boolean
-  onBackClick?: () => void
-  actionText?: string
-  onActionClick?: () => void
-  isActionDisabled?: boolean
+  title?: string // 페이지 제목
+  showBackButton?: boolean // 뒤로가기 버튼 표시 여부 (기본값: false)
+  onBackClick?: () => void // 뒤로가기 버튼 클릭 핸들러
+  actionText?: string // 액션 버튼 텍스트 (제공되지 않으면 버튼 미표시)
+  actionIcon?: boolean
+  onActionClick?: () => void // 액션 버튼 클릭 핸들러
+  isActionDisabled?: boolean // 액션 버튼 비활성화 상태 (기본값: false)
   leftContent?: ReactNode
   rightContent?: ReactNode
   showBorder?: boolean
@@ -29,61 +30,14 @@ const TopBar: React.FC<TopBarProps> = ({
   showBackButton = false,
   onBackClick,
   actionText,
-  actionIcon = false,
   onActionClick,
   isActionDisabled = false,
   leftContent,
   rightContent,
-  showBorder = true,
-  isFixed = true,
+  showBorder = false,
+  isFixed = true, // 기본값을 true로 설정
 }) => {
-  // 스크롤 위치에 따른 고정 상태 관리
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [topBarHeight, setTopBarHeight] = useState(56) // 기본 높이
-  const topBarRef = React.useRef<HTMLDivElement>(null)
-  const wrapperRef = React.useRef<HTMLDivElement>(null)
-  const [containerWidth, setContainerWidth] = useState<number | undefined>(
-    undefined
-  )
-
-  // 스크롤 이벤트 처리 및 컨테이너 너비 측정
-  useEffect(() => {
-    if (!isFixed) return // isFixed가 false인 경우 스크롤 이벤트 무시
-
-    // 초기 TopBar 위치와 높이, 너비 측정
-    const measureTopBar = () => {
-      if (topBarRef.current) {
-        const rect = topBarRef.current.getBoundingClientRect()
-        setTopBarHeight(rect.height)
-      }
-
-      if (wrapperRef.current) {
-        const rect = wrapperRef.current.getBoundingClientRect()
-        setContainerWidth(rect.width)
-      }
-    }
-
-    measureTopBar()
-
-    // 스크롤 핸들러
-    const handleScroll = () => {
-      if (topBarRef.current) {
-        const rect = topBarRef.current.getBoundingClientRect()
-        // TopBar가 화면 상단에 도달하면 고정 상태로 변경
-        setIsScrolled(rect.top <= 0)
-      }
-    }
-
-    // 이벤트 리스너 등록
-    window.addEventListener('scroll', handleScroll)
-    window.addEventListener('resize', measureTopBar)
-
-    // 컴포넌트 언마운트 시 이벤트 리스너 제거
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', measureTopBar)
-    }
-  }, [isFixed])
+  const topBarHeight = 56 // 고정 높이
 
   // 뒤로가기 핸들러
   const handleBackClick = () => {
@@ -132,27 +86,20 @@ const TopBar: React.FC<TopBarProps> = ({
     return null
   }
 
-  // TopBar 컨테이너 스타일 - 고정 시 너비 설정
-  const containerStyle =
-    isFixed && isScrolled && containerWidth
-      ? { maxWidth: `${containerWidth}px` }
-      : {}
-
   return (
-    <div ref={wrapperRef} style={{ width: '100%', position: 'relative' }}>
+    <div style={{ width: '100%', position: 'relative' }}>
       <TopBarContainer
-        ref={topBarRef}
         showBorder={showBorder}
-        isFixed={isFixed && isScrolled} // 스크롤 시에만 고정
-        style={containerStyle}
+        isFixed={isFixed} // isFixed 프롭 사용
+        style={{ maxWidth: 'inherit' }}
       >
         {renderLeftContent()}
         {title && <TopBarTitle>{title}</TopBarTitle>}
         {renderRightContent()}
       </TopBarContainer>
 
-      {/* 고정 상태일 때 컨텐츠 겹침 방지용 스페이서 */}
-      {isFixed && isScrolled && <div style={{ height: `${topBarHeight}px` }} />}
+      {/* 항상 여백 공간 추가 (isFixed일 때만) */}
+      {isFixed && <div style={{ height: `${topBarHeight}px` }} />}
     </div>
   )
 }
