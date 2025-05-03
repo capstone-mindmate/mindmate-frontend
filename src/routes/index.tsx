@@ -1,4 +1,4 @@
-import { createBrowserRouter, useParams } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import Register from '../pages/Register'
 import Devtools from '../pages/Devtools'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
@@ -7,9 +7,10 @@ import Matching from '../pages/Matching'
 import HomePage from '../pages/Home/Home.tsx'
 
 import MyPage from '../pages/Mypage/Mypage.tsx'
+import Notification from '../pages/Home/NotificationPage.tsx'
 import Review from '../pages/Review/ReviewPage.tsx'
 import DetailReviewPage from '../pages/Mypage/DetailReviewPage.tsx'
-import Report from '../pages/mypage/ReportPage.tsx'
+import Report from '../pages/Mypage/ReportPage.tsx'
 
 import ChatTest from '../pages/ChatTest/ChatTest'
 import RegisterChatRoom from '../pages/Matching/registerChatRoom'
@@ -102,5 +103,9 @@ export const router = createBrowserRouter([
   {
     path: '/report',
     element: <Report />,
+  },
+  {
+    path: '/notification',
+    element: <Notification />,
   },
 ])
