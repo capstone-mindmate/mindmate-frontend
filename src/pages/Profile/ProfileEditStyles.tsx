@@ -21,3 +21,9 @@ export const MainContainer = styled.div`
     width: 100%;
   }
 `
+
+export const MenuList = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`
