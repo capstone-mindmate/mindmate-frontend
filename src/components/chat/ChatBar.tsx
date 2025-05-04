@@ -5,7 +5,7 @@ import {
   StyledInput,
   IconButton,
 } from '../../styles/ChatBarStyles'
-import { useToast } from '../toast/Toastprovider'
+import { useToast } from '../toast/ToastProvider'
 import * as IconComponents from '../../components/icon/iconComponents'
 import EmoticonPicker from '../emoticon/EmoticonPicker'
 import { EmoticonType } from '../emoticon/Emoticon'

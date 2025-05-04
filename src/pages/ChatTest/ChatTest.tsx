@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from '@emotion/styled'
-import { useToast } from '../../components/toast/Toastprovider'
+import { useToast } from '../../components/toast/ToastProvider'
 import Bubble from '../../components/chat/Bubble'
 import EmoticonComponent, {
   EmoticonType,
