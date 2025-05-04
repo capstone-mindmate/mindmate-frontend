@@ -16,8 +16,6 @@ import {
   MatchingGraphContainer,
 } from './MypageStyles'
 
-import { useNavigate } from 'react-router-dom'
-
 const MyPage = () => {
   const navigate = useNavigate()
 
