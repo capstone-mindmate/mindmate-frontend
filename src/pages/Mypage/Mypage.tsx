@@ -6,6 +6,7 @@ import NavigationComponent from '../../components/navigation/navigationComponent
 import DetailReview from '../../components/review/DetailReview'
 import TagReview from '../../components/review/TagReview'
 import TopBar from '../../components/topbar/Topbar'
+import { useNavigate } from 'react-router-dom'
 import {
   ContentContainer,
   MypageContainer,
@@ -16,6 +17,8 @@ import {
 } from './MypageStyles'
 
 const MyPage = () => {
+  const navigate = useNavigate()
+
   // TODO: API 또는 상태 관리 라이브러리에서 사용자 정보를 가져오는 로직 추가
   // const { userProfile, userStats, userReviews } = useUserData() 같은 형태로 구현
 
@@ -40,10 +43,9 @@ const MyPage = () => {
     // TODO: 설정 페이지로 이동 또는 설정 모달 표시 로직 추가
   }
 
-  // TODO: 리뷰 전체보기 클릭 핸들러
+  // 리뷰 전체보기 클릭 핸들러 - 상세 리뷰 페이지로 이동
   const handleViewAllReviewsClick = () => {
-    console.log('전체보기 클릭됨')
-    // TODO: 리뷰 전체보기 페이지로 이동하는 로직 추가
+    navigate('/detailreview')
   }
 
   // TODO: API에서 가져온 데이터로 대체해야 함

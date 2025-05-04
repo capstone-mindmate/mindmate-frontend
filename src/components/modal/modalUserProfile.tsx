@@ -33,9 +33,11 @@ const profileStyles = {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
   `,
 
   profileImageStyle: css`
+    width: 100%;
     object-fit: cover;
   `,
 
