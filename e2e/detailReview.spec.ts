@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('DetailReview 컴포넌트 테스트', () => {
   test.beforeEach(async ({ page }) => {
-    // 애플리케이션의 메인 페이지로 이동
+    // 마이 페이지로 이동
     await page.goto('/mypage')
     await page.waitForLoadState('networkidle')
 

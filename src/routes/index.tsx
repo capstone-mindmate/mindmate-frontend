@@ -9,6 +9,7 @@ import HomePage from '../pages/Home/Home.tsx'
 import MyPage from '../pages/Mypage/Mypage.tsx'
 import Review from '../pages/Review/ReviewPage.tsx'
 import DetailReviewPage from '../pages/Mypage/DetailReviewPage.tsx'
+import Report from '../pages/mypage/ReportPage.tsx'
 
 import ChatTest from '../pages/ChatTest/ChatTest'
 import RegisterChatRoom from '../pages/Matching/registerChatRoom'
@@ -97,5 +98,9 @@ export const router = createBrowserRouter([
   {
     path: '/review',
     element: <Review />,
+  },
+  {
+    path: '/report',
+    element: <Report />,
   },
 ])
