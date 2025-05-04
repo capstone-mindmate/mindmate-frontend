@@ -84,6 +84,7 @@ const EmoticonHome = () => {
         title="이모티콘 샵"
         showBackButton={true}
         onActionClick={() => setBottomSheetOpen(true)}
+        isFixed={true}
       />
 
       <BottomSheet
