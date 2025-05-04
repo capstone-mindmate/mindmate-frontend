@@ -19,6 +19,8 @@ import ProfileSetting from '../pages/Profile/ProfileSetting.tsx'
 import ProfileEdit from '../pages/Profile/ProfileEdit.tsx'
 import ChatTest from '../pages/ChatTest/ChatTest'
 import TermsOfUse from '../pages/Register/steps/TermsOfUse'
+import WithdrawMindMate from '../pages/Profile/WithdrawMindMate'
+
 export const router = createBrowserRouter([
   {
     path: '/register',
@@ -35,6 +37,10 @@ export const router = createBrowserRouter([
   {
     path: '/terms',
     element: <TermsOfUse />,
+  },
+  {
+    path: '/withdraw',
+    element: <WithdrawMindMate />,
   },
   {
     path: '/devdev',

@@ -47,7 +47,7 @@ const ProfileSetting = ({}: ProfileSettingProps) => {
           />
 
           <Logout text="로그아웃" onClick={() => {}} />
-          <Withdraw text="회원 탈퇴" onClick={() => {}} />
+          <Withdraw text="회원 탈퇴" onClick={() => navigate('/withdraw')} />
         </MenuList>
       </MainContainer>
     </RootContainer>
