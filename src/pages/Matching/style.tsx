@@ -11,31 +11,35 @@ export const RootContainer = styled.div`
 `
 
 export const MatchingContainer = styled.div`
-  width: 478px;
+  width: 884px;
   height: 100%;
   position: relative;
   box-sizing: border-box;
 
-  ${media.mobileBig} {
+  ${media.tablet} {
     width: 100%;
   }
 `
 
 export const TopFixedContent = styled.div<{ fixedType: 'normal' | 'matched' }>`
-  width: 478px;
+  width: 884px;
   position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
   ${({ fixedType }) => (fixedType === 'normal' ? 'top: 0;' : 'top: 57px;')}
   z-index: 100;
   background-color: #ffffff;
 
-  ${media.mobileBig} {
+  ${media.tablet} {
     width: 100%;
   }
 `
 
 export const MatchingTopBar = styled.div`
   width: 100%;
-  height: 48px;
+  height: 56px;
   display: flex;
   flex-direction: row;
   align-items: center;

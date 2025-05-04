@@ -4,12 +4,11 @@ import { useState, useEffect, useRef } from 'react'
 import { RootContainer, ChatContainer, LogoText } from './styles/rootStyles'
 
 import TopBar from '../../components/topbar/Topbar'
+import NavigationComponent from '../../components/navigation/navigationComponent'
 
-interface ChatHomeProps {
-  matchId: string
-}
+interface ChatHomeProps {}
 
-const ChatHome = ({ matchId }: ChatHomeProps) => {
+const ChatHome = ({}: ChatHomeProps) => {
   return (
     <RootContainer>
       <TopBar
@@ -18,6 +17,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         isFixed={true}
       />
       <ChatContainer></ChatContainer>
+      <NavigationComponent />
     </RootContainer>
   )
 }

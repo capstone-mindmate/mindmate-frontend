@@ -85,8 +85,8 @@ export const router = createBrowserRouter([
     element: <MatchedApplication />,
   },
   {
-    path: '/chat/:matchId',
-    element: <ChatHomeWrapper />,
+    path: '/chat',
+    element: <ChatHome />,
   },
   {
     path: '/emoticons',
@@ -133,9 +133,3 @@ export const router = createBrowserRouter([
     element: <Report />,
   },
 ])
-
-function ChatHomeWrapper() {
-  const { matchId } = useParams()
-  if (!matchId) return <div>: )</div>
-  return <ChatHome matchId={matchId} />
-}

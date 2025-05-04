@@ -81,7 +81,7 @@ const NavigationComponent: React.FC = () => {
 
   const navItems: NavItem[] = [
     {
-      path: '/',
+      path: '/home',
       icon: (color) => <HomeIcon color={color} />,
       label: '홈',
     },
@@ -91,7 +91,7 @@ const NavigationComponent: React.FC = () => {
       label: '매칭',
     },
     {
-      path: '/나중에 정하기',
+      path: '/chat',
       icon: (color) => (
         <div
           css={css`
@@ -116,7 +116,7 @@ const NavigationComponent: React.FC = () => {
       alertCount: unreadCount,
     },
     {
-      path: '/나중에 정하기',
+      path: '/mypage',
       icon: (color) => <UserIcon color={color} />,
       label: '마이페이지',
     },
