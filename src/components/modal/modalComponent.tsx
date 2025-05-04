@@ -677,6 +677,68 @@ const ModalComponent = ({
         </div>
       </div>
     )
+  } else if (modalType === '채팅종료') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header"></div>
+          <div className="modal-body"></div>
+          <div className="modal-footer"></div>
+        </div>
+      </div>
+    )
+  } else if (modalType === '신고완료') {
+    return (
+      <div
+        className="container"
+        css={modalStyles.container}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose()
+          }
+        }}
+        data-testid="modal-overlay"
+      >
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div className="modal-header">
+            <p
+              css={modalStyles.modalHeaderText}
+              style={{
+                margin: `var(--modal-header-margin, 20px) 0`,
+                fontSize: `var(--modal-font-size, 18px)`,
+              }}
+            >
+              신고가 완료되었습니다
+              <br />
+              감사합니다
+            </p>
+          </div>
+          <div className="modal-footer">
+            <div
+              className="confirm-btn"
+              css={modalStyles.confirmBtn}
+              style={{
+                marginTop: `var(--modal-button-margin, 12px)`,
+              }}
+            >
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={buttonClick}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 }
 

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import TopBar from '../../components/topbar/Topbar'
 import { AlarmIcon, NormalPlusIcon } from '../../components/icon/iconComponents'
 import FrameSlider from './FrameSlider'
@@ -27,10 +28,18 @@ import {
 import FloatingButton from '../../components/buttons/floatingButton'
 
 const HomePage = () => {
+  const navigate = useNavigate()
+
   // 알람 아이콘 클릭 핸들러
   const handleAlarmClick = () => {
-    console.log('Alarm icon clicked')
-    // Todo: 알림 페이지로 이동하는 로직 추가
+    navigate('/notification') // 알림 페이지로 이동
+  }
+
+  // 플로팅 버튼 활성화 핸들러
+  const handleFloatingButtonActive = (isActive: boolean) => {
+    if (isActive) {
+      navigate('/matching/register') // 글쓰기 페이지로 이동
+    }
   }
 
   // 프레임 클릭 핸들러
@@ -41,14 +50,12 @@ const HomePage = () => {
 
   // 더보기 버튼 클릭 핸들러
   const handleSeeMoreClick = () => {
-    console.log('See more emoticons clicked')
-    // Todo: 이모티콘 더보기 페이지로 이동하는 로직 추가
+    navigate('/emoticons')
   }
 
   // 이모티콘 클릭 핸들러
   const handleEmoticonClick = (type: EmoticonType) => {
-    console.log(`Emoticon ${type} clicked`)
-    // Todo: 이모티콘 선택 또는 상세 페이지로 이동하는 로직 추가
+    navigate('/emoticons')
   }
 
   // 카드뉴스 클릭 핸들러
@@ -87,9 +94,7 @@ const HomePage = () => {
           <FloatingButton
             buttonIcon={<NormalPlusIcon color="#ffffff" />}
             buttonText="글쓰기"
-            onActiveChange={(isActive) => {
-              console.log('버튼 상태 : ', isActive)
-            }}
+            onActiveChange={handleFloatingButtonActive}
           />
         </div>
         {/* 추천 이모티콘 섹션 */}
