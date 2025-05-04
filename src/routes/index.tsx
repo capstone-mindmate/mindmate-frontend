@@ -120,8 +120,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '*',
-    // element: <div>404 Not Found</div>
-    element: <Devtools />,
+    element: <div>404 Not Found</div>,
   },
   {
     path: '/report',
