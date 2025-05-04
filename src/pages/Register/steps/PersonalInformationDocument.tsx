@@ -2,6 +2,7 @@
 import { css } from '@emotion/react'
 import { CloseIcon } from '../../../components/icon/iconComponents'
 import { useNavigate } from 'react-router-dom'
+import TopBar from '../../../components/topbar/Topbar'
 
 const documentStyles = {
   rootContainer: css`
@@ -76,24 +77,18 @@ const documentStyles = {
 }
 
 const PersonalInformationDocument = () => {
-  const navigate = useNavigate()
-
   const handleClose = () => {
-    // 이전 단계로 돌아가면서 privacy 페이지에서 돌아왔다는 상태를 전달
-    navigate('/register', {
-      state: { fromPrivacy: true },
-      replace: true, // 현재 페이지를 히스토리에서 대체
-    })
+    window.history.back()
   }
 
   return (
     <div className="rootContainer" css={documentStyles.rootContainer}>
       <div css={documentStyles.container}>
-        <div css={documentStyles.head}>
-          <div css={documentStyles.closeButton} onClick={handleClose}>
-            <CloseIcon />
-          </div>
-        </div>
+        <TopBar
+          title="개인정보 수집 및 이용동의"
+          showBackButton={true}
+          onBackClick={handleClose}
+        />
 
         <div css={documentStyles.body}>
           <h2 css={documentStyles.title}>개인정보 수집 및 이용동의</h2>

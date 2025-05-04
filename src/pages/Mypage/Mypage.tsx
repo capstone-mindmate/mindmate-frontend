@@ -16,6 +16,8 @@ import {
   MatchingGraphContainer,
 } from './MypageStyles'
 
+import { useNavigate } from 'react-router-dom'
+
 const MyPage = () => {
   const navigate = useNavigate()
 
@@ -33,14 +35,13 @@ const MyPage = () => {
 
   // TODO: 프로필 편집 버튼 클릭 핸들러
   const handleProfileEdit = () => {
-    console.log('프로필 편집 버튼이 클릭되었습니다')
+    navigate('/profile/edit')
     // TODO: 프로필 편집 페이지로 이동하는 로직 추가
   }
 
   // TODO: 설정 버튼 클릭 핸들러
   const handleSettingClick = () => {
-    console.log('설정 버튼이 클릭되었습니다')
-    // TODO: 설정 페이지로 이동 또는 설정 모달 표시 로직 추가
+    navigate('/profile/setting')
   }
 
   // 리뷰 전체보기 클릭 핸들러 - 상세 리뷰 페이지로 이동
