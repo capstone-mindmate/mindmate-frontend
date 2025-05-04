@@ -7,6 +7,11 @@ import Matching from '../pages/Matching'
 import HomePage from '../pages/Home/Home.tsx'
 import MyPage from '../pages/Mypage/Mypage.tsx'
 import Review from '../pages/Review/ReviewPage.tsx'
+
+import DetailReviewPage from '../pages/Mypage/DetailReviewPage.tsx'
+import Report from '../pages/mypage/ReportPage.tsx'
+
+import ChatTest from '../pages/ChatTest/ChatTest'
 import RegisterChatRoom from '../pages/Matching/registerChatRoom'
 import MatchedInfo from '../pages/Matching/matchedInfo'
 import MatchedApplication from '../pages/Matching/application'
@@ -63,6 +68,10 @@ export const router = createBrowserRouter([
     element: <MyPage />,
   },
   {
+    path: '/detailreview',
+    element: <DetailReviewPage />,
+  },
+  {
     path: '/matching/register',
     element: <RegisterChatRoom />,
   },
@@ -114,5 +123,9 @@ export const router = createBrowserRouter([
     path: '*',
     // element: <div>404 Not Found</div>
     element: <Devtools />,
+  },
+  {
+    path: '/report',
+    element: <Report />,
   },
 ])

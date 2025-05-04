@@ -1,4 +1,3 @@
-import React from 'react'
 import TopBar from '../../components/topbar/Topbar'
 import { AlarmIcon, NormalPlusIcon } from '../../components/icon/iconComponents'
 import FrameSlider from './FrameSlider'
