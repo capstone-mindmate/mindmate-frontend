@@ -1,7 +1,9 @@
-import '../../App.css'
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react'
+
 import * as IconComponents from '../../components/icon/iconComponents'
 import NavigationComponent from '../../components/navigation/navigationComponent'
-import { useToast } from '../../components/toast/Toastprovider.tsx'
+import { useToast } from '../../components/toast/ToastProvider.tsx'
 import TopBar from '../../components/topbar/Topbar.tsx'
 import Frame from '../../components/frame/Frame'
 import TitleInputBox from '../../components/inputs/titleInputBox.tsx'
@@ -38,8 +40,6 @@ import EmoticonComponent, {
 } from '../../components/emoticon/Emoticon.tsx'
 import React, { useState } from 'react'
 import InitialProfileImageSetting from '../../components/mypage/InitialProfileImageSetting'
-/** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react'
 
 // styles 경로 변환
 import { GlobalStyles } from '../../../styles/GlobalStyles'
@@ -604,6 +604,7 @@ function App() {
               onActiveChange={(isActive) => {
                 console.log('버튼 상태 : ', isActive)
               }}
+              widthType="half"
             />
 
             <CategoryButton
@@ -611,6 +612,7 @@ function App() {
               onActiveChange={(isActive) => {
                 console.log('버튼 상태 : ', isActive)
               }}
+              widthType="half"
             />
 
             <CategoryButton
@@ -618,6 +620,7 @@ function App() {
               onActiveChange={(isActive) => {
                 console.log('버튼 상태 : ', isActive)
               }}
+              widthType="half"
             />
 
             <ConfirmButton

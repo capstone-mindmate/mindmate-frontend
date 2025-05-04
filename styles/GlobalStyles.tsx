@@ -21,6 +21,13 @@ const globalStyles = css`
       'Segoe UI Symbol',
       sans-serif;
   }
+
+  body,
+  html {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
 `
 
 export const GlobalStyles = () => <Global styles={globalStyles} />
