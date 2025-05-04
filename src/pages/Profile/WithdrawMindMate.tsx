@@ -72,7 +72,7 @@ const WithdrawMindMate = () => {
       <TopBar
         title="회원탈퇴"
         showBackButton={true}
-        onBackClick={() => navigate('/profile')}
+        onBackClick={() => navigate('/profile/setting')}
       />
       <MainContainer>
         <WithdrawTitle>
