@@ -25,6 +25,8 @@ import ChatTest from '../pages/ChatTest/ChatTest'
 import TermsOfUse from '../pages/Register/steps/TermsOfUse'
 import WithdrawMindMate from '../pages/Profile/WithdrawMindMate'
 
+import ChatHome from '../pages/Chat/ChatHome'
+
 export const router = createBrowserRouter([
   {
     path: '/register',
@@ -83,6 +85,10 @@ export const router = createBrowserRouter([
     element: <MatchedApplication />,
   },
   {
+    path: '/chat/:matchId',
+    element: <ChatHomeWrapper />,
+  },
+  {
     path: '/emoticons',
     element: <EmoticonHome />,
   },
@@ -127,3 +133,9 @@ export const router = createBrowserRouter([
     element: <Report />,
   },
 ])
+
+function ChatHomeWrapper() {
+  const { matchId } = useParams()
+  if (!matchId) return <div>: )</div>
+  return <ChatHome matchId={matchId} />
+}

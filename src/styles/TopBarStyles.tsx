@@ -1,12 +1,12 @@
 import styled from '@emotion/styled'
 import { css } from '@emotion/react'
-
+import { media } from './breakpoints'
 // 탑바 컨테이너 스타일
 export const TopBarContainer = styled.div<{
   showBorder: boolean
   isFixed: boolean
 }>`
-  width: 100%;
+  width: 884px;
   max-width: inherit; // 부모 요소의 max-width 상속
   height: 56px;
   display: flex;
@@ -33,6 +33,10 @@ export const TopBarContainer = styled.div<{
 
   // 고정 상태일 때 트랜지션 효과 추가 (그림자 제거)
   transition: background-color 0.2s ease;
+
+  ${media.tablet} {
+    width: 100%;
+  }
 `
 
 // 페이지 제목 스타일 (body2_re)

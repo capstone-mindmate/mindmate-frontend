@@ -1,5 +1,5 @@
-import React from 'react'
 /** @jsxImportSource @emotion/react */
+import React from 'react'
 import { css } from '@emotion/react'
 import { Link, useLocation } from 'react-router-dom'
 import {
@@ -23,9 +23,12 @@ interface NavItem {
 
 const navigationStyle = {
   root: css`
-    width: 478px;
+    width: 884px;
     position: fixed;
+    left: 0;
+    right: 0;
     bottom: 0;
+    margin: 0 auto;
     ${media.tablet} {
       width: 100%;
     }
