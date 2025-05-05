@@ -37,3 +37,15 @@ export const LogoText = styled.span`
     font-size: 22px;
   }
 `
+
+export const CustomFormContainer = styled.div`
+  width: 884px;
+  height: 100%;
+  position: relative;
+  padding: 0 24px;
+  box-sizing: border-box;
+
+  ${media.tablet} {
+    width: 100%;
+  }
+`

@@ -24,6 +24,8 @@ import ProfileEdit from '../pages/Profile/ProfileEdit.tsx'
 import ChatTest from '../pages/ChatTest/ChatTest'
 import TermsOfUse from '../pages/Register/steps/TermsOfUse'
 import WithdrawMindMate from '../pages/Profile/WithdrawMindMate'
+import CustomFormMake from '../pages/Chat/CustomFormMake'
+import CustomFormView from '../pages/Chat/CustomFormView'
 
 import ChatHome from '../pages/Chat/ChatHome'
 import ChatRoom from '../pages/Chat/ChatRoom'
@@ -31,6 +33,16 @@ import ChatRoom from '../pages/Chat/ChatRoom'
 const ChatRoomRoute = () => {
   const { id } = useParams()
   return <ChatRoom chatId={id} />
+}
+
+const CustomFormMakeRoute = () => {
+  const { id } = useParams()
+  return <CustomFormMake matchId={id} />
+}
+
+const CustomFormViewRoute = () => {
+  const { id } = useParams()
+  return <CustomFormView matchId={id} />
 }
 
 export const router = createBrowserRouter([
@@ -97,6 +109,14 @@ export const router = createBrowserRouter([
   {
     path: '/chat/:id',
     element: <ChatRoomRoute />,
+  },
+  {
+    path: '/chat/custom-form/make/:id',
+    element: <CustomFormMakeRoute />,
+  },
+  {
+    path: '/chat/custom-form/view/:id',
+    element: <CustomFormViewRoute />,
   },
   {
     path: '/emoticons',
