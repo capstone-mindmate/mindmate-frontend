@@ -8,15 +8,17 @@ export const RootContainer = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  position: relative;
 `
 
 export const ChatContainer = styled.div`
-  width: 478px;
+  width: 884px;
   height: 100%;
   position: relative;
+  padding: 57px 24px 0 24px;
   box-sizing: border-box;
 
-  ${media.mobileBig} {
+  ${media.tablet} {
     width: 100%;
   }
 `
