@@ -381,6 +381,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           onSendEmoticon={handleSendEmoticon}
           onTyping={handleTyping}
           disabled={!isConnected}
+          chatId={chatId}
         />
       </ChatBarWrapper>
     </RootContainer>

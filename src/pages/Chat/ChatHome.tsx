@@ -124,6 +124,10 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
     }
   }
 
+  const handleChatItemClick = (itemId: string) => {
+    console.log('채팅 아이템 클릭 : ', itemId)
+  }
+
   return (
     <RootContainer>
       <TopBar
@@ -173,6 +177,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
               isRead={item.isRead}
               unreadCount={item.unreadCount}
               borderBottom={index < filteredChatItems.length - 1}
+              onClick={() => handleChatItemClick(item.id)}
             />
           ))
         ) : (
