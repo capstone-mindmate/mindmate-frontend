@@ -11,11 +11,18 @@ import EmoticonPicker from '../emoticon/EmoticonPicker'
 import { EmoticonType } from '../emoticon/Emoticon'
 
 interface ChatBarProps {
-  onSendMessage?: (message: string) => void
+  onSendMessage: (message: string) => void
   onSendEmoticon?: (emoticonType: EmoticonType) => void
+  onTyping?: (isTyping: boolean) => void
+  disabled?: boolean
 }
 
-function ChatBar({ onSendMessage, onSendEmoticon }: ChatBarProps) {
+function ChatBar({
+  onSendMessage,
+  onSendEmoticon,
+  onTyping,
+  disabled,
+}: ChatBarProps) {
   const [message, setMessage] = useState<string>('')
   const [showEmoticonPicker, setShowEmoticonPicker] = useState<boolean>(false)
   const { showToast } = useToast()
@@ -33,7 +40,7 @@ function ChatBar({ onSendMessage, onSendEmoticon }: ChatBarProps) {
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && message.trim() && onSendMessage) {
+    if (e.key === 'Enter' && message.trim()) {
       handleSendMessage()
     }
   }

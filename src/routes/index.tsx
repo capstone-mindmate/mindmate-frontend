@@ -26,6 +26,12 @@ import TermsOfUse from '../pages/Register/steps/TermsOfUse'
 import WithdrawMindMate from '../pages/Profile/WithdrawMindMate'
 
 import ChatHome from '../pages/Chat/ChatHome'
+import ChatRoom from '../pages/Chat/ChatRoom'
+
+const ChatRoomRoute = () => {
+  const { id } = useParams()
+  return <ChatRoom chatId={id} />
+}
 
 export const router = createBrowserRouter([
   {
@@ -87,6 +93,10 @@ export const router = createBrowserRouter([
   {
     path: '/chat',
     element: <ChatHome />,
+  },
+  {
+    path: '/chat/:id',
+    element: <ChatRoomRoute />,
   },
   {
     path: '/emoticons',
