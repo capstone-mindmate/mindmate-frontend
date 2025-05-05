@@ -12,6 +12,7 @@ import EmoticonComponent, {
   EmoticonType,
 } from '../../components/emoticon/Emoticon'
 import { useToast } from '../../components/toast/ToastProvider'
+import BottomSheet from '../../components/bottomSheet/BottomSheet'
 
 import { ChatContainer } from './styles/RootStyles'
 import {
@@ -51,6 +52,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const [otherUserName, setOtherUserName] = useState('상대방')
   const [isTyping, setIsTyping] = useState(false)
   const { showToast } = useToast()
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
 
   // WebSocket 연결 참조 저장
   const socketRef = useRef<WebSocket | null>(null)
@@ -290,8 +292,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
   // 케밥 메뉴 클릭 처리
   const handleKebabClick = () => {
-    // 추후 구현: 채팅방 메뉴 (신고, 차단, 나가기 등)
-    showToast('채팅방 메뉴 준비 중입니다', 'info')
+    setIsBottomSheetOpen(true)
   }
 
   return (
@@ -301,6 +302,21 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         showBackButton={true}
         onBackClick={handleBackClick}
         rightContent={<KebabIcon color="#000000" onClick={handleKebabClick} />}
+      />
+
+      <BottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => setIsBottomSheetOpen(false)}
+        menuItems={[
+          { text: '신고', onClick: () => {} },
+          { text: '종료 요청', onClick: () => {} },
+          {
+            text: '채팅 제거',
+            onClick: () => {
+              // API 호출로 확인하고 지우기
+            },
+          },
+        ]}
       />
 
       <ChatContainer>

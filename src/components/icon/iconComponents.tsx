@@ -1,5 +1,5 @@
-import React from 'react'
 /** @jsxImportSource @emotion/react */
+import React from 'react'
 import { css } from '@emotion/react'
 
 interface IconProps {
@@ -242,8 +242,14 @@ export const KebabIcon: React.FC<IconProps> = ({
   color = '#000000',
   className = '',
   strokeWidth = 2,
+  onClick,
 }) => (
-  <div className="icon-container" css={containerStyle}>
+  <div
+    className="icon-container"
+    css={containerStyle}
+    onClick={onClick}
+    style={{ cursor: 'pointer' }}
+  >
     <svg
       className={'kebab-icon ' + className}
       width={width}
