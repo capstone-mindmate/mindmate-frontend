@@ -9,17 +9,27 @@ import { useToast } from '../toast/ToastProvider'
 import * as IconComponents from '../../components/icon/iconComponents'
 import EmoticonPicker from '../emoticon/EmoticonPicker'
 import { EmoticonType } from '../emoticon/Emoticon'
+import { useNavigate } from 'react-router-dom'
 
 interface ChatBarProps {
-  onSendMessage?: (message: string) => void
+  onSendMessage: (message: string) => void
   onSendEmoticon?: (emoticonType: EmoticonType) => void
+  onTyping?: (isTyping: boolean) => void
+  disabled?: boolean
+  chatId?: string | undefined
 }
 
-function ChatBar({ onSendMessage, onSendEmoticon }: ChatBarProps) {
+function ChatBar({
+  onSendMessage,
+  onSendEmoticon,
+  onTyping,
+  disabled,
+  chatId,
+}: ChatBarProps) {
   const [message, setMessage] = useState<string>('')
   const [showEmoticonPicker, setShowEmoticonPicker] = useState<boolean>(false)
   const { showToast } = useToast()
-
+  const navigate = useNavigate()
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value)
   }
@@ -33,13 +43,13 @@ function ChatBar({ onSendMessage, onSendEmoticon }: ChatBarProps) {
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && message.trim() && onSendMessage) {
+    if (e.key === 'Enter' && message.trim()) {
       handleSendMessage()
     }
   }
 
   const handlePlusClick = () => {
-    showToast('커스텀폼 버튼이 클릭되었습니다', 'info')
+    navigate(`/chat/custom-form/make/${chatId}`)
   }
 
   const handleEmojiClick = () => {
