@@ -1,6 +1,8 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect, TouchEvent, MouseEvent } from 'react'
 import Emoticon from '../../components/emoticon/Emoticon'
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import {
   pageContainerStyle,
   headerStyle,
@@ -21,6 +23,10 @@ import {
   textFadeStyle,
   emoticonSlideStyle,
 } from '../../styles/OnboardingStyles'
+import { useNavigate } from 'react-router-dom'
+
+const clientId =
+  '886143898358-4cja76nlu7mp5upid042la3k3vovnd8p.apps.googleusercontent.com'
 
 // 반응형을 위한 화면 크기 감지 hook
 const useWindowSize = () => {
@@ -44,7 +50,7 @@ const useWindowSize = () => {
   return windowSize
 }
 
-const OnboardingPage = () => {
+function OnboardingContent() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isInitialized, setIsInitialized] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -52,6 +58,7 @@ const OnboardingPage = () => {
   const [currentX, setCurrentX] = useState(0)
   const [autoPlayPaused, setAutoPlayPaused] = useState(false)
   const { width } = useWindowSize()
+  const navigate = useNavigate()
 
   // 반응형 이모티콘 크기 설정
   const getEmoticonSize = () => {
@@ -85,11 +92,59 @@ const OnboardingPage = () => {
     },
   ]
 
-  // 구글 로그인 핸들러
-  const handleGoogleLogin = () => {
-    console.log('Google login clicked')
-    alert('구글 로그인 버튼 클릭됨')
-  }
+  const TEMP_PASSWORD = '@Test1234!'
+
+  // 구글 로그인 성공 시 서버에 access_token 전달
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      // 1. 구글 유저 정보 가져오기 (여기는 credentials 필요 없음)
+      const googleUserInfo = await fetch(
+        'https://www.googleapis.com/oauth2/v3/userinfo',
+        {
+          headers: {
+            Authorization: `Bearer ${tokenResponse.access_token}`,
+          },
+        }
+      ).then((res) => res.json())
+
+      // 2. 회원가입 시도 (credentials: 'include')
+      const registerRes = await fetch('http://localhost/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: googleUserInfo.email,
+          password: TEMP_PASSWORD,
+          confirmPassword: TEMP_PASSWORD,
+          agreeToTerm: true,
+        }),
+      }).then((res) => res.json())
+
+      // 3. 로그인 시도 (credentials: 'include')
+      const loginRes = await fetch('http://localhost/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: googleUserInfo.email,
+          password: TEMP_PASSWORD,
+          fcmToken: '',
+        }),
+      }).then((res) => res.json())
+
+      // 4. 응답 분기 처리
+      if (loginRes.error === 'PROFILE_NOT_REGISTER') {
+        navigate('/register')
+      } else {
+        navigate('/home')
+      }
+    },
+    onError: (errorResponse) => {
+      alert('구글 로그인에 실패했습니다.')
+      console.error(errorResponse)
+    },
+    flow: 'implicit',
+  })
 
   // ProgressBar 관련 기능 구현
   useEffect(() => {
@@ -281,7 +336,7 @@ const OnboardingPage = () => {
             <div css={buttonContainerStyle}>
               <button
                 css={googleButtonStyle}
-                onClick={handleGoogleLogin}
+                onClick={() => googleLogin()}
                 type="button"
               >
                 <img
@@ -296,6 +351,14 @@ const OnboardingPage = () => {
         </div>
       </div>
     </div>
+  )
+}
+
+const OnboardingPage = () => {
+  return (
+    <GoogleOAuthProvider clientId={clientId}>
+      <OnboardingContent />
+    </GoogleOAuthProvider>
   )
 }
 

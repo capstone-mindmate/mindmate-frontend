@@ -29,6 +29,9 @@ import CustomFormView from '../pages/Chat/CustomFormView'
 
 import ChatHome from '../pages/Chat/ChatHome'
 import ChatRoom from '../pages/Chat/ChatRoom'
+import { useAuthStore } from '../stores/userStore'
+import { useEffect } from 'react'
+import { useNavigate, Navigate } from 'react-router-dom'
 
 const ChatRoomRoute = () => {
   const { id } = useParams()
@@ -45,7 +48,27 @@ const CustomFormViewRoute = () => {
   return <CustomFormView matchId={id} />
 }
 
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { user } = useAuthStore()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/onboarding', { replace: true })
+    }
+  }, [user, navigate])
+
+  if (!user) {
+    return <Navigate to="/onboarding" replace />
+  }
+  return <>{children}</>
+}
+
 export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <OnboardingPage />,
+  },
   {
     path: '/register',
     element: <Register />,
@@ -63,103 +86,195 @@ export const router = createBrowserRouter([
     element: <TermsOfUse />,
   },
   {
-    path: '/withdraw',
-    element: <WithdrawMindMate />,
-  },
-  {
-    path: '/devdev',
-    element: <Devtools />,
-  },
-  {
     path: '/onboarding',
     element: <OnboardingPage />,
   },
   {
+    path: '/withdraw',
+    element: (
+      <RequireAuth>
+        <WithdrawMindMate />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/devdev',
+    element: (
+      <RequireAuth>
+        <Devtools />
+      </RequireAuth>
+    ),
+  },
+  {
     path: '/matching',
-    element: <Matching />,
+    element: (
+      <RequireAuth>
+        <Matching />
+      </RequireAuth>
+    ),
   },
   {
     path: '/home',
-    element: <HomePage />,
+    element: (
+      <RequireAuth>
+        <HomePage />
+      </RequireAuth>
+    ),
   },
   {
     path: '/mypage',
-    element: <MyPage />,
+    element: (
+      <RequireAuth>
+        <MyPage />
+      </RequireAuth>
+    ),
   },
   {
     path: '/detailreview',
-    element: <DetailReviewPage />,
+    element: (
+      <RequireAuth>
+        <DetailReviewPage />
+      </RequireAuth>
+    ),
   },
   {
     path: '/matching/register',
-    element: <RegisterChatRoom />,
+    element: (
+      <RequireAuth>
+        <RegisterChatRoom />
+      </RequireAuth>
+    ),
   },
   {
     path: '/matching/matched',
-    element: <MatchedInfo />,
+    element: (
+      <RequireAuth>
+        <MatchedInfo />
+      </RequireAuth>
+    ),
   },
   {
     path: '/matching/application',
-    element: <MatchedApplication />,
+    element: (
+      <RequireAuth>
+        <MatchedApplication />
+      </RequireAuth>
+    ),
   },
   {
     path: '/chat',
-    element: <ChatHome />,
+    element: (
+      <RequireAuth>
+        <ChatHome />
+      </RequireAuth>
+    ),
   },
   {
     path: '/chat/:id',
-    element: <ChatRoomRoute />,
+    element: (
+      <RequireAuth>
+        <ChatRoomRoute />
+      </RequireAuth>
+    ),
   },
   {
     path: '/chat/custom-form/make/:id',
-    element: <CustomFormMakeRoute />,
+    element: (
+      <RequireAuth>
+        <CustomFormMakeRoute />
+      </RequireAuth>
+    ),
   },
   {
     path: '/chat/custom-form/view/:id',
-    element: <CustomFormViewRoute />,
+    element: (
+      <RequireAuth>
+        <CustomFormViewRoute />
+      </RequireAuth>
+    ),
   },
   {
     path: '/emoticons',
-    element: <EmoticonHome />,
+    element: (
+      <RequireAuth>
+        <EmoticonHome />
+      </RequireAuth>
+    ),
   },
   {
     path: '/coin',
-    element: <PointPurchase />,
+    element: (
+      <RequireAuth>
+        <PointPurchase />
+      </RequireAuth>
+    ),
   },
   {
     path: '/coin/history',
-    element: <PointHistory />,
+    element: (
+      <RequireAuth>
+        <PointHistory />
+      </RequireAuth>
+    ),
   },
   {
     path: '/coin/success',
-    element: <PurchaseSuccess />,
+    element: (
+      <RequireAuth>
+        <PurchaseSuccess />
+      </RequireAuth>
+    ),
   },
   {
     path: '/coin/fail',
-    element: <PurchaseFail />,
+    element: (
+      <RequireAuth>
+        <PurchaseFail />
+      </RequireAuth>
+    ),
   },
   {
     path: '/chat-test',
-    element: <ChatTest />,
+    element: (
+      <RequireAuth>
+        <ChatTest />
+      </RequireAuth>
+    ),
   },
   {
     path: '/review',
-    element: <Review />,
+    element: (
+      <RequireAuth>
+        <Review />
+      </RequireAuth>
+    ),
   },
   {
     path: '/profile/setting',
-    element: <ProfileSetting />,
+    element: (
+      <RequireAuth>
+        <ProfileSetting />
+      </RequireAuth>
+    ),
   },
   {
     path: '/profile/edit',
-    element: <ProfileEdit />,
+    element: (
+      <RequireAuth>
+        <ProfileEdit />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/report',
+    element: (
+      <RequireAuth>
+        <Report />
+      </RequireAuth>
+    ),
   },
   {
     path: '*',
     element: <div>404 Not Found</div>,
-  },
-  {
-    path: '/report',
-    element: <Report />,
   },
 ])

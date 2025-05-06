@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import DepartmentAndAdmission from './steps/DepartmentAndAdmission'
 import NickNameAndProfile from './steps/NickNameAndProfile'
 import InitialCategorySetting from './steps/InitialCategorySetting'
@@ -14,6 +14,7 @@ import {
   RootContainer,
 } from './style'
 import { BackIcon } from '../../components/icon/iconComponents'
+import { useMutation } from '@tanstack/react-query'
 
 // 회원 상태 타입 신규(NEW) 재방문(REVISITING)
 type UserStatus = 'NEW' | 'REVISITING'
@@ -45,8 +46,19 @@ const StepIndicator = ({ currentStep }: { currentStep: RegisterStep }) => {
   )
 }
 
+// File을 base64로 변환하는 함수
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 const Register = () => {
   const location = useLocation()
+  const navigate = useNavigate()
 
   // 로컬 스토리지에서 이전 데이터 불러오기
   const getInitialStep = (): RegisterStep => {
@@ -75,8 +87,29 @@ const Register = () => {
     localStorage.setItem(REGISTER_STEP_KEY, currentStep)
   }, [currentStep])
 
+  // 프로필 생성 mutation
+  const profileMutation = useMutation({
+    mutationFn: async (profileData: any) => {
+      const res = await fetch('http://localhost/api/profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(profileData),
+      }).then((res) => res.json())
+      console.log(res)
+      if (!res.ok) throw new Error('프로필 생성 실패')
+      return res
+    },
+    onSuccess: () => {
+      navigate('/home')
+    },
+    onError: (e) => {
+      alert('프로필 생성에 실패했습니다.')
+    },
+  })
+
   // 다음 단계로 이동하는 함수
-  const goToNextStep = (data?: any) => {
+  const goToNextStep = async (data?: any) => {
     const stepOrder: RegisterStep[] = [
       'DEPARTMENT_AND_ADMISSION',
       'NICKNAME_AND_PROFILE',
@@ -87,11 +120,25 @@ const Register = () => {
     const currentIndex = stepOrder.indexOf(currentStep)
     if (currentIndex < stepOrder.length - 1) {
       // 데이터가 있으면 상태 업데이트
-      if (data) {
-        const updatedData = { ...registerData, ...data }
-        setRegisterData(updatedData)
+      let updatedData = { ...registerData, ...data }
+      // 이미지가 File 객체라면 base64로 변환해서 저장
+      if (data && data.profileImage instanceof File) {
+        const base64 = await fileToBase64(data.profileImage)
+        updatedData.profileImage = base64
       }
+      setRegisterData(updatedData)
+      localStorage.setItem(REGISTER_DATA_KEY, JSON.stringify(updatedData))
       setCurrentStep(stepOrder[currentIndex + 1])
+    } else if (currentStep === 'FINAL_CONFIRMATION') {
+      // 마지막 단계에서 프로필 생성 API 호출
+      const profilePayload = {
+        nickname: registerData.nickname,
+        profileImage: registerData.profileImage || '', // base64 문자열
+        department: registerData.department,
+        entranceTime: Number(registerData.admissionYear),
+        graduation: false, // 기본값, 필요시 수정
+      }
+      profileMutation.mutate(profilePayload)
     }
   }
 
