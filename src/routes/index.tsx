@@ -9,6 +9,8 @@ import MyPage from '../pages/Mypage/Mypage.tsx'
 import Notification from '../pages/Home/NotificationPage.tsx'
 import Review from '../pages/Review/ReviewPage.tsx'
 import MagazineList from '../pages/Magazine/MagazineList.tsx'
+import MagazineWrite from '../pages/Magazine/MagazineWrite.tsx'
+import Magazine from '../pages/Magazine/Magazine.tsx'
 
 import DetailReviewPage from '../pages/Mypage/DetailReviewPage.tsx'
 import Report from '../pages/Mypage/ReportPage.tsx'
@@ -121,8 +123,16 @@ export const router = createBrowserRouter([
     element: <ProfileEdit />,
   },
   {
-    path: '/magazine',
+    path: '/magazinelist',
     element: <MagazineList />,
+  },
+  {
+    path: '/magazine/write',
+    element: <MagazineWrite />,
+  },
+  {
+    path: '/magazine',
+    element: <Magazine />,
   },
   {
     path: '*',
