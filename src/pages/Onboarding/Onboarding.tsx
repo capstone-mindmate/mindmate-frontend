@@ -3,6 +3,7 @@ import { useState, useEffect, TouchEvent, MouseEvent } from 'react'
 import Emoticon from '../../components/emoticon/Emoticon'
 import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import {
   pageContainerStyle,
   headerStyle,
@@ -24,6 +25,8 @@ import {
   emoticonSlideStyle,
 } from '../../styles/OnboardingStyles'
 import { useNavigate } from 'react-router-dom'
+import { setTokenCookie } from '../../utils/fetchWithRefresh'
+import { useAuthStore } from '../../stores/userStore'
 
 const clientId =
   '886143898358-4cja76nlu7mp5upid042la3k3vovnd8p.apps.googleusercontent.com'
@@ -59,6 +62,7 @@ function OnboardingContent() {
   const [autoPlayPaused, setAutoPlayPaused] = useState(false)
   const { width } = useWindowSize()
   const navigate = useNavigate()
+  const { setUser, user } = useAuthStore()
 
   // 반응형 이모티콘 크기 설정
   const getEmoticonSize = () => {
@@ -130,13 +134,33 @@ function OnboardingContent() {
           password: TEMP_PASSWORD,
           fcmToken: '',
         }),
-      }).then((res) => res.json())
+      })
 
-      // 4. 응답 분기 처리
-      if (loginRes.error === 'PROFILE_NOT_REGISTER') {
-        navigate('/register')
-      } else {
-        navigate('/home')
+      if (loginRes.ok) {
+        loginRes.json().then(async (data) => {
+          if (data.accessToken && data.refreshToken) {
+            setTokenCookie(data.accessToken, 'accessToken')
+            setTokenCookie(data.refreshToken, 'refreshToken')
+
+            if (data.message == null) {
+              const res = await fetchWithRefresh(
+                `http://localhost/api/profiles/${localStorage.getItem('userId')}`,
+                {
+                  method: 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                }
+              )
+              const ProfileData = await res.json()
+              if (!res.ok) throw new Error('프로필 생성 실패')
+
+              setUser(ProfileData)
+
+              navigate('/home')
+            } else {
+              navigate('/register')
+            }
+          }
+        })
       }
     },
     onError: (errorResponse) => {
@@ -237,6 +261,13 @@ function OnboardingContent() {
     if (index === currentIndex) return
     setCurrentIndex(index)
   }
+
+  // 이미 로그인된 경우 home으로 이동
+  useEffect(() => {
+    if (user) {
+      navigate('/home', { replace: true })
+    }
+  }, [user, navigate])
 
   if (!isInitialized) return null
 

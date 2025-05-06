@@ -49,14 +49,33 @@ const CustomFormViewRoute = () => {
 }
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { user } = useAuthStore()
+  const { user, hydrated, setUser } = useAuthStore()
   const navigate = useNavigate()
 
+  // hydration 후 user가 null이고 localStorage에 user가 있으면 복원 시도 (임시)
   useEffect(() => {
-    if (!user) {
-      navigate('/onboarding', { replace: true })
+    if (hydrated && !user) {
+      const raw = localStorage.getItem('auth-store')
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw)
+          if (parsed.state?.user) {
+            setUser(parsed.state.user)
+          } else {
+            navigate('/onboarding', { replace: true })
+          }
+        } catch (e) {
+          navigate('/onboarding', { replace: true })
+        }
+      } else {
+        navigate('/onboarding', { replace: true })
+      }
     }
-  }, [user, navigate])
+  }, [hydrated, user, navigate, setUser])
+
+  if (!hydrated) {
+    return null
+  }
 
   if (!user) {
     return <Navigate to="/onboarding" replace />

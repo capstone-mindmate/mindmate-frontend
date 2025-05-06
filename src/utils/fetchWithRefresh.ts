@@ -1,22 +1,47 @@
+export function setTokenCookie(token: string, key: string, days = 1) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString()
+  document.cookie = `${key}=${token}; path=/; expires=${expires}`
+}
+
+export function getTokenCookie(key: string) {
+  return document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(key + '='))
+    ?.split('=')[1]
+}
+
 export async function fetchWithRefresh(input: RequestInfo, init?: RequestInit) {
-  let res = await fetch(input, { ...init, credentials: 'include' })
+  const accessToken = getTokenCookie('accessToken')
+  const headers = {
+    ...(init?.headers || {}),
+    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+  }
+
+  let res = await fetch(input, { ...init, headers, credentials: 'include' })
 
   if (res.status === 401) {
-    const refreshRes = await fetch('/api/auth/refresh', {
-      method: 'POST',
-      headers: {
-        ...(init?.headers || {}),
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-    if (refreshRes.ok) {
-      // 갱신 성공 → 원래 요청 재시도
-      res = await fetch(input, { ...init, credentials: 'include' })
-    } else {
-      // 로그아웃 시키기
-      throw new Error('토큰 갱신 실패')
-    }
+    // const refreshToken = getTokenCookie('refreshToken')
+    // const refreshRes = await fetch('/api/auth/refresh', {
+    //   method: 'POST',
+    //   headers: {
+    //     ...(refreshToken ? { 'Authorization': `Bearer ${refreshToken}` } : {}),
+    //     'Content-Type': 'application/json',
+    //   },
+    //   credentials: 'include',
+    // })
+    // if (refreshRes.ok) {
+    //   const refreshData = await refreshRes.json()
+    //   if (refreshData.accessToken) setTokenCookie(refreshData.accessToken, 'accessToken')
+    //   if (refreshData.refreshToken) setTokenCookie(refreshData.refreshToken, 'refreshToken')
+    //   const newAccessToken = getTokenCookie('accessToken')
+    //   const retryHeaders = {
+    //     ...(init?.headers || {}),
+    //     ...(newAccessToken ? { Authorization: `Bearer ${newAccessToken}` } : {}),
+    //   }
+    //   res = await fetch(input, { ...init, headers: retryHeaders, credentials: 'include' })
+    // } else {
+    //   throw new Error('토큰 갱신 실패')
+    // }
   }
   return res
 }

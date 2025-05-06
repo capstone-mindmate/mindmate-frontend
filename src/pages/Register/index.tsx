@@ -15,6 +15,8 @@ import {
 } from './style'
 import { BackIcon } from '../../components/icon/iconComponents'
 import { useMutation } from '@tanstack/react-query'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+import { useAuthStore } from '../../stores/userStore'
 
 // 회원 상태 타입 신규(NEW) 재방문(REVISITING)
 type UserStatus = 'NEW' | 'REVISITING'
@@ -59,6 +61,7 @@ function fileToBase64(file: File): Promise<string> {
 const Register = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const { setUser, user } = useAuthStore()
 
   // 로컬 스토리지에서 이전 데이터 불러오기
   const getInitialStep = (): RegisterStep => {
@@ -87,20 +90,40 @@ const Register = () => {
     localStorage.setItem(REGISTER_STEP_KEY, currentStep)
   }, [currentStep])
 
+  // 이미 로그인된 경우 home으로 이동
+  useEffect(() => {
+    if (user) {
+      navigate('/home', { replace: true })
+    }
+  }, [user, navigate])
+
   // 프로필 생성 mutation
   const profileMutation = useMutation({
     mutationFn: async (profileData: any) => {
-      const res = await fetch('http://localhost/api/profiles', {
+      const res = await fetchWithRefresh('http://localhost/api/profiles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(profileData),
-      }).then((res) => res.json())
-      console.log(res)
+      })
+      const data = await res.json()
       if (!res.ok) throw new Error('프로필 생성 실패')
-      return res
+      return data
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      localStorage.setItem('userId', data.id)
+
+      const res = await fetchWithRefresh(
+        `http://localhost/api/profiles/${data.id}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+      const ProfileData = await res.json()
+      if (!res.ok) throw new Error('프로필 생성 실패')
+
+      setUser(ProfileData)
+
       navigate('/home')
     },
     onError: (e) => {
@@ -133,7 +156,8 @@ const Register = () => {
       // 마지막 단계에서 프로필 생성 API 호출
       const profilePayload = {
         nickname: registerData.nickname,
-        profileImage: registerData.profileImage || '', // base64 문자열
+        // profileImage: registerData.profileImage || '', // base64 문자열
+        profileImage: 'devdevdev',
         department: registerData.department,
         entranceTime: Number(registerData.admissionYear),
         graduation: false, // 기본값, 필요시 수정

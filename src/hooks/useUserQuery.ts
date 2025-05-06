@@ -5,11 +5,14 @@ import { fetchWithRefresh } from '../utils/fetchWithRefresh'
 
 async function fetchMe() {
   const res = await fetchWithRefresh(
-    '/api/백엔드한테사용자정보요청엔드포인트달라고하기',
+    `http://localhost/api/profiles/${localStorage.getItem('userId')}`,
     {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     }
   )
+
   if (!res.ok) throw new Error('인증 필요')
   return res.json()
 }
