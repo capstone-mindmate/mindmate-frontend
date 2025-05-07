@@ -1,4 +1,4 @@
-import { createBrowserRouter, useParams } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import Register from '../pages/Register'
 import Devtools from '../pages/Devtools'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
@@ -6,6 +6,7 @@ import PersonalInformationDocument from '../pages/Register/steps/PersonalInforma
 import Matching from '../pages/Matching'
 import HomePage from '../pages/Home/Home.tsx'
 import MyPage from '../pages/Mypage/Mypage.tsx'
+import Notification from '../pages/Home/NotificationPage.tsx'
 import Review from '../pages/Review/ReviewPage.tsx'
 
 import DetailReviewPage from '../pages/Mypage/DetailReviewPage.tsx'
@@ -31,7 +32,7 @@ import ChatHome from '../pages/Chat/ChatHome'
 import ChatRoom from '../pages/Chat/ChatRoom'
 import { useAuthStore } from '../stores/userStore'
 import { useEffect } from 'react'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate, Navigate, useParams } from 'react-router-dom'
 
 const ChatRoomRoute = () => {
   const { id } = useParams()
@@ -303,5 +304,13 @@ export const router = createBrowserRouter([
   {
     path: '*',
     element: <div>404 Not Found</div>,
+  },
+  {
+    path: '/report',
+    element: <Report />,
+  },
+  {
+    path: '/notification',
+    element: <Notification />,
   },
 ])

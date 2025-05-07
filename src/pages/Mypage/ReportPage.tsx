@@ -12,7 +12,7 @@ import {
   ReportTextArea,
   CharCounter,
   ReportButtonContainer,
-} from './ReportPageStyles.tsx'
+} from './ReportPageStyles'
 
 // 신고 사유 옵션 데이터
 const REPORT_OPTIONS = [
