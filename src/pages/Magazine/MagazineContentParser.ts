@@ -12,7 +12,7 @@ import { EmoticonType } from '../../components/emoticon/Emoticon'
  * @returns 게시 결과
  */
 
-import { mapEmoticonTypeToId } from './MagazineEmoticonHandler'
+import { mapEmoticonTypeToId } from './EmoticonService'
 
 export const postMagazine = async (
   title: string,

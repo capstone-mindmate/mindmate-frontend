@@ -23,7 +23,7 @@ import {
   insertEmoticonToEditor,
   EmoticonState,
   getEmoticonSrc,
-} from './SimpleEmoticonSolution' // 새로운 간소화된 이모티콘 처리 모듈
+} from './EmoticonService'
 import {
   emoticonButtonStyles,
   emoticonPickerOverlayStyles,
@@ -139,7 +139,7 @@ const MagazineWrite: React.FC = () => {
       console.log('이모티콘 선택됨:', type)
 
       // 새로운 간소화된 함수 사용
-      insertEmoticonToEditor(quillRef, type)
+      insertEmoticonToEditor(quillRef, type, onclose)
 
       // 이모티콘 피커 닫기
       setShowEmoticonPicker(false)
