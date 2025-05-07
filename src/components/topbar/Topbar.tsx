@@ -11,7 +11,7 @@ import {
 
 // 탑바 컴포넌트 Props 인터페이스
 interface TopBarProps {
-  title?: string // 페이지 제목
+  title?: string | React.ReactNode // 페이지 제목
   showBackButton?: boolean // 뒤로가기 버튼 표시 여부 (기본값: false)
   onBackClick?: () => void // 뒤로가기 버튼 클릭 핸들러
   actionText?: string // 액션 버튼 텍스트 (제공되지 않으면 버튼 미표시)
