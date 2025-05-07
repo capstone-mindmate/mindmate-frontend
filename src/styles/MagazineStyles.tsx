@@ -8,7 +8,7 @@ export const MagazineGrid = styled.div`
   box-sizing: border-box;
   width: 100%;
   margin: 0 auto; // 좌우 마진을 auto로 변경
-  justify-content: center; // 중앙 정렬 추가
+  justify-content: flex-start; // 중앙 정렬 추가
   max-width: 1200px; // 최대 너비 설정 (필요에 따라 조정)
 `
 

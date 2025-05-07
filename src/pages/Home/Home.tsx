@@ -37,7 +37,7 @@ const HomePage = () => {
   // 플로팅 버튼 활성화 핸들러
   const handleFloatingButtonActive = (isActive: boolean) => {
     if (isActive) {
-      navigate('/matching/register') // 글쓰기 페이지로 이동
+      navigate('/magazine/write') // 글쓰기 페이지로 이동
     }
   }
 
