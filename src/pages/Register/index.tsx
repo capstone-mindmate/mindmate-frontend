@@ -65,8 +65,7 @@ const Register = () => {
 
   // 로컬 스토리지에서 이전 데이터 불러오기
   const getInitialStep = (): RegisterStep => {
-    const savedStep = localStorage.getItem(REGISTER_STEP_KEY)
-    return (savedStep as RegisterStep) || 'DEPARTMENT_AND_ADMISSION'
+    return 'DEPARTMENT_AND_ADMISSION'
   }
 
   const getInitialData = () => {
@@ -112,22 +111,19 @@ const Register = () => {
     onSuccess: async (data) => {
       localStorage.setItem('userId', data.id)
 
-      const res = await fetchWithRefresh(
-        `http://localhost/api/profiles/${data.id}`,
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+      const res = await fetchWithRefresh(`http://localhost/api/profiles`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
       const ProfileData = await res.json()
-      if (!res.ok) throw new Error('프로필 생성 실패')
+      if (!res.ok) throw new Error(await res.json())
 
       setUser(ProfileData)
 
       navigate('/home')
     },
     onError: (e) => {
-      alert('프로필 생성에 실패했습니다.')
+      console.error(e)
     },
   })
 

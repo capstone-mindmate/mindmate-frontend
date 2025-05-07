@@ -30,6 +30,7 @@ const MyPage = () => {
   const [categoryData, setCategoryData] = useState<any>(null)
   const [reviewTags, setReviewTags] = useState<any[]>([])
   const [userReviews, setUserReviews] = useState<any[]>([])
+  const [pointBalance, setPointBalance] = useState<number | null>(null)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -39,19 +40,9 @@ const MyPage = () => {
         if (!userId || (user && String(user.id) === userId)) {
           // 내 프로필
           setIsOwnProfile(true)
-          let profileImage = user?.profileImage || ''
-          let username = user?.nickname || ''
-          if (user?.profileId) {
+          if (user?.id) {
             profileRes = await fetchWithRefresh(
-              `http://localhost/api/profiles/${user?.profileId}`,
-              {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-              }
-            )
-          } else if (user?.id) {
-            profileRes = await fetchWithRefresh(
-              `http://localhost/api/profiles/users/${user?.id}`,
+              `http://localhost/api/profiles/${user.id}`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -61,12 +52,14 @@ const MyPage = () => {
             throw new Error('로그인 정보가 없습니다.')
           }
           profileData = await profileRes.json()
-          // 서버에서 받아온 정보가 있으면 우선 적용
-          profileImage = profileData.profileImage || profileImage
-          username = profileData.nickname || username
+          console.log(profileData)
           setUserProfile({
-            profileImage,
-            username,
+            profileImage: profileData.profileImage,
+            username: profileData.nickname || '닉네임 없음',
+            department: profileData.department || '',
+            entranceTime: profileData.entranceTime
+              ? String(profileData.entranceTime)
+              : '',
           })
           setUserStats({
             averageScore: profileData.averageRating,
@@ -119,6 +112,10 @@ const MyPage = () => {
           setUserProfile({
             profileImage: profileData.profileImage,
             username: profileData.nickname,
+            department: profileData.department || '',
+            entranceTime: profileData.entranceTime
+              ? String(profileData.entranceTime)
+              : '',
           })
           setUserStats({
             averageScore: profileData.averageRating,
@@ -169,6 +166,27 @@ const MyPage = () => {
       }
     }
     fetchProfile()
+
+    // 포인트 잔액 별도 조회
+    const fetchPointBalance = async () => {
+      try {
+        const res = await fetchWithRefresh(
+          'http://localhost/api/points/balance',
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          }
+        )
+        if (res.ok) {
+          const balance = await res.json()
+          setPointBalance(balance)
+        }
+      } catch (e) {
+        setPointBalance(null)
+      }
+    }
+    fetchPointBalance()
   }, [userId, user])
 
   // TODO: 프로필 편집 버튼 클릭 핸들러
@@ -216,7 +234,7 @@ const MyPage = () => {
           <InfoBoxContainer>
             <InfoBox
               averageScore={userStats?.averageScore}
-              coins={userStats?.coins}
+              coins={pointBalance !== null ? pointBalance : userStats?.coins}
               matchCount={userStats?.matchCount}
             />
           </InfoBoxContainer>

@@ -32,8 +32,6 @@ import { css } from '@emotion/react'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { useToast } from '../../components/toast/ToastProvider'
 
-// 더미 데이터. API 연동 후 삭제 예정 - 2025-04-19 석지원
-
 // 매칭방 아이템 타입 정의 (API 응답 구조 기반)
 interface MatchItemType {
   id: number
@@ -339,12 +337,16 @@ const Matching = () => {
             }),
           }
         )
-        if (!res.ok) throw new Error('매칭 신청에 실패했습니다.')
+        if (!res.ok) {
+          const errorData = await res.json()
+          throw new Error(errorData.message || '매칭 신청에 실패했습니다.')
+        }
         showToast('매칭 신청이 완료되었습니다!', 'success')
         setIsModalOpen(false)
         setMessageToSend('')
       } catch (e: any) {
-        showToast('매칭 신청 중 오류가 발생했습니다.', 'error')
+        setIsModalOpen(false)
+        showToast(e.message, 'error')
       }
     }
   }

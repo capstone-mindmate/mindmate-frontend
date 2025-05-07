@@ -4,14 +4,11 @@ import { useEffect } from 'react'
 import { fetchWithRefresh } from '../utils/fetchWithRefresh'
 
 async function fetchMe() {
-  const res = await fetchWithRefresh(
-    `http://localhost/api/profiles/${localStorage.getItem('userId')}`,
-    {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-    }
-  )
+  const res = await fetchWithRefresh(`http://localhost/api/profiles`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  })
 
   if (!res.ok) throw new Error('인증 필요')
   return res.json()

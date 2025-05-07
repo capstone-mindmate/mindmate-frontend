@@ -139,12 +139,19 @@ function OnboardingContent() {
       if (loginRes.ok) {
         loginRes.json().then(async (data) => {
           if (data.accessToken && data.refreshToken) {
-            setTokenCookie(data.accessToken, 'accessToken')
-            setTokenCookie(data.refreshToken, 'refreshToken')
+            // 프로필 입력 안한 사용자
+            if (data.currentRole == 'ROLE_USER') {
+              setTokenCookie(data.accessToken, 'accessToken')
+              setTokenCookie(data.refreshToken, 'refreshToken')
+              navigate('/register')
+            }
+            //프로필 입력 한 사용자
+            else if (data.currentRole == 'ROLE_PROFILE') {
+              setTokenCookie(data.accessToken, 'accessToken')
+              setTokenCookie(data.refreshToken, 'refreshToken')
 
-            if (data.message == null) {
               const res = await fetchWithRefresh(
-                `http://localhost/api/profiles/${localStorage.getItem('userId')}`,
+                `http://localhost/api/profiles`,
                 {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },
@@ -156,8 +163,10 @@ function OnboardingContent() {
               setUser(ProfileData)
 
               navigate('/home')
-            } else {
-              navigate('/register')
+            }
+            //정지된 사용자
+            else if (data.currentRole == 'ROLE_SUSPENDED') {
+              navigate('/onboarding')
             }
           }
         })
