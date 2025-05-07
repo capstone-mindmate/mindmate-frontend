@@ -61,10 +61,8 @@ const AskInput = ({ placeHolder, onCloseBtnClick }: AskInputProps) => {
   }
 
   const handleCloseClick = () => {
-    if (hasValue) {
-      setInputValue('')
-      onCloseBtnClick()
-    }
+    setInputValue('')
+    onCloseBtnClick()
   }
 
   return (
@@ -76,7 +74,10 @@ const AskInput = ({ placeHolder, onCloseBtnClick }: AskInputProps) => {
         onChange={handleInputChange}
         css={askInputStyles.input(hasValue)}
       />
-      <button onClick={() => {}} css={askInputStyles.closeButton(hasValue)}>
+      <button
+        onClick={handleCloseClick}
+        css={askInputStyles.closeButton(hasValue)}
+      >
         <CloseIcon
           width={24}
           height={24}
