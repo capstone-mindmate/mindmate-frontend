@@ -15,6 +15,7 @@ import {
 } from './style'
 import MatchItem from '../../components/matching/matchItem'
 import ModalComponent from '../../components/modal/modalComponent'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 const myCreatedMatchingRooms = [
   {
@@ -90,9 +91,52 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
 
   useEffect(() => {
     if (selectedCategory === '내가 만든 매칭방') {
-      setMatchingRooms(myCreatedMatchingRooms)
+      // API 호출
+      const fetchMyCreatedRooms = async () => {
+        try {
+          const res = await fetchWithRefresh(
+            'http://localhost/api/matchings/creator',
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          )
+          if (!res.ok)
+            throw new Error('내가 만든 매칭방을 불러오지 못했습니다.')
+          const data = await res.json()
+          if (Array.isArray(data.content)) {
+            setMatchingRooms(data.content)
+          } else {
+            setMatchingRooms([])
+          }
+        } catch (e) {
+          setMatchingRooms(myCreatedMatchingRooms)
+        }
+      }
+      fetchMyCreatedRooms()
     } else {
-      setMatchingRooms(appliedMatchingRooms)
+      // 신청보낸 매칭방 API 호출
+      const fetchAppliedRooms = async () => {
+        try {
+          const res = await fetchWithRefresh(
+            'http://localhost/api/matchings/participant?page=0&size=20',
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          )
+          if (!res.ok) throw new Error('신청보낸 매칭방을 불러오지 못했습니다.')
+          const data = await res.json()
+          if (Array.isArray(data.content)) {
+            setMatchingRooms(data.content)
+          } else {
+            setMatchingRooms([])
+          }
+        } catch (e) {
+          setMatchingRooms(appliedMatchingRooms)
+        }
+      }
+      fetchAppliedRooms()
     }
   }, [selectedCategory])
 

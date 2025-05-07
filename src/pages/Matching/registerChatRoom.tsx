@@ -6,6 +6,9 @@ import { css } from '@emotion/react'
 import YellowInputBox from '../../components/inputs/yellowInputBox'
 import BrownRoundButton from '../../components/buttons/brownRoundButton'
 import YellowRoundButton from '../../components/buttons/yellowRoundButton'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+import { useNavigate } from 'react-router-dom'
+import { useToast } from '../../components/toast/ToastProvider.tsx'
 
 import { RootContainer, MatchingContainer } from './style'
 
@@ -63,6 +66,9 @@ const registerStyles = {
 }
 
 const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
+  const navigate = useNavigate()
+  const { showToast } = useToast()
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
@@ -72,6 +78,26 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
   const [isDepartmentHidden, setIsDepartmentHidden] = useState(false)
   const [isRandomMatchingAllowed, setIsRandomMatchingAllowed] = useState(false)
   const [category, setCategory] = useState('진로')
+
+  // 카테고리 한글 → 영문 변환 맵
+  const categoryMap: Record<string, string> = {
+    학업: 'ACADEMIC',
+    진로: 'CAREER',
+    대인관계: 'RELATIONSHIP',
+    건강: 'MENTAL_HEALTH',
+    학교생활: 'CAMPUS_LIFE',
+    자기계발: 'PERSONAL_GROWTH',
+    경제: 'FINANCIAL',
+    취업: 'EMPLOYMENT',
+    기타: 'OTHER',
+  }
+
+  // 포지션 한글 → 영문 변환
+  const getCreatorRole = () => {
+    if (position === 'listener') return 'LISTENER'
+    if (position === 'speaker') return 'SPEAKER'
+    return null
+  }
 
   const handleTitleChange = (value: string) => {
     setTitle(value)
@@ -104,9 +130,43 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
   const isListenerActive = position === 'listener'
   const isSpeakerActive = position === 'speaker'
 
+  // 등록 버튼 클릭 시 API 호출
+  const handleRegister = async () => {
+    if (!title || !description || !position) {
+      showToast('모든 필드를 입력해주세요.', 'error')
+      return
+    }
+    try {
+      const res = await fetchWithRefresh('http://localhost/api/matchings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description,
+          category: categoryMap[category] || 'ETC',
+          creatorRole: getCreatorRole(),
+          showDepartment: !isDepartmentHidden,
+          allowRandom: isRandomMatchingAllowed,
+          anonymous: isAnonymous,
+        }),
+      })
+      if (!res.ok) throw new Error('매칭방 생성 실패')
+      showToast('매칭방이 성공적으로 생성되었습니다!', 'success')
+      navigate('/matching')
+      // TODO: 성공 시 이동 처리 (예: 홈/매칭방 목록 등)
+    } catch (e: any) {
+      showToast('매칭방 생성 중 오류가 발생했습니다.', 'error')
+    }
+  }
+
   return (
     <RootContainer>
-      <TopBar title="매칭방 만들기" showBackButton actionText="등록" />
+      <TopBar
+        title="매칭방 만들기"
+        showBackButton
+        actionText="등록"
+        onActionClick={handleRegister}
+      />
       <MatchingContainer style={{ paddingTop: '57px' }}>
         <div className="categoryBox" css={registerStyles.categoryBox}>
           <select

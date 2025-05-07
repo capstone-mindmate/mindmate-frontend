@@ -22,6 +22,7 @@ interface ModalComponentProps {
     name: string
     department: string
     makeDate: string
+    userId?: number
   }
   matchingInfoProps?: {
     title: string
@@ -36,6 +37,7 @@ interface ModalComponentProps {
     size: string
     price: number
   }
+  onProfileClick?: () => void
 }
 
 const ModalComponent = ({
@@ -63,6 +65,7 @@ const ModalComponent = ({
     size: 'xlarge',
     price: 10,
   },
+  onProfileClick,
 }: ModalComponentProps) => {
   const [showDetails, setShowDetails] = useState(false)
   const matchedInfoRef = useRef<HTMLDivElement>(null)
@@ -294,6 +297,7 @@ const ModalComponent = ({
               name={userProfileProps.name}
               department={userProfileProps.department}
               makeDate={userProfileProps.makeDate}
+              onClick={onProfileClick}
             />
           </div>
           <div className="modal-body" css={modalStyles.modalBody}>

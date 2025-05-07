@@ -19,6 +19,8 @@ export interface Review {
 export interface User {
   id: number
   userId: number
+  profileId?: number // 내 프로필 id (프론트에서 관리용, 선택적)
+  email: string // 로그인 이메일
   nickname: string
   profileImage: string
   department: string
@@ -34,6 +36,8 @@ export interface User {
   reviews: Review[]
   points: number
   createdAt: string
+  accessToken?: string // JWT 액세스 토큰
+  refreshToken?: string // JWT 리프레시 토큰
 }
 
 interface AuthStore {
@@ -50,47 +54,31 @@ export const useAuthStore = create<AuthStore>()(
     (set, get) => ({
       user: null,
       setUser: (user: User) => {
-        console.log('[zustand] setUser 호출:', user)
         set({ user })
       },
       clearUser: () => {
-        console.log('[zustand] clearUser 호출')
         set({ user: null })
       },
       hydrated: false,
       setHydrated: (hydrated: boolean) => {
-        console.log('[zustand] setHydrated 호출:', hydrated)
         set({ hydrated })
       },
       restoreUserFromStorage: () => {
         const raw = localStorage.getItem('auth-store')
-        console.log('[zustand] restoreUserFromStorage 호출, raw:', raw)
         if (raw) {
           try {
             const parsed = JSON.parse(raw)
-            console.log('[zustand] parsed:', parsed)
             if (parsed.state?.user) {
               set({ user: parsed.state.user })
-              console.log('[zustand] user 복원 성공:', parsed.state.user)
-            } else {
-              console.log('[zustand] user 복원 실패: user 없음')
             }
-          } catch (e) {
-            console.log('[zustand] user 복원 실패: JSON 파싱 에러', e)
-          }
-        } else {
-          console.log('[zustand] user 복원 실패: localStorage에 없음')
+          } catch (e) {}
         }
       },
     }),
     {
       name: 'auth-store',
       onRehydrateStorage: () => (state) => {
-        console.log('[zustand] onRehydrateStorage 실행, state:', state)
         state?.setHydrated(true)
-        setTimeout(() => {
-          console.log('[zustand] hydration 후 user:', state?.user)
-        }, 100)
       },
     }
   )

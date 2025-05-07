@@ -2,6 +2,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
+import SockJS from 'sockjs-client'
+import { Client, Stomp } from '@stomp/stompjs'
+import { useAuthStore } from '../../stores/userStore'
 
 import { RootContainer } from './styles/RootStyles'
 import { KebabIcon } from '../../components/icon/iconComponents'
@@ -13,6 +16,7 @@ import EmoticonComponent, {
 } from '../../components/emoticon/Emoticon'
 import { useToast } from '../../components/toast/ToastProvider'
 import BottomSheet from '../../components/bottomSheet/BottomSheet'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 import { ChatContainer } from './styles/RootStyles'
 import {
@@ -47,141 +51,126 @@ interface ChatRoomProps {
 
 const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
   const [messages, setMessages] = useState<Message[]>([])
   const [isConnected, setIsConnected] = useState(false)
   const [otherUserName, setOtherUserName] = useState('상대방')
   const [isTyping, setIsTyping] = useState(false)
   const { showToast } = useToast()
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
-
-  // WebSocket 연결 참조 저장
-  const socketRef = useRef<WebSocket | null>(null)
+  const stompClientRef = useRef<any>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
 
-  // 현재 사용자 정보 (실제 구현에서는 인증 시스템과 연동)
-  const currentUserId = 'user123' // 실제 구현시 인증에서 가져와야 함
-
-  // WebSocket 연결 설정
+  // 최초 1회 REST로 메시지 목록 불러오기
   useEffect(() => {
-    if (!chatId) {
-      showToast('채팅방 ID가 유효하지 않습니다', 'error')
-      return
-    }
-
-    // WebSocket 연결
-    const socket = new WebSocket(`ws://localhost:80/chat/${chatId}`)
-    socketRef.current = socket
-
-    // 연결 이벤트 처리
-    socket.onopen = () => {
-      console.log('WebSocket 연결됨')
-      setIsConnected(true)
-
-      // 연결 후 초기 데이터 요청 (채팅 이력 등)
-      socket.send(
-        JSON.stringify({
-          type: 'INIT',
-          chatId: chatId,
-          userId: currentUserId,
-        })
-      )
-    }
-
-    // 메시지 수신 처리
-    socket.onmessage = (event) => {
+    if (!chatId) return
+    const fetchMessages = async () => {
       try {
-        const data = JSON.parse(event.data)
-
-        // 메시지 유형에 따른 처리
-        switch (data.type) {
-          case 'CHAT_HISTORY':
-            // 채팅 이력 처리
-            const history = data.messages.map((msg: any) => ({
-              id: msg.id,
-              type: msg.messageType.toLowerCase(),
-              content: msg.content,
-              emoticonType: msg.emoticonType,
-              isMe: msg.senderId === currentUserId,
-              timestamp: formatTimestamp(msg.timestamp),
-              isRead: msg.isRead,
-            }))
-            setMessages(history)
-            break
-
-          case 'MESSAGE':
-            // 새 메시지 처리
-            const newMessage: Message = {
-              id: data.id,
-              type: data.messageType.toLowerCase(),
-              content: data.messageType === 'TEXT' ? data.content : '',
-              emoticonType:
-                data.messageType === 'EMOTICON' ? data.emoticonType : 'normal',
-              isMe: data.senderId === currentUserId,
-              timestamp: formatTimestamp(data.timestamp),
-              isRead: false,
-            }
-            setMessages((prev) => [...prev, newMessage])
-            break
-
-          case 'USER_INFO':
-            // 상대방 정보 처리
-            setOtherUserName(data.userName)
-            break
-
-          case 'TYPING':
-            // 타이핑 상태 처리
-            setIsTyping(data.senderId !== currentUserId && data.isTyping)
-            break
-
-          case 'READ_RECEIPT':
-            // 읽음 처리
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id <= data.messageId ? { ...msg, isRead: true } : msg
-              )
-            )
-            break
+        const res = await fetchWithRefresh(
+          `http://localhost/api/chat/rooms/${chatId}/messages`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        if (!res.ok) throw new Error('메시지 목록을 불러오지 못했습니다.')
+        const data = await res.json()
+        if (Array.isArray(data.messages)) {
+          setMessages(data.messages)
+        } else {
+          setMessages([])
         }
-      } catch (error) {
-        console.error('메시지 처리 중 오류:', error)
+      } catch (e) {
+        setMessages([])
       }
     }
+    fetchMessages()
+  }, [chatId])
 
-    // 에러 처리
-    socket.onerror = (error) => {
-      console.error('WebSocket 오류:', error)
-      showToast('연결 중 오류가 발생했습니다', 'error')
-    }
-
-    // 연결 종료 처리
-    socket.onclose = () => {
-      console.log('WebSocket 연결 종료')
+  // WebSocket 연결/구독
+  useEffect(() => {
+    if (!chatId || !user?.accessToken) return
+    const socket = new SockJS('http://localhost:8080/ws')
+    const stompClient = Stomp.over(socket)
+    stompClientRef.current = stompClient
+    stompClient.connect({ Authorization: `Bearer ${user.accessToken}` }, () => {
+      setIsConnected(true)
+      stompClient.subscribe(`/topic/chat.room.${chatId}`, onMessage)
+      stompClient.subscribe(`/topic/chat.room.${chatId}.read`, onRead)
+      stompClient.subscribe(`/topic/chat.room.${chatId}.reaction`, onReaction)
+      stompClient.subscribe(
+        `/topic/chat.room.${chatId}.customform`,
+        onCustomForm
+      )
+      stompClient.subscribe(`/topic/chat.room.${chatId}.emoticon`, onEmoticon)
+      stompClient.send(
+        '/app/presence',
+        {},
+        JSON.stringify({ status: 'ONLINE', activeRoomId: chatId })
+      )
+      stompClient.send('/app/chat.read', {}, JSON.stringify({ roomId: chatId }))
+    })
+    return () => {
+      stompClient.disconnect()
       setIsConnected(false)
     }
+  }, [chatId, user?.accessToken])
 
-    // 컴포넌트 언마운트 시 연결 해제
-    return () => {
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.close()
-      }
-    }
-  }, [chatId, showToast, currentUserId])
+  // 메시지 수신 핸들러 예시
+  const onMessage = (msg: any) => {
+    const data = JSON.parse(msg.body)
+    setMessages((prev) => [...prev, data])
+  }
+  const onRead = (msg: any) => {
+    /* 읽음 처리 UI 반영 */
+  }
+  const onReaction = (msg: any) => {
+    /* 리액션 UI 반영 */
+  }
+  const onCustomForm = (msg: any) => {
+    /* 커스텀폼 UI 반영 */
+  }
+  const onEmoticon = (msg: any) => {
+    /* 이모티콘 UI 반영 */
+  }
+
+  // 메시지 전송
+  const sendMessage = (content: string) => {
+    stompClientRef.current?.send(
+      '/app/chat.send',
+      {},
+      JSON.stringify({ roomId: chatId, content, type: 'TEXT' })
+    )
+  }
+  // 이모티콘 전송
+  const sendEmoticon = (emoticonType: EmoticonType) => {
+    stompClientRef.current?.send(
+      '/app/chat.emoticon',
+      {},
+      JSON.stringify({ roomId: chatId, emoticonType })
+    )
+  }
+  // 리액션 전송
+  const sendReaction = (messageId: number, reactionType: string) => {
+    stompClientRef.current?.send(
+      '/app/chat.reaction',
+      {},
+      JSON.stringify({ messageId, roomId: chatId, reactionType })
+    )
+  }
+  // 읽음 처리
+  const markAsRead = () => {
+    stompClientRef.current?.send(
+      '/app/chat.read',
+      {},
+      JSON.stringify({ roomId: chatId })
+    )
+  }
 
   // 새 메시지가 추가될 때마다 스크롤을 아래로 이동
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
-
-  // 타임스탬프 형식 변환 함수
-  const formatTimestamp = (timestamp: string): string => {
-    const date = new Date(timestamp)
-    const hours = date.getHours()
-    const minutes = date.getMinutes()
-    const ampm = hours >= 12 ? '오후' : '오전'
-    const formattedHours = hours % 12 || 12
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes
-    return `${ampm} ${formattedHours}:${formattedMinutes}`
-  }
 
   // 현재 시간을 "오전/오후 h:mm" 형식으로 반환
   const getCurrentTime = (): string => {
@@ -192,81 +181,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     const formattedHours = hours % 12 || 12
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes
     return `${ampm} ${formattedHours}:${formattedMinutes}`
-  }
-
-  // 메시지 전송 함수
-  const sendMessage = (
-    type: string,
-    content: string,
-    emoticonType?: EmoticonType
-  ) => {
-    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
-      showToast('연결이 끊어졌습니다. 다시 시도해주세요.', 'error')
-      return
-    }
-
-    const messageData = {
-      type: 'MESSAGE',
-      messageType: type.toUpperCase(),
-      content: type === 'text' ? content : '',
-      emoticonType: type === 'emoticon' ? emoticonType : null,
-      chatId: chatId,
-      senderId: currentUserId,
-      timestamp: new Date().toISOString(),
-    }
-
-    socketRef.current.send(JSON.stringify(messageData))
-  }
-
-  // 텍스트 메시지 전송 처리
-  const handleSendMessage = (text: string) => {
-    if (!text.trim()) return
-
-    // 메시지 전송
-    sendMessage('text', text)
-
-    // UI에 즉시 반영 (낙관적 업데이트)
-    const newMessage: TextMessage = {
-      id: Date.now().toString(),
-      type: 'text',
-      content: text,
-      isMe: true,
-      timestamp: getCurrentTime(),
-      isRead: false,
-    }
-    setMessages((prev) => [...prev, newMessage])
-  }
-
-  // 이모티콘 메시지 전송 처리
-  const handleSendEmoticon = (emoticonType: EmoticonType) => {
-    // 메시지 전송
-    sendMessage('emoticon', '', emoticonType)
-
-    // UI에 즉시 반영 (낙관적 업데이트)
-    const newMessage: EmoticonMessage = {
-      id: Date.now().toString(),
-      type: 'emoticon',
-      emoticonType,
-      isMe: true,
-      timestamp: getCurrentTime(),
-      isRead: false,
-    }
-    setMessages((prev) => [...prev, newMessage])
-  }
-
-  // 타이핑 상태 전송 처리
-  const handleTyping = (isTyping: boolean) => {
-    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN)
-      return
-
-    socketRef.current.send(
-      JSON.stringify({
-        type: 'TYPING',
-        chatId: chatId,
-        senderId: currentUserId,
-        isTyping,
-      })
-    )
   }
 
   // 연속된 메시지인지 확인하는 함수
@@ -393,9 +307,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
       <ChatBarWrapper>
         <ChatBar
-          onSendMessage={handleSendMessage}
-          onSendEmoticon={handleSendEmoticon}
-          onTyping={handleTyping}
+          onSendMessage={sendMessage}
+          onSendEmoticon={sendEmoticon}
+          onTyping={setIsTyping}
           disabled={!isConnected}
           chatId={chatId}
         />

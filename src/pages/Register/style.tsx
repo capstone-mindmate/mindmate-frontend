@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { css } from '@emotion/react'
+import { media } from '../../styles/breakpoints'
 
 export const RootContainer = styled.div`
   width: 100%;
@@ -10,13 +11,17 @@ export const RootContainer = styled.div`
 `
 
 export const RegisterContainer = styled.div`
-  width: 478px;
+  width: 884px;
   height: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
   padding: 0 24px;
   box-sizing: border-box;
+
+  ${media.tablet} {
+    width: 100%;
+  }
 `
 
 export const RegisterStepContainer = styled.div`

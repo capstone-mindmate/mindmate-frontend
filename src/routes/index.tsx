@@ -149,6 +149,14 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: '/mypage/:userId',
+    element: (
+      <RequireAuth>
+        <MyPage />
+      </RequireAuth>
+    ),
+  },
+  {
     path: '/detailreview',
     element: (
       <RequireAuth>
