@@ -164,6 +164,25 @@ function OnboardingContent() {
 
               navigate('/home')
             }
+            // 어드민 일때
+            else if (data.currentRole == 'ROLE_ADMIN') {
+              setTokenCookie(data.accessToken, 'accessToken')
+              setTokenCookie(data.refreshToken, 'refreshToken')
+
+              const res = await fetchWithRefresh(
+                `http://localhost/api/profiles`,
+                {
+                  method: 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                }
+              )
+              const ProfileData = await res.json()
+              if (!res.ok) throw new Error('프로필 생성 실패')
+
+              setUser(ProfileData)
+
+              navigate('/home')
+            }
             //정지된 사용자
             else if (data.currentRole == 'ROLE_SUSPENDED') {
               navigate('/onboarding')

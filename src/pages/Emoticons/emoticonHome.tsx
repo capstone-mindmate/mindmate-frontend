@@ -75,7 +75,7 @@ const EmoticonHome = () => {
       try {
         // 프로필 정보
         let profileRes = await fetchWithRefresh(
-          'http://localhost/api/profiles/me',
+          'http://localhost/api/profiles',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -117,6 +117,7 @@ const EmoticonHome = () => {
         )
         let myData = await myRes.json()
         setOwnedEmoticons(myData.ownedEmoticons || [])
+        setShopEmoticons(myData.notOwnedEmoticons || [])
       } catch (e) {
         setProfile(null)
         setPointBalance(null)
@@ -148,7 +149,7 @@ const EmoticonHome = () => {
     )
   }
 
-  if (loading) return <div>로딩중...</div>
+  if (loading) return <div>.</div>
 
   return (
     <RootContainer>
@@ -197,7 +198,9 @@ const EmoticonHome = () => {
         </PurchaseAbleEmoticonContainer>
 
         <OwnedEmoticonContainer>
-          <OwnedEmoticonHeadT>행복한 돌멩이님의 이모티콘</OwnedEmoticonHeadT>
+          <OwnedEmoticonHeadT>
+            {profile?.nickname}님의 이모티콘
+          </OwnedEmoticonHeadT>
           <OwnedEmoticonList>
             {ownedEmoticons.map((emoticon) => (
               <EmotionWrapper key={emoticon.id}>

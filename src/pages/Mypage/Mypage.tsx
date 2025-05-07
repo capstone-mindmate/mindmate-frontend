@@ -37,12 +37,12 @@ const MyPage = () => {
       setLoading(true)
       try {
         let profileRes, profileData
-        if (!userId || (user && String(user.id) === userId)) {
+        if (!userId || (user && String(user.id) === String(userId))) {
           // 내 프로필
           setIsOwnProfile(true)
           if (user?.id) {
             profileRes = await fetchWithRefresh(
-              `http://localhost/api/profiles/${user.id}`,
+              `http://localhost/api/profiles`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -52,7 +52,6 @@ const MyPage = () => {
             throw new Error('로그인 정보가 없습니다.')
           }
           profileData = await profileRes.json()
-          console.log(profileData)
           setUserProfile({
             profileImage: profileData.profileImage,
             username: profileData.nickname || '닉네임 없음',
@@ -67,7 +66,6 @@ const MyPage = () => {
             matchCount: profileData.totalCounselingCount,
           })
           setCategoryData(profileData.categoryCounts)
-          // 리뷰 태그, 상세 리뷰 등 추가 API 호출
           // 리뷰 태그(임시: 태그 카운트)
           if (profileData.tagCounts) {
             setReviewTags(
@@ -78,17 +76,9 @@ const MyPage = () => {
               }))
             )
           }
-          // 상세 리뷰
-          const reviewRes = await fetchWithRefresh(
-            `http://localhost/api/reviews/profile/${profileData.id}`,
-            {
-              method: 'GET',
-              headers: { 'Content-Type': 'application/json' },
-            }
-          )
-          const reviewData = await reviewRes.json()
+          // 상세 리뷰 (응답의 reviews 배열 활용)
           setUserReviews(
-            (reviewData.content || []).map((r: any) => ({
+            (profileData.reviews || []).map((r: any) => ({
               profileImage: r.reviewerProfileImage,
               username: r.reviewerNickname,
               rating: r.rating,
@@ -101,6 +91,16 @@ const MyPage = () => {
         } else {
           // 타인 프로필 (상대방 userId)
           setIsOwnProfile(false)
+          if (!userId) {
+            alert('상대방 userId가 없습니다.')
+            setUserProfile(null)
+            setUserStats(null)
+            setCategoryData(null)
+            setReviewTags([])
+            setUserReviews([])
+            setLoading(false)
+            return
+          }
           profileRes = await fetchWithRefresh(
             `http://localhost/api/profiles/users/${userId}`,
             {

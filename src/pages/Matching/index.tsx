@@ -45,7 +45,7 @@ interface MatchItemType {
   username?: string
   profileImage?: string
   makeDate?: string
-  userId?: number
+  userId: number
   creatorId?: number
 }
 
@@ -134,7 +134,12 @@ const Matching = () => {
         if (!res.ok) throw new Error('매칭방 목록을 불러오지 못했습니다.')
         const data = await res.json()
         if (Array.isArray(data.content)) {
-          setMatchItems(data.content)
+          setMatchItems(
+            data.content.map((item: any) => ({
+              ...item,
+              userId: item.userId ?? item.creatorId,
+            }))
+          )
         } else {
           setMatchItems([])
         }
@@ -444,7 +449,7 @@ const Matching = () => {
     }
     const handleProfileClick = () => {
       // userId 우선, 없으면 creatorId 사용
-      const userId = selectedItem?.userId || selectedItem?.creatorId
+      const userId = selectedItem?.userId ?? selectedItem?.creatorId
       if (userId) {
         navigate(`/mypage/${userId}`)
       } else {
