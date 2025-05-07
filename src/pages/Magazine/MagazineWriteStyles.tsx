@@ -90,6 +90,7 @@ export const QuillEditorContainer = styled.div`
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  z-index: 110;
 
   /* Quill 에디터 스타일 */
   .quill {
@@ -198,7 +199,7 @@ export const ReviewNoticeTooltip = styled.div`
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  width: 80%;
+  width: 74%;
   max-width: 800px;
   z-index: 100;
   transition: opacity 0.5s ease-in-out;

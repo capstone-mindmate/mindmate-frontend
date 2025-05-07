@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ReactQuill from 'react-quill'
+import { createRoot } from 'react-dom/client'
 import 'react-quill/dist/quill.snow.css'
 import {
   MagazineWriteContainer,
@@ -12,10 +13,23 @@ import {
 import TopBar from '../../components/topbar/Topbar'
 import {
   insertImageToQuill,
-  getFeaturedImageUrl,
   getStorageOptimizedContent,
   ImageState,
 } from './MagazineImageHandler'
+//import { postMagazine } from './MagazineContentParser'
+import { EmoticonType } from '../../components/emoticon/Emoticon'
+import EmoticonPicker from '../../components/emoticon/EmoticonPicker'
+import {
+  insertEmoticonToEditor,
+  EmoticonState,
+  getEmoticonSrc,
+} from './SimpleEmoticonSolution' // 새로운 간소화된 이모티콘 처리 모듈
+import {
+  emoticonButtonStyles,
+  emoticonPickerOverlayStyles,
+} from './EmoticonButtonStyles'
+import { css } from '@emotion/react'
+import { SmileIcon } from '../../components/icon/iconComponents'
 
 // 제목과 소제목 글자 수 제한 상수
 const TITLE_MAX_LENGTH = 18
@@ -24,17 +38,34 @@ const SUBTITLE_MAX_LENGTH = 21
 // 로컬 스토리지 키
 const STORAGE_KEY = 'magazine_draft'
 
+// 이모티콘 버튼 컴포넌트
+const EmoticonButton = ({ onClick }: { onClick: () => void }) => {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      css={emoticonButtonStyles}
+      title="이모티콘 삽입"
+    >
+      <SmileIcon color="#484848" width={20} height={20} />
+    </button>
+  )
+}
+
 // Quill 에디터 모듈 설정
 const quillModules = {
-  toolbar: [
-    ['bold', 'underline'],
-    [{ size: ['small', false, 'large', 'huge'] }],
-    [{ color: [] }, { background: [] }],
-    [{ align: [] }],
-    ['image'],
-  ],
+  toolbar: {
+    container: [
+      ['bold', 'underline'],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
+      ['image'],
+    ],
+    handlers: {}, // 핸들러는 컴포넌트 내에서 동적으로 설정
+  },
   clipboard: {
-    matchVisual: false, // findDOMNode 관련 경고를 줄이기 위한 설정
+    matchVisual: false,
   },
 }
 
@@ -47,6 +78,7 @@ const quillFormats = [
   'background',
   'align',
   'image',
+  'link',
 ]
 
 const MagazineWrite: React.FC = () => {
@@ -55,11 +87,20 @@ const MagazineWrite: React.FC = () => {
   const [subtitle, setSubtitle] = useState('')
   const [content, setContent] = useState('')
   const [isActive, setIsActive] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const quillRef = useRef<ReactQuill>(null)
+  const toolbarRef = useRef<HTMLDivElement | null>(null)
+  const emoticonPickerRef = useRef<HTMLDivElement>(null)
   const [imageState, setImageState] = useState<ImageState>({
     featuredImageId: null,
   })
+  // 이모티콘 관련 상태 추가
+  const [emoticonState, setEmoticonState] = useState<EmoticonState>({
+    selectedEmoticonId: null,
+  })
+  const [showEmoticonPicker, setShowEmoticonPicker] = useState(false)
+
   // 알림 메시지 목록 및 애니메이션 관련 상태 추가
   const noticeMessages = [
     '모든 게시글은 MindMate에서 검토 후 등록돼요!',
@@ -71,6 +112,47 @@ const MagazineWrite: React.FC = () => {
   const [fadeState, setFadeState] = useState('fade-in')
   // 카테고리 상태 추가
   const [category, setCategory] = useState('진로')
+
+  // 이미지 버튼 클릭 핸들러
+  const handleImageClick = useCallback(() => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }, [])
+
+  // 이모티콘 버튼 토글 핸들러
+  const handleEmoticonButtonClick = useCallback(() => {
+    console.log('이모티콘 버튼 클릭됨')
+
+    // Quill의 현재 포커스/선택 유지
+    const quillEditor = quillRef.current?.getEditor()
+    if (quillEditor && !quillEditor.hasFocus()) {
+      quillEditor.focus()
+    }
+
+    setShowEmoticonPicker((prev) => !prev)
+  }, [quillRef])
+
+  // 이모티콘 선택 핸들러 - 간소화된 방식 사용
+  const handleEmoticonSelect = useCallback(
+    (type: EmoticonType) => {
+      console.log('이모티콘 선택됨:', type)
+
+      // 새로운 간소화된 함수 사용
+      insertEmoticonToEditor(quillRef, type)
+
+      // 이모티콘 피커 닫기
+      setShowEmoticonPicker(false)
+    },
+    [quillRef]
+  )
+
+  // 이모티콘샵 클릭 핸들러
+  const handleEmoticonShopClick = useCallback(() => {
+    // 이모티콘샵으로 이동하는 로직 (필요시 구현)
+    console.log('이모티콘샵으로 이동')
+    setShowEmoticonPicker(false)
+  }, [])
 
   // 메시지 순환 효과
   useEffect(() => {
@@ -91,13 +173,6 @@ const MagazineWrite: React.FC = () => {
       clearInterval(messageInterval)
     }
   }, [noticeMessages.length])
-
-  // 이미지 버튼 클릭 핸들러
-  const handleImageClick = useCallback(() => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click()
-    }
-  }, [])
 
   // 카테고리 변경 핸들러 추가
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -124,27 +199,77 @@ const MagazineWrite: React.FC = () => {
     }
   }, [])
 
-  // Quill 에디터에 이미지 버튼 클릭 핸들러 등록
+  // 이모티콘 피커 외부 클릭 시 닫기
   useEffect(() => {
-    // 이미지 버튼 클릭 시 파일 선택 창 열기
-    const toolbar = document.querySelector('.ql-toolbar')
-    if (toolbar) {
-      const imageButton = toolbar.querySelector('.ql-image')
-      if (imageButton) {
-        imageButton.addEventListener('click', handleImageClick)
+    if (!showEmoticonPicker) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node
+      const emoticonButton = document.querySelector(
+        'button[title="이모티콘 삽입"]'
+      )
+
+      if (
+        emoticonPickerRef.current &&
+        !emoticonPickerRef.current.contains(target) &&
+        emoticonButton &&
+        !emoticonButton.contains(target as Node)
+      ) {
+        setShowEmoticonPicker(false)
       }
     }
 
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      const toolbar = document.querySelector('.ql-toolbar')
-      if (toolbar) {
-        const imageButton = toolbar.querySelector('.ql-image')
-        if (imageButton) {
-          imageButton.removeEventListener('click', handleImageClick)
-        }
-      }
+      document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [handleImageClick])
+  }, [showEmoticonPicker])
+
+  // Quill 에디터 마운트 후 툴바 핸들러 설정
+  useEffect(() => {
+    if (!quillRef.current) return
+
+    // 에디터가 마운트된 후에 실행할 수 있도록 setTimeout 사용
+    const timeoutId = setTimeout(() => {
+      // Quill 인스턴스 가져오기
+      const quill = quillRef.current?.getEditor()
+      if (!quill) return
+
+      // 툴바 모듈 가져오기
+      const toolbar = quill.getModule('toolbar')
+      if (!toolbar) return
+
+      // 이미지 핸들러 설정
+      toolbar.handlers.image = handleImageClick
+
+      // 이모티콘 버튼 추가 (커스텀 버튼 방식)
+      const toolbarElement = document.querySelector('.ql-toolbar')
+      if (toolbarElement) {
+        toolbarRef.current = toolbarElement as HTMLDivElement
+
+        // 이미 있는 툴바 버튼 그룹 가져오기 또는 새로 만들기
+        let customGroup = toolbarElement.querySelector('.ql-formats.ql-custom')
+        if (!customGroup) {
+          customGroup = document.createElement('span')
+          customGroup.className = 'ql-formats ql-custom'
+          toolbarElement.appendChild(customGroup)
+        }
+
+        // 이모티콘 버튼 컨테이너 생성
+        const emoticonBtnContainer = document.createElement('span')
+
+        // React 18 방식으로 렌더링
+        const root = createRoot(emoticonBtnContainer)
+        root.render(<EmoticonButton onClick={handleEmoticonButtonClick} />)
+
+        customGroup.appendChild(emoticonBtnContainer)
+      }
+    }, 100)
+
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [handleImageClick, handleEmoticonButtonClick])
 
   // 제목, 소제목, 내용, 이미지가 모두 있을 때 버튼 활성화
   useEffect(() => {
@@ -202,33 +327,30 @@ const MagazineWrite: React.FC = () => {
     navigate(-1)
   }
 
-  // 등록 버튼 핸들러
-  const handleSubmit = () => {
-    if (!isActive) return
+  // 등록 버튼 핸들러 - 새로운 API 형식에 맞게 수정
+  const handleSubmit = async () => {
+    if (!isActive || isSubmitting) return
 
-    // MagazineImageHandler에서 가져온 함수 사용
-    const featuredImageUrl = getFeaturedImageUrl(
-      content,
-      imageState.featuredImageId
-    )
+    try {
+      setIsSubmitting(true) // 제출 중 상태 설정
 
-    // 이미지와 함께 매거진 등록 로직 구현
-    console.log('매거진 등록:', {
-      title,
-      subtitle,
-      content, // 원본 콘텐츠 그대로 사용 (이미지 데이터 포함)
-      featuredImageUrl,
-      category,
-    })
+      // 매거진 게시 함수 호출
+      //const result = await postMagazine(title, subtitle, category, content)
 
-    // API 호출 로직 (예시)
-    // 여기서는 HTML 내용 자체를 서버로 전송하므로 별도의 이미지 파일 전송은 생략
+      // 성공 시 로컬 스토리지 드래프트 삭제
+      localStorage.removeItem(STORAGE_KEY)
 
-    // 등록 성공 후 로컬 스토리지 드래프트 삭제
-    localStorage.removeItem(STORAGE_KEY)
+      // 등록 성공 알림
+      alert('매거진이 성공적으로 등록되었습니다. 검토 후 게시됩니다.')
 
-    // 등록 후 매거진 목록 페이지로 이동
-    navigate('/magazine')
+      // 매거진 목록 페이지로 이동
+      navigate('/magazine')
+    } catch (error) {
+      console.error('매거진 등록 실패:', error)
+      alert('매거진 등록 중 오류가 발생했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsSubmitting(false) // 제출 중 상태 해제
+    }
   }
 
   // 이미지 선택 핸들러
@@ -262,9 +384,9 @@ const MagazineWrite: React.FC = () => {
         title={categorySelectComponent}
         showBackButton
         onBackClick={handleBackClick}
-        actionText="등록"
+        actionText={isSubmitting ? '등록 중...' : '등록'}
         onActionClick={handleSubmit}
-        isActionDisabled={!isActive}
+        isActionDisabled={!isActive || isSubmitting}
       />
       <div className="write-content">
         <div className="fixed-area">
@@ -310,6 +432,29 @@ const MagazineWrite: React.FC = () => {
             formats={quillFormats}
             placeholder="메이트들에게 들려주고 싶은 이야기를 남겨보세요!"
           />
+
+          {/* 이모티콘 피커 - z-index 및 위치 조정 */}
+          {showEmoticonPicker && (
+            <div
+              ref={emoticonPickerRef}
+              css={css`
+                ${emoticonPickerOverlayStyles}
+                position: absolute;
+                z-index: 1000;
+                bottom: 40px;
+                left: 0;
+                border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                background-color: white;
+              `}
+            >
+              <EmoticonPicker
+                onSelectEmoticon={handleEmoticonSelect}
+                onShopClick={handleEmoticonShopClick}
+                onClose={() => setShowEmoticonPicker(false)}
+              />
+            </div>
+          )}
         </QuillEditorContainer>
 
         {/* 검토 알림 말풍선 추가 - 에디터 밖으로 이동 */}
