@@ -5,6 +5,8 @@ import styled from '@emotion/styled'
 import SockJS from 'sockjs-client'
 import { Client, Stomp } from '@stomp/stompjs'
 import { useAuthStore } from '../../stores/userStore'
+import { useUserQuery } from '../../hooks/useUserQuery'
+import { getTokenCookie } from '../../utils/fetchWithRefresh'
 
 import { RootContainer } from './styles/RootStyles'
 import { KebabIcon } from '../../components/icon/iconComponents'
@@ -52,8 +54,12 @@ interface ChatRoomProps {
 const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const navigate = useNavigate()
   const { user } = useAuthStore()
+  // 사용자 정보 로드
+  const { isLoading: isUserLoading, error: userError } = useUserQuery()
+
   const [messages, setMessages] = useState<Message[]>([])
   const [isConnected, setIsConnected] = useState(false)
+  const [isConnecting, setIsConnecting] = useState(false)
   const [otherUserName, setOtherUserName] = useState('상대방')
   const [isTyping, setIsTyping] = useState(false)
   const { showToast } = useToast()
@@ -66,33 +72,72 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
   // 1. WebSocket 연결 및 topic 구독
   useEffect(() => {
-    if (!chatId || !user?.accessToken) return
+    if (!chatId) {
+      console.log('채팅방 ID가 없습니다.')
+      return
+    }
+
+    // 쿠키에서 직접 토큰 가져오기
+    const cookieToken = getTokenCookie('accessToken')
+
+    // 상태에서 토큰이 없으면 쿠키에서 확인
+    const tokenToUse = user?.accessToken || cookieToken
+
+    if (!tokenToUse) {
+      console.log('액세스 토큰이 없습니다. 쿠키와 상태 모두 확인했습니다.')
+      return
+    }
+
+    console.log('WebSocket 연결 시도 중...')
+    console.log(`사용할 토큰 시작 부분: ${tokenToUse.substring(0, 15)}...`)
+
+    setIsConnecting(true)
+
     const socket = new SockJS('http://localhost/api/ws')
     const stompClient = Stomp.over(socket)
     stompClientRef.current = stompClient
-    stompClient.connect({ Authorization: `Bearer ${user.accessToken}` }, () => {
-      setIsConnected(true)
-      stompClient.subscribe(`/topic/chat.room.${chatId}`, onMessage)
-      stompClient.subscribe(`/topic/chat.room.${chatId}.read`, onRead)
-      stompClient.subscribe(`/topic/chat.room.${chatId}.reaction`, onReaction)
-      stompClient.subscribe(
-        `/topic/chat.room.${chatId}.customform`,
-        onCustomForm
-      )
-      stompClient.subscribe(`/topic/chat.room.${chatId}.toastbox`, onToastBox)
-      stompClient.subscribe(`/topic/chat.room.${chatId}.emoticon`, onEmoticon)
-      stompClient.send(
-        '/app/presence',
-        {},
-        JSON.stringify({ status: 'ONLINE', activeRoomId: chatId })
-      )
-      stompClient.send('/app/chat.read', {}, JSON.stringify({ roomId: chatId }))
-    })
+
+    stompClient.connect(
+      { Authorization: `Bearer ${tokenToUse}` },
+      () => {
+        console.log('WebSocket 연결 성공!')
+        setIsConnected(true)
+        setIsConnecting(false)
+
+        stompClient.subscribe(`/topic/chat.room.${chatId}`, onMessage)
+        stompClient.subscribe(`/topic/chat.room.${chatId}.read`, onRead)
+        stompClient.subscribe(`/topic/chat.room.${chatId}.reaction`, onReaction)
+        stompClient.subscribe(
+          `/topic/chat.room.${chatId}.customform`,
+          onCustomForm
+        )
+        stompClient.subscribe(`/topic/chat.room.${chatId}.toastbox`, onToastBox)
+        stompClient.subscribe(`/topic/chat.room.${chatId}.emoticon`, onEmoticon)
+        stompClient.send(
+          '/app/presence',
+          {},
+          JSON.stringify({ status: 'ONLINE', activeRoomId: chatId })
+        )
+        stompClient.send(
+          '/app/chat.read',
+          {},
+          JSON.stringify({ roomId: chatId })
+        )
+      },
+      (error: any) => {
+        console.error('WebSocket 연결 실패:', error)
+        setIsConnecting(false)
+      }
+    )
+
     return () => {
-      stompClient.disconnect()
+      if (stompClient && stompClient.connected) {
+        console.log('WebSocket 연결 종료')
+        stompClient.disconnect()
+      }
       setIsConnected(false)
     }
-  }, [chatId, user?.accessToken])
+  }, [chatId, user?.accessToken, isUserLoading, userError])
 
   // 2. REST 메시지/이모티콘/참가자 상태 등 조회
   useEffect(() => {
@@ -110,6 +155,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         const data = await res.json()
         setMessages(Array.isArray(data.messages) ? data.messages : [])
       } catch (e) {
+        console.error('메시지 조회 실패:', e)
         setMessages([])
       }
     }
@@ -127,6 +173,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           setAvailableEmoticons(data)
         }
       } catch (e) {
+        console.error('이모티콘 조회 실패:', e)
         setAvailableEmoticons([])
       }
     }
@@ -219,8 +266,16 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         ]}
       />
       <ChatContainer>
-        {!isConnected ? (
-          <LoadingText>연결 중입니다...</LoadingText>
+        {isUserLoading ? (
+          <LoadingText>사용자 정보 로딩 중...</LoadingText>
+        ) : isConnecting ? (
+          <LoadingText>WebSocket 연결 중...</LoadingText>
+        ) : !isConnected ? (
+          <LoadingText>
+            {user?.accessToken
+              ? '서버에 연결할 수 없습니다'
+              : '로그인이 필요합니다'}
+          </LoadingText>
         ) : (
           <>
             {messages.map((message: any, index) => {

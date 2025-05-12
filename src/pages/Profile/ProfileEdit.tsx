@@ -12,6 +12,7 @@ import {
   ProfileImageContainer,
   ProfileInfoContainer,
 } from './ProfileEditStyles'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 const departmentOptions = [
   '기계공학과',
@@ -67,6 +68,46 @@ const ProfileEdit = ({}: ProfileEditProps) => {
   const [userNickName, setUserNickName] = useState('')
   const [selectedDepartment, setSelectedDepartment] = useState('')
   const [selectedYear, setSelectedYear] = useState('')
+  const [profileImageFile, setProfileImageFile] = useState<File | undefined>(
+    undefined
+  )
+  const [profileImagePreview, setProfileImagePreview] = useState<
+    string | undefined
+  >(undefined)
+  const [profileImageId, setProfileImageId] = useState<number | undefined>(
+    undefined
+  )
+  const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>(
+    undefined
+  )
+  const [loading, setLoading] = useState(true)
+
+  // 내 프로필 정보 불러오기
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true)
+      try {
+        const res = await fetchWithRefresh('http://localhost/api/profiles', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        })
+        const data = await res.json()
+        setUserNickName(data.nickname || '')
+        setSelectedDepartment(data.department || '')
+        setSelectedYear(data.entranceTime ? String(data.entranceTime) : '')
+        setProfileImagePreview(
+          'http://localhost/api' + data.profileImage || undefined
+        )
+        setProfileImageUrl(data.profileImage || undefined)
+        setProfileImageId(data.profileImageId)
+      } catch (e) {
+        // 에러 처리
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
+  }, [])
 
   const handleNickNameChange = (value: string) => {
     setUserNickName(value)
@@ -80,6 +121,75 @@ const ProfileEdit = ({}: ProfileEditProps) => {
     setSelectedYear(value)
   }
 
+  // 이미지 변경 핸들러
+  const handleImageChange = (file: File) => {
+    setProfileImageFile(file)
+    setProfileImagePreview(URL.createObjectURL(file))
+  }
+
+  // 완료 버튼 클릭 시
+  const handleSave = async () => {
+    let newProfileImageId = profileImageId
+    if (profileImageFile) {
+      try {
+        // 1. 현재 프로필 이미지 id 조회
+        // const currentImgRes = await fetchWithRefresh('http://localhost/api/profiles/image/current', {
+        //   method: 'GET',
+        //   headers: { 'Content-Type': 'application/json' },
+        // })
+        // const currentImgData = await currentImgRes.json()
+        // if (currentImgRes.ok && currentImgData.id) {
+        //   // 2. 기존 이미지 삭제
+        //   await fetchWithRefresh(`http://localhost/api/profiles/image/${currentImgData.id}`, {
+        //     method: 'DELETE',
+        //     headers: { 'Content-Type': 'application/json' },
+        //   })
+        // }
+        // 3. 새 이미지 업로드
+        const formData = new FormData()
+        formData.append('file', profileImageFile)
+        const imageRes = await fetchWithRefresh(
+          'http://localhost/api/profiles/image',
+          {
+            method: 'POST',
+            body: formData,
+          }
+        )
+        const imageData = await imageRes.json()
+        if (!imageRes.ok) {
+          alert('이미지 업로드 실패')
+          return
+        }
+        newProfileImageId = imageData.id
+      } catch (e) {
+        alert('프로필 이미지 처리 중 오류가 발생했습니다.')
+        return
+      }
+    }
+    // 프로필 정보 업데이트
+    const payload: any = {
+      nickname: userNickName,
+      department: selectedDepartment,
+      entranceTime: Number(selectedYear),
+      graduation: false,
+    }
+    if (newProfileImageId !== undefined) {
+      payload.profileImageId = newProfileImageId
+    }
+    const res = await fetchWithRefresh('http://localhost/api/profiles', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    if (res.ok) {
+      navigate('/mypage')
+    } else {
+      alert('프로필 업데이트 실패')
+    }
+  }
+
+  if (loading) return <div></div>
+
   return (
     <RootContainer>
       <TopBar
@@ -87,11 +197,14 @@ const ProfileEdit = ({}: ProfileEditProps) => {
         showBackButton={true}
         onBackClick={() => navigate('/mypage')}
         actionText="완료"
-        onActionClick={() => {}}
+        onActionClick={handleSave}
       />
       <MainContainer>
         <ProfileImageContainer>
-          <InitialProfileImageSetting />
+          <InitialProfileImageSetting
+            onImageChange={handleImageChange}
+            initialImage={'http://localhost/api' + profileImageUrl}
+          />
         </ProfileImageContainer>
 
         <ProfileInfoContainer>

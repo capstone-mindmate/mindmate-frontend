@@ -10,7 +10,7 @@ async function fetchMe() {
     credentials: 'include',
   })
 
-  if (!res.ok) throw new Error('인증 필요')
+  if (!res.ok) throw new Error(res.statusText)
   return res.json()
 }
 

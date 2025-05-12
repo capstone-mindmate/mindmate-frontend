@@ -320,9 +320,9 @@ const ModalComponent = ({
 
             <GrayInputBox
               placeholder="상대방에게 전달하고 싶은 메시지를 입력해주세요"
-              value=""
+              value={messageProps.messageValue}
               height={100}
-              onChange={() => {}}
+              onChange={messageProps.onMessageChange}
               activeState={true}
             />
           </div>
@@ -456,7 +456,7 @@ const ModalComponent = ({
             <div className="confirm-btn" css={modalStyles.confirmBtn}>
               <BrownRectButton
                 buttonText={buttonText}
-                onActiveChange={() => onClose()}
+                onActiveChange={buttonClick}
               />
             </div>
           </div>
@@ -615,7 +615,7 @@ const ModalComponent = ({
             <div className="confirm-btn" css={modalStyles.confirmBtn}>
               <BrownRectButton
                 buttonText={buttonText}
-                onActiveChange={() => onClose()}
+                onActiveChange={buttonClick}
               />
             </div>
           </div>

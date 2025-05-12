@@ -3,9 +3,9 @@ import { css } from '@emotion/react'
 
 // 반응형 디자인을 위한 브레이크포인트 정의
 const breakpoints = {
-  mobile: '375px',
-  tablet: '479px',
-  desktop: '767px',
+  mobile: '478px',
+  tablet: '600px',
+  desktop: '884px',
 }
 
 // 미디어 쿼리 헬퍼 함수
@@ -49,7 +49,8 @@ export const headerStyle = css`
 export const contentContainerStyle = css`
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 44px);
+  height: auto;
+  // height: calc(100vh - 44px);
   flex: 1;
 `
 
@@ -245,17 +246,20 @@ export const progressDotStyle = (isActive: boolean) => css`
 
 // 버튼 스타일
 export const buttonContainerStyle = css`
-  padding: 0 0 40px;
+  padding: 0;
   width: 90%;
   margin: 0 24px;
   justify-content: center;
+  position: relative;
+  bottom: 100px;
   ${media.tablet(`
-    padding: 0 0 32px;
+    bottom: 100px;
     margin: 0 24px;
   `)}
 
   ${media.mobile(`
-    padding: 0 0 24px;
+    bottom: 100px;
+    padding: 0 0 0px;
   `)}
 `
 

@@ -192,7 +192,6 @@ const MyPage = () => {
   // TODO: 프로필 편집 버튼 클릭 핸들러
   const handleProfileEdit = () => {
     navigate('/profile/edit')
-    // TODO: 프로필 편집 페이지로 이동하는 로직 추가
   }
 
   // TODO: 설정 버튼 클릭 핸들러
@@ -226,7 +225,11 @@ const MyPage = () => {
         />
         <ComponentContainer>
           <ProfileEdit
-            profileImage={userProfile?.profileImage}
+            profileImage={
+              userProfile?.profileImage
+                ? `http://localhost/api${userProfile.profileImage}`
+                : 'http://localhost/api/profileImages/default-profile-image.png'
+            }
             username={userProfile?.username}
             onEditClick={handleProfileEdit}
             isOwnProfile={isOwnProfile}

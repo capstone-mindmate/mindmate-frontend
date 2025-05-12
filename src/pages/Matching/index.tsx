@@ -96,6 +96,31 @@ const departmentOptions = [
   '국제학부',
 ]
 
+const categoryMap: Record<string, string> = {
+  ACADEMIC: '학업',
+  CAREER: '진로',
+  RELATIONSHIP: '대인관계',
+  MENTAL_HEALTH: '건강',
+  CAMPUS_LIFE: '학교생활',
+  PERSONAL_GROWTH: '자기계발',
+  FINANCIAL: '경제',
+  EMPLOYMENT: '취업',
+  OTHER: '기타',
+}
+
+// 한글 → 영문 카테고리 맵
+const categoryEngMap: Record<string, string> = {
+  학업: 'ACADEMIC',
+  진로: 'CAREER',
+  대인관계: 'RELATIONSHIP',
+  건강: 'MENTAL_HEALTH',
+  학교생활: 'CAMPUS_LIFE',
+  자기계발: 'PERSONAL_GROWTH',
+  경제: 'FINANCIAL',
+  취업: 'EMPLOYMENT',
+  기타: 'OTHER',
+}
+
 const Matching = () => {
   const navigate = useNavigate()
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -123,32 +148,85 @@ const Matching = () => {
   // 상세 정보 로딩 상태
   const [isDetailLoading, setIsDetailLoading] = useState(false)
 
-  useEffect(() => {
-    // 매칭방 목록 API 호출
-    const fetchMatchings = async () => {
-      try {
-        const res = await fetchWithRefresh('http://localhost/api/matchings', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        })
-        if (!res.ok) throw new Error('매칭방 목록을 불러오지 못했습니다.')
-        const data = await res.json()
-        if (Array.isArray(data.content)) {
-          setMatchItems(
-            data.content.map((item: any) => ({
-              ...item,
-              userId: item.userId ?? item.creatorId,
-            }))
-          )
-        } else {
-          setMatchItems([])
-        }
-      } catch (e) {
-        setMatchItems([])
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const [loading, setLoading] = useState(false)
+
+  const loaderRef = useRef<HTMLDivElement | null>(null)
+
+  const fetchMatchings = async (pageNum = 0, append = false) => {
+    setLoading(true)
+    const params = new URLSearchParams()
+    params.append('pageable', pageNum.toString())
+    if (selectedCategory !== '전체')
+      params.append('category', categoryEngMap[selectedCategory])
+    if (selectedDepartment) params.append('department', selectedDepartment)
+    if (isListenerActive && !isSpeakerActive)
+      params.append('requiredRole', 'LISTENER')
+    if (!isListenerActive && isSpeakerActive)
+      params.append('requiredRole', 'SPEAKER')
+    if (searchQuery.trim() !== '') params.append('keyword', searchQuery.trim())
+    // 검색어가 있으면 /search, 없으면 /matchings
+    const endpoint =
+      searchQuery.trim() !== ''
+        ? `http://localhost/api/matchings/search?${params.toString()}`
+        : `http://localhost/api/matchings?${params.toString()}`
+    try {
+      const res = await fetchWithRefresh(endpoint, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!res.ok) throw new Error('매칭방 목록을 불러오지 못했습니다.')
+      const data = await res.json()
+      if (Array.isArray(data.content)) {
+        const mapped = data.content.map((item: any) => ({
+          ...item,
+          userId: item.userId ?? item.creatorId,
+          category: categoryMap[item.category?.trim()] || item.category,
+        }))
+        setMatchItems((prev) => (append ? [...prev, ...mapped] : mapped))
+        setHasMore(!data.last)
+      } else {
+        if (!append) setMatchItems([])
+        setHasMore(false)
       }
+    } catch (e) {
+      if (!append) setMatchItems([])
+      setHasMore(false)
+    } finally {
+      setLoading(false)
     }
-    fetchMatchings()
-  }, [])
+  }
+
+  // 필터 변경 시 첫 페이지부터 다시 불러오기
+  useEffect(() => {
+    setPage(0)
+    fetchMatchings(0, false)
+  }, [
+    selectedCategory,
+    selectedDepartment,
+    isListenerActive,
+    isSpeakerActive,
+    searchQuery,
+  ])
+
+  // 무한 스크롤 (IntersectionObserver)
+  useEffect(() => {
+    if (!hasMore || loading) return
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchMatchings(page + 1, true)
+          setPage((p) => p + 1)
+        }
+      },
+      { threshold: 1 }
+    )
+    if (loaderRef.current) observer.observe(loaderRef.current)
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current)
+    }
+  }, [hasMore, loading, page])
 
   useEffect(() => {
     let filtered = matchItems
@@ -179,10 +257,10 @@ const Matching = () => {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
         (item: MatchItemType) =>
-          item.title.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query) ||
-          item.department.toLowerCase().includes(query) ||
-          (item.category ? item.category.toLowerCase().includes(query) : false)
+          (item.title ?? '').toLowerCase().includes(query) ||
+          (item.description ?? '').toLowerCase().includes(query) ||
+          (item.department ?? '').toLowerCase().includes(query) ||
+          (item.category ?? '').toLowerCase().includes(query)
       )
     }
 
@@ -195,32 +273,6 @@ const Matching = () => {
     selectedCategory,
     searchQuery,
   ])
-
-  // 검색어가 변경될 때마다 서버에 쿼리로 검색
-  useEffect(() => {
-    const fetchSearch = async () => {
-      try {
-        let url = 'http://localhost/api/matchings'
-        if (searchQuery.trim() !== '') {
-          url += `?keyword=${encodeURIComponent(searchQuery.trim())}`
-        }
-        const res = await fetchWithRefresh(url, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        })
-        if (!res.ok) throw new Error('매칭방 목록을 불러오지 못했습니다.')
-        const data = await res.json()
-        if (Array.isArray(data.content)) {
-          setMatchItems(data.content)
-        } else {
-          setMatchItems([])
-        }
-      } catch (e) {
-        setMatchItems([])
-      }
-    }
-    fetchSearch()
-  }, [searchQuery])
 
   // location.state 기반 자동 카테고리 필터링
   useEffect(() => {
@@ -291,7 +343,9 @@ const Matching = () => {
         matchType: data.creatorRole === 'SPEAKER' ? '스피커' : '리스너',
         borderSet: false,
         username: data.creatorNickname ?? '',
-        profileImage: data.creatorProfileImage ?? '',
+        profileImage: data.anonymous
+          ? 'http://localhost/api/profileImages/default-profile-image.png'
+          : `http://localhost/api${data.creatorProfileImage ?? ''}`,
         makeDate: data.createdAt
           ? new Date(data.createdAt).toLocaleString('ko-KR', {
               month: '2-digit',
@@ -602,8 +656,8 @@ const Matching = () => {
         </TopFixedContent>
 
         <MatchItemsContainer pageType="normal">
-          {filteredItems.length > 0 ? (
-            filteredItems.map((item: MatchItemType, index: number) => (
+          {matchItems.length > 0 ? (
+            matchItems.map((item: MatchItemType, index: number) => (
               <MatchItem
                 key={item.id}
                 department={item.department ?? ''}
@@ -611,7 +665,7 @@ const Matching = () => {
                 description={item.description ?? ''}
                 matchType={item.matchType ?? ''}
                 category={item.category ?? ''}
-                borderSet={index < filteredItems.length - 1}
+                borderSet={index < matchItems.length - 1}
                 onClick={() => handleMatchItemClick(item)}
               />
             ))
@@ -627,6 +681,7 @@ const Matching = () => {
               {searchQuery ? '검색 결과가 없습니다.' : '매칭방이 없습니다.'}
             </div>
           )}
+          <div ref={loaderRef} style={{ height: 1 }} />
         </MatchItemsContainer>
       </MatchingContainer>
 

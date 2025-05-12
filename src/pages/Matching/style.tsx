@@ -117,7 +117,7 @@ export const MatchItemsContainer = styled.div<{
   flex-direction: column;
   gap: 4px;
   align-items: flex-start;
-  padding-top: ${({ pageType }) => (pageType === 'normal' ? '140px' : '101px')};
+  padding-top: ${({ pageType }) => (pageType === 'normal' ? '140px' : '44px')};
   padding-bottom: 90px;
 `
 
@@ -158,5 +158,4 @@ export const ApplicationList = styled.div<{ pageType: 'normal' | 'matched' }>`
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding-top: 57px;
 `

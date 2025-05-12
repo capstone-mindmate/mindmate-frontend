@@ -39,7 +39,7 @@ export default defineConfig({
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
   },
   server: {
-    host: '0.0.0.0',
+    // host: '0.0.0.0',
   },
   optimizeDeps: {
     esbuildOptions: {

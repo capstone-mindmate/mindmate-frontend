@@ -9,7 +9,9 @@ import TopBar from '../../components/topbar/Topbar'
 import NavigationComponent from '../../components/navigation/navigationComponent'
 import FilterButton from '../../components/buttons/filterButton'
 import ChatItem from '../../components/chat/pageComponent/ChatItem'
-import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+import { fetchWithRefresh, getTokenCookie } from '../../utils/fetchWithRefresh'
+import { useAuthStore } from '../../stores/userStore'
+import { useUserQuery } from '../../hooks/useUserQuery'
 
 interface ChatHomeProps {
   matchId?: string
@@ -31,8 +33,14 @@ interface ChatItemType {
 }
 
 const ChatHome = ({ matchId }: ChatHomeProps) => {
+  // 사용자 인증 정보 가져오기
+  const { user } = useAuthStore()
+  // 사용자 정보 로드
+  const { isLoading: isUserLoading, error: userError } = useUserQuery()
+
   // 채팅방 목록 상태
   const [chatItems, setChatItems] = useState<ChatItemType[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   // 필터 상태 관리 (전체, 리스너, 스피커, 완료)
   const [activeFilter, setActiveFilter] = useState<string>('전체')
@@ -76,12 +84,30 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
   }
 
   useEffect(() => {
+    // 토큰 확인 및 디버깅
+    const cookieToken = getTokenCookie('accessToken')
+    const tokenToUse = user?.accessToken || cookieToken
+
+    if (!tokenToUse) {
+      return
+    }
+
+    // 사용자 정보 로딩 중이면 API 호출 안함
+    if (isUserLoading) {
+      return
+    }
+
     // 채팅방 목록 API 호출
     const fetchChatRooms = async () => {
+      setIsLoading(true)
       try {
         const res = await fetchWithRefresh('http://localhost/api/chat/rooms', {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${tokenToUse}`,
+          },
+          credentials: 'include',
         })
         if (!res.ok) throw new Error('채팅방 목록을 불러오지 못했습니다.')
         const data = await res.json()
@@ -110,11 +136,18 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
           setChatItems([])
         }
       } catch (e) {
+        console.error('채팅방 목록 불러오기 실패:', e)
         setChatItems([])
+      } finally {
+        setIsLoading(false)
       }
     }
+
     fetchChatRooms()
-  }, [])
+
+    // 매번 API를 호출하지 않도록 의존성 배열에 user.id만 포함
+    // 사용자 정보(ID)가 변경될 때만 API 호출
+  }, [user?.id, isUserLoading])
 
   return (
     <RootContainer>
@@ -151,11 +184,21 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
       </CategoryFilterContainer>
 
       <ChatContainer>
-        {filteredChatItems.length > 0 ? (
+        {isLoading ? (
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '40px 20px',
+              color: '#888',
+            }}
+          >
+            채팅방 목록을 불러오는 중...
+          </div>
+        ) : filteredChatItems.length > 0 ? (
           filteredChatItems.map((item, index) => (
             <ChatItem
               key={item.id}
-              profileImage={item.profileImage}
+              profileImage={'http://localhost/api' + item.profileImage}
               userName={item.userName}
               lastTime={item.lastTime}
               category={item.category}

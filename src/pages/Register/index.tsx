@@ -48,16 +48,6 @@ const StepIndicator = ({ currentStep }: { currentStep: RegisterStep }) => {
   )
 }
 
-// File을 base64로 변환하는 함수
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
-
 const Register = () => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -140,23 +130,41 @@ const Register = () => {
     if (currentIndex < stepOrder.length - 1) {
       // 데이터가 있으면 상태 업데이트
       let updatedData = { ...registerData, ...data }
-      // 이미지가 File 객체라면 base64로 변환해서 저장
-      if (data && data.profileImage instanceof File) {
-        const base64 = await fileToBase64(data.profileImage)
-        updatedData.profileImage = base64
-      }
+      // File 객체는 그대로 저장, 변환 없이
       setRegisterData(updatedData)
       localStorage.setItem(REGISTER_DATA_KEY, JSON.stringify(updatedData))
       setCurrentStep(stepOrder[currentIndex + 1])
     } else if (currentStep === 'FINAL_CONFIRMATION') {
-      // 마지막 단계에서 프로필 생성 API 호출
-      const profilePayload = {
+      let profileImageId: number | undefined = undefined
+      // base64 문자열이 남아있으면 무시
+      const imageFile =
+        registerData.profileImage instanceof File
+          ? registerData.profileImage
+          : undefined
+      if (imageFile) {
+        // 1. 이미지 업로드
+        const formData = new FormData()
+        formData.append('file', imageFile)
+        const imageRes = await fetchWithRefresh(
+          'http://localhost/api/profiles/image',
+          {
+            method: 'POST',
+            body: formData,
+          }
+        )
+        const imageData = await imageRes.json()
+        if (!imageRes.ok) throw new Error('이미지 업로드 실패')
+        profileImageId = imageData.id
+      }
+      // 2. 프로필 생성
+      const profilePayload: any = {
         nickname: registerData.nickname,
-        // profileImage: registerData.profileImage || '', // base64 문자열
-        profileImage: 'devdevdev',
         department: registerData.department,
         entranceTime: Number(registerData.admissionYear),
-        graduation: false, // 기본값, 필요시 수정
+        graduation: false,
+      }
+      if (profileImageId !== undefined) {
+        profilePayload.profileImageId = profileImageId
       }
       profileMutation.mutate(profilePayload)
     }
@@ -183,6 +191,10 @@ const Register = () => {
         // 로컬 스토리지에 저장된 단계가 없으면 처음 단계로 설정
         if (!localStorage.getItem(REGISTER_STEP_KEY)) {
           setCurrentStep('DEPARTMENT_AND_ADMISSION')
+        } else {
+          setCurrentStep(
+            localStorage.getItem(REGISTER_STEP_KEY) as RegisterStep
+          )
         }
         break
       case 'REVISITING':

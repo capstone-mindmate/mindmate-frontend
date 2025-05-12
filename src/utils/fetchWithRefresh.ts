@@ -12,9 +12,18 @@ export function getTokenCookie(key: string) {
 
 export async function fetchWithRefresh(input: RequestInfo, init?: RequestInit) {
   const accessToken = getTokenCookie('accessToken')
-  const headers = {
+
+  let headers = {
     ...(init?.headers || {}),
     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+  }
+
+  // FormData일 경우 Content-Type 헤더 제거 (브라우저가 자동 생성)
+  if (init?.body instanceof FormData) {
+    if ('Content-Type' in headers) {
+      // @ts-ignore
+      delete headers['Content-Type']
+    }
   }
 
   let res = await fetch(input, { ...init, headers, credentials: 'include' })

@@ -43,7 +43,7 @@ const DetailReviewPage: React.FC = () => {
             profileId = user.profileId
           } else {
             const myProfileRes = await fetchWithRefresh(
-              `http://localhost/api/profiles/users/${user.id}`,
+              `http://localhost/api/profiles/users/${user?.id}`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },

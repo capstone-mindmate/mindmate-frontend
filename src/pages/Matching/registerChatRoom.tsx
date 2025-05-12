@@ -167,7 +167,7 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
         actionText="등록"
         onActionClick={handleRegister}
       />
-      <MatchingContainer style={{ paddingTop: '57px' }}>
+      <MatchingContainer>
         <div className="categoryBox" css={registerStyles.categoryBox}>
           <select
             name="category"

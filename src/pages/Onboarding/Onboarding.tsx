@@ -158,7 +158,7 @@ function OnboardingContent() {
                 }
               )
               const ProfileData = await res.json()
-              if (!res.ok) throw new Error('프로필 생성 실패')
+              if (!res.ok) throw new Error(res.statusText)
 
               setUser(ProfileData)
 
