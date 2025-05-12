@@ -29,7 +29,6 @@ import FloatingButton from '../../components/buttons/floatingButton'
 
 const HomePage = () => {
   const navigate = useNavigate()
-
   // 알람 아이콘 클릭 핸들러
   const handleAlarmClick = () => {
     navigate('/notification') // 알림 페이지로 이동
@@ -64,6 +63,11 @@ const HomePage = () => {
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
+  // 카테고리별 필터링 이동 핸들러
+  const handleCategoryClick = (category: string) => {
+    navigate('/matching', { state: { category } })
+  }
+
   return (
     <HomeContainer>
       <ContentContainer>
@@ -82,12 +86,36 @@ const HomePage = () => {
         <div>
           <CategoryTitle>메이트들과 고민을 나눠보세요!</CategoryTitle>
           <HomeCategoryContainer>
-            <HomeCategoryButton buttonText="진로고민" emoji="🤯" />
-            <HomeCategoryButton buttonText="취업고민" emoji="💼" />
-            <HomeCategoryButton buttonText="학업고민" emoji="📚" />
-            <HomeCategoryButton buttonText="인간관계" emoji="👥" />
-            <HomeCategoryButton buttonText="건강고민" emoji="💪🏻" />
-            <HomeCategoryButton buttonText="경제고민" emoji="💰" />
+            <HomeCategoryButton
+              buttonText="진로고민"
+              emoji="🤯"
+              onClick={() => handleCategoryClick('진로')}
+            />
+            <HomeCategoryButton
+              buttonText="취업고민"
+              emoji="💼"
+              onClick={() => handleCategoryClick('취업')}
+            />
+            <HomeCategoryButton
+              buttonText="학업고민"
+              emoji="📚"
+              onClick={() => handleCategoryClick('학업')}
+            />
+            <HomeCategoryButton
+              buttonText="인간관계"
+              emoji="👥"
+              onClick={() => handleCategoryClick('인간관계')}
+            />
+            <HomeCategoryButton
+              buttonText="경제고민"
+              emoji="💰"
+              onClick={() => handleCategoryClick('경제')}
+            />
+            <HomeCategoryButton
+              buttonText="기타고민"
+              emoji="🤔"
+              onClick={() => handleCategoryClick('기타')}
+            />
           </HomeCategoryContainer>
         </div>
         <div className="floatingList">

@@ -38,7 +38,7 @@ function ChatBar({
     if (message.trim() && onSendMessage) {
       onSendMessage(message)
       setMessage('')
-      showToast('메시지가 전송되었습니다', 'success')
+      // showToast('메시지가 전송되었습니다', 'success')
     }
   }
 
@@ -59,15 +59,15 @@ function ChatBar({
   const handleSelectEmoticon = (type: EmoticonType) => {
     if (onSendEmoticon) {
       onSendEmoticon(type)
-      showToast(`${type} 이모티콘을 보냈습니다`, 'success')
+      // showToast(`${type} 이모티콘을 보냈습니다`, 'success')
     } else {
-      showToast(`이모티콘을 선택했습니다: ${type}`, 'info')
+      // showToast(`이모티콘을 선택했습니다: ${type}`, 'info')
     }
     setShowEmoticonPicker(false)
   }
 
   const handleEmoticonShopClick = () => {
-    showToast('이모티콘샵으로 이동합니다', 'info')
+    // showToast('이모티콘샵으로 이동합니다', 'info')
     setShowEmoticonPicker(false)
   }
 

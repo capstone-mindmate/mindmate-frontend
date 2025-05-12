@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import DepartmentAndAdmission from './steps/DepartmentAndAdmission'
 import NickNameAndProfile from './steps/NickNameAndProfile'
 import InitialCategorySetting from './steps/InitialCategorySetting'
@@ -14,6 +14,9 @@ import {
   RootContainer,
 } from './style'
 import { BackIcon } from '../../components/icon/iconComponents'
+import { useMutation } from '@tanstack/react-query'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+import { useAuthStore } from '../../stores/userStore'
 
 // 회원 상태 타입 신규(NEW) 재방문(REVISITING)
 type UserStatus = 'NEW' | 'REVISITING'
@@ -47,11 +50,12 @@ const StepIndicator = ({ currentStep }: { currentStep: RegisterStep }) => {
 
 const Register = () => {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { setUser, user } = useAuthStore()
 
   // 로컬 스토리지에서 이전 데이터 불러오기
   const getInitialStep = (): RegisterStep => {
-    const savedStep = localStorage.getItem(REGISTER_STEP_KEY)
-    return (savedStep as RegisterStep) || 'DEPARTMENT_AND_ADMISSION'
+    return 'DEPARTMENT_AND_ADMISSION'
   }
 
   const getInitialData = () => {
@@ -75,8 +79,46 @@ const Register = () => {
     localStorage.setItem(REGISTER_STEP_KEY, currentStep)
   }, [currentStep])
 
+  // 이미 로그인된 경우 home으로 이동
+  useEffect(() => {
+    if (user) {
+      navigate('/home', { replace: true })
+    }
+  }, [user, navigate])
+
+  // 프로필 생성 mutation
+  const profileMutation = useMutation({
+    mutationFn: async (profileData: any) => {
+      const res = await fetchWithRefresh('http://localhost/api/profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error('프로필 생성 실패')
+      return data
+    },
+    onSuccess: async (data) => {
+      localStorage.setItem('userId', data.id)
+
+      const res = await fetchWithRefresh(`http://localhost/api/profiles`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const ProfileData = await res.json()
+      if (!res.ok) throw new Error(await res.json())
+
+      setUser(ProfileData)
+
+      navigate('/home')
+    },
+    onError: (e) => {
+      console.error(e)
+    },
+  })
+
   // 다음 단계로 이동하는 함수
-  const goToNextStep = (data?: any) => {
+  const goToNextStep = async (data?: any) => {
     const stepOrder: RegisterStep[] = [
       'DEPARTMENT_AND_ADMISSION',
       'NICKNAME_AND_PROFILE',
@@ -87,11 +129,44 @@ const Register = () => {
     const currentIndex = stepOrder.indexOf(currentStep)
     if (currentIndex < stepOrder.length - 1) {
       // 데이터가 있으면 상태 업데이트
-      if (data) {
-        const updatedData = { ...registerData, ...data }
-        setRegisterData(updatedData)
-      }
+      let updatedData = { ...registerData, ...data }
+      // File 객체는 그대로 저장, 변환 없이
+      setRegisterData(updatedData)
+      localStorage.setItem(REGISTER_DATA_KEY, JSON.stringify(updatedData))
       setCurrentStep(stepOrder[currentIndex + 1])
+    } else if (currentStep === 'FINAL_CONFIRMATION') {
+      let profileImageId: number | undefined = undefined
+      // base64 문자열이 남아있으면 무시
+      const imageFile =
+        registerData.profileImage instanceof File
+          ? registerData.profileImage
+          : undefined
+      if (imageFile) {
+        // 1. 이미지 업로드
+        const formData = new FormData()
+        formData.append('file', imageFile)
+        const imageRes = await fetchWithRefresh(
+          'http://localhost/api/profiles/image',
+          {
+            method: 'POST',
+            body: formData,
+          }
+        )
+        const imageData = await imageRes.json()
+        if (!imageRes.ok) throw new Error('이미지 업로드 실패')
+        profileImageId = imageData.id
+      }
+      // 2. 프로필 생성
+      const profilePayload: any = {
+        nickname: registerData.nickname,
+        department: registerData.department,
+        entranceTime: Number(registerData.admissionYear),
+        graduation: false,
+      }
+      if (profileImageId !== undefined) {
+        profilePayload.profileImageId = profileImageId
+      }
+      profileMutation.mutate(profilePayload)
     }
   }
 
@@ -116,6 +191,10 @@ const Register = () => {
         // 로컬 스토리지에 저장된 단계가 없으면 처음 단계로 설정
         if (!localStorage.getItem(REGISTER_STEP_KEY)) {
           setCurrentStep('DEPARTMENT_AND_ADMISSION')
+        } else {
+          setCurrentStep(
+            localStorage.getItem(REGISTER_STEP_KEY) as RegisterStep
+          )
         }
         break
       case 'REVISITING':

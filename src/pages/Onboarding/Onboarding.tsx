@@ -2,6 +2,9 @@
 import { css } from '@emotion/react'
 import { useState, useEffect, TouchEvent, MouseEvent } from 'react'
 import Emoticon from '../../components/emoticon/Emoticon'
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
+import { GoogleOAuthProvider } from '@react-oauth/google'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import {
   pageContainerStyle,
   contentContainerStyle,
@@ -23,6 +26,12 @@ import {
   RootContainer,
   OnboardingContainer,
 } from '../../styles/OnboardingStyles'
+import { useNavigate } from 'react-router-dom'
+import { setTokenCookie } from '../../utils/fetchWithRefresh'
+import { useAuthStore } from '../../stores/userStore'
+
+const clientId =
+  '886143898358-4cja76nlu7mp5upid042la3k3vovnd8p.apps.googleusercontent.com'
 
 // 반응형을 위한 화면 크기 감지 hook
 const useWindowSize = () => {
@@ -46,7 +55,7 @@ const useWindowSize = () => {
   return windowSize
 }
 
-const OnboardingPage = () => {
+function OnboardingContent() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isInitialized, setIsInitialized] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -54,6 +63,8 @@ const OnboardingPage = () => {
   const [currentX, setCurrentX] = useState(0)
   const [autoPlayPaused, setAutoPlayPaused] = useState(false)
   const { width } = useWindowSize()
+  const navigate = useNavigate()
+  const { setUser, user } = useAuthStore()
 
   // 반응형 이모티콘 크기 설정
   const getEmoticonSize = () => {
@@ -87,11 +98,107 @@ const OnboardingPage = () => {
     },
   ]
 
-  // 구글 로그인 핸들러
-  const handleGoogleLogin = () => {
-    console.log('Google login clicked')
-    alert('구글 로그인 버튼 클릭됨')
-  }
+  const TEMP_PASSWORD = '@Test1234!'
+
+  // 구글 로그인 성공 시 서버에 access_token 전달
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      // 1. 구글 유저 정보 가져오기 (여기는 credentials 필요 없음)
+      const googleUserInfo = await fetch(
+        'https://www.googleapis.com/oauth2/v3/userinfo',
+        {
+          headers: {
+            Authorization: `Bearer ${tokenResponse.access_token}`,
+          },
+        }
+      ).then((res) => res.json())
+
+      // 2. 회원가입 시도 (credentials: 'include')
+      const registerRes = await fetch('http://localhost/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: googleUserInfo.email,
+          password: TEMP_PASSWORD,
+          confirmPassword: TEMP_PASSWORD,
+          agreeToTerm: true,
+        }),
+      }).then((res) => res.json())
+
+      // 3. 로그인 시도 (credentials: 'include')
+      const loginRes = await fetch('http://localhost/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: googleUserInfo.email,
+          password: TEMP_PASSWORD,
+          fcmToken: '',
+        }),
+      })
+
+      if (loginRes.ok) {
+        loginRes.json().then(async (data) => {
+          if (data.accessToken && data.refreshToken) {
+            // 프로필 입력 안한 사용자
+            if (data.currentRole == 'ROLE_USER') {
+              setTokenCookie(data.accessToken, 'accessToken')
+              setTokenCookie(data.refreshToken, 'refreshToken')
+              navigate('/register')
+            }
+            //프로필 입력 한 사용자
+            else if (data.currentRole == 'ROLE_PROFILE') {
+              setTokenCookie(data.accessToken, 'accessToken')
+              setTokenCookie(data.refreshToken, 'refreshToken')
+
+              const res = await fetchWithRefresh(
+                `http://localhost/api/profiles`,
+                {
+                  method: 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                }
+              )
+              const ProfileData = await res.json()
+              if (!res.ok) throw new Error(res.statusText)
+
+              setUser(ProfileData)
+
+              navigate('/home')
+            }
+            // 어드민 일때
+            else if (data.currentRole == 'ROLE_ADMIN') {
+              setTokenCookie(data.accessToken, 'accessToken')
+              setTokenCookie(data.refreshToken, 'refreshToken')
+
+              const res = await fetchWithRefresh(
+                `http://localhost/api/profiles`,
+                {
+                  method: 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                }
+              )
+              const ProfileData = await res.json()
+              if (!res.ok) throw new Error('프로필 생성 실패')
+
+              setUser(ProfileData)
+
+              navigate('/home')
+            }
+            //정지된 사용자
+            else if (data.currentRole == 'ROLE_SUSPENDED') {
+              navigate('/onboarding')
+            }
+          }
+        })
+      }
+    },
+    onError: (errorResponse) => {
+      alert('구글 로그인에 실패했습니다.')
+      console.error(errorResponse)
+    },
+    flow: 'implicit',
+  })
 
   // ProgressBar 관련 기능 구현
   useEffect(() => {
@@ -185,6 +292,13 @@ const OnboardingPage = () => {
     setCurrentIndex(index)
   }
 
+  // 이미 로그인된 경우 home으로 이동
+  useEffect(() => {
+    if (user) {
+      navigate('/home', { replace: true })
+    }
+  }, [user, navigate])
+
   if (!isInitialized) return null
 
   const emoticonSize = getEmoticonSize()
@@ -271,7 +385,7 @@ const OnboardingPage = () => {
             <div css={buttonContainerStyle}>
               <button
                 css={googleButtonStyle}
-                onClick={handleGoogleLogin}
+                onClick={() => googleLogin()}
                 type="button"
               >
                 <img
@@ -286,6 +400,14 @@ const OnboardingPage = () => {
         </div>
       </div>
     </div>
+  )
+}
+
+const OnboardingPage = () => {
+  return (
+    <GoogleOAuthProvider clientId={clientId}>
+      <OnboardingContent />
+    </GoogleOAuthProvider>
   )
 }
 

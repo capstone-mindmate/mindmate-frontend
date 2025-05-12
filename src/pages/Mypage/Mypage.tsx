@@ -6,7 +6,7 @@ import NavigationComponent from '../../components/navigation/navigationComponent
 import DetailReview from '../../components/review/DetailReview'
 import TagReview from '../../components/review/TagReview'
 import TopBar from '../../components/topbar/Topbar'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   ContentContainer,
   MypageContainer,
@@ -15,26 +15,183 @@ import {
   InfoBoxContainer,
   MatchingGraphContainer,
 } from './MypageStyles'
+import { useAuthStore } from '../../stores/userStore'
+import { useEffect, useState } from 'react'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 const MyPage = () => {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
+  const { userId } = useParams<{ userId?: string }>()
+  const [isOwnProfile, setIsOwnProfile] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [userProfile, setUserProfile] = useState<any>(null)
+  const [userStats, setUserStats] = useState<any>(null)
+  const [categoryData, setCategoryData] = useState<any>(null)
+  const [reviewTags, setReviewTags] = useState<any[]>([])
+  const [userReviews, setUserReviews] = useState<any[]>([])
+  const [pointBalance, setPointBalance] = useState<number | null>(null)
 
-  // TODO: API 또는 상태 관리 라이브러리에서 사용자 정보를 가져오는 로직 추가
-  // const { userProfile, userStats, userReviews } = useUserData() 같은 형태로 구현
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true)
+      try {
+        let profileRes, profileData
+        if (!userId || (user && String(user.id) === String(userId))) {
+          // 내 프로필
+          setIsOwnProfile(true)
+          if (user?.id) {
+            profileRes = await fetchWithRefresh(
+              `http://localhost/api/profiles`,
+              {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+              }
+            )
+          } else {
+            throw new Error('로그인 정보가 없습니다.')
+          }
+          profileData = await profileRes.json()
+          setUserProfile({
+            profileImage: profileData.profileImage,
+            username: profileData.nickname || '닉네임 없음',
+            department: profileData.department || '',
+            entranceTime: profileData.entranceTime
+              ? String(profileData.entranceTime)
+              : '',
+          })
+          setUserStats({
+            averageScore: profileData.averageRating,
+            coins: profileData.points,
+            matchCount: profileData.totalCounselingCount,
+          })
+          setCategoryData(profileData.categoryCounts)
+          // 리뷰 태그(임시: 태그 카운트)
+          if (profileData.tagCounts) {
+            setReviewTags(
+              Object.entries(profileData.tagCounts).map(([text, count]) => ({
+                icon: '',
+                text,
+                count,
+              }))
+            )
+          }
+          // 상세 리뷰 (응답의 reviews 배열 활용)
+          setUserReviews(
+            (profileData.reviews || []).map((r: any) => ({
+              profileImage: r.reviewerProfileImage,
+              username: r.reviewerNickname,
+              rating: r.rating,
+              date: r.createdAt
+                ? r.createdAt.slice(2, 10).replace(/-/g, '.')
+                : '',
+              content: r.comment,
+            }))
+          )
+        } else {
+          // 타인 프로필 (상대방 userId)
+          setIsOwnProfile(false)
+          if (!userId) {
+            alert('상대방 userId가 없습니다.')
+            setUserProfile(null)
+            setUserStats(null)
+            setCategoryData(null)
+            setReviewTags([])
+            setUserReviews([])
+            setLoading(false)
+            return
+          }
+          profileRes = await fetchWithRefresh(
+            `http://localhost/api/profiles/users/${userId}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          )
+          profileData = await profileRes.json()
+          setUserProfile({
+            profileImage: profileData.profileImage,
+            username: profileData.nickname,
+            department: profileData.department || '',
+            entranceTime: profileData.entranceTime
+              ? String(profileData.entranceTime)
+              : '',
+          })
+          setUserStats({
+            averageScore: profileData.averageRating,
+            coins: profileData.points,
+            matchCount: profileData.totalCounselingCount,
+          })
+          setCategoryData(profileData.categoryCounts)
+          // 리뷰 태그, 상세 리뷰 등 추가 API 호출
+          // 리뷰 태그(임시: 태그 카운트)
+          if (profileData.tagCounts) {
+            setReviewTags(
+              Object.entries(profileData.tagCounts).map(([text, count]) => ({
+                icon: '',
+                text,
+                count,
+              }))
+            )
+          }
+          // 상세 리뷰
+          const reviewRes = await fetchWithRefresh(
+            `http://localhost/api/reviews/profile/${profileData.id}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          )
+          const reviewData = await reviewRes.json()
+          setUserReviews(
+            (reviewData.content || []).map((r: any) => ({
+              profileImage: r.reviewerProfileImage,
+              username: r.reviewerNickname,
+              rating: r.rating,
+              date: r.createdAt
+                ? r.createdAt.slice(2, 10).replace(/-/g, '.')
+                : '',
+              content: r.comment,
+            }))
+          )
+        }
+      } catch (e) {
+        setUserProfile(null)
+        setUserStats(null)
+        setCategoryData(null)
+        setReviewTags([])
+        setUserReviews([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
 
-  // TODO: 현재 로그인한 사용자의 ID와 보고 있는 프로필의 사용자 ID를 비교하는 로직
-  // 실제 구현 시에는 아래와 같은 형태가 될 수 있음
-  // const { currentUserId } = useAuth() // 현재 로그인한 사용자 ID
-  // const { id: profileUserId } = useParams() // URL에서 가져온 프로필 사용자 ID
-  // const isOwnProfile = currentUserId === profileUserId
-
-  // 임시로 하드코딩된 값 (실제 구현 시 위 로직으로 대체)
-  const isOwnProfile = false // TODO: 실제 인증 상태에 따라 변경되어야 함
+    // 포인트 잔액 별도 조회
+    const fetchPointBalance = async () => {
+      try {
+        const res = await fetchWithRefresh(
+          'http://localhost/api/points/balance',
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          }
+        )
+        if (res.ok) {
+          const balance = await res.json()
+          setPointBalance(balance)
+        }
+      } catch (e) {
+        setPointBalance(null)
+      }
+    }
+    fetchPointBalance()
+  }, [userId, user])
 
   // TODO: 프로필 편집 버튼 클릭 핸들러
   const handleProfileEdit = () => {
     navigate('/profile/edit')
-    // TODO: 프로필 편집 페이지로 이동하는 로직 추가
   }
 
   // TODO: 설정 버튼 클릭 핸들러
@@ -47,57 +204,9 @@ const MyPage = () => {
     navigate('/detailreview')
   }
 
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  // TagReview 테스트 데이터
-  const reviewTags = [
-    { icon: '⚡', text: '응답이 빨라요', count: 12 },
-    { icon: '🤝', text: '신뢰할 수 있는 대화였어요', count: 9 },
-    { icon: '❤️', text: '공감을 잘해줘요', count: 8 },
-    { icon: '☕', text: '편안한 분위기에서 이야기할 수 있었어요', count: 6 },
-    { icon: '🎯', text: '솔직하고 현실적인 조언을 해줘요', count: 3 },
-    { icon: '💡', text: '새로운 관점을 제시해줘요', count: 1 },
-  ]
-
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  const userProfile = {
-    profileImage: '/public/image.png',
-    username: '행복한 돌멩이',
+  if (loading) {
+    return <div></div>
   }
-
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  const userStats = {
-    averageScore: 4.6,
-    coins: 500,
-    matchCount: 3,
-  }
-
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  const categoryData = {
-    진로: 3,
-    취업: 7,
-    학업: 1,
-    인간관계: 6,
-    경제: 4,
-    기타: 1,
-  }
-
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  const userReviews = [
-    {
-      profileImage: '/public/image.png',
-      username: '건들면 짖는댕',
-      rating: 4.0,
-      date: '25.03.28',
-      content: '응답이 엄청 빨랐어요! 대화 재밌었어요 ㅎ ㅎ',
-    },
-    {
-      profileImage: '/public/image copy.png',
-      username: '말하고 싶어라',
-      rating: 3.5,
-      date: '25.03.28',
-      content: '공감 천재세요',
-    },
-  ]
 
   return (
     <MypageContainer>
@@ -105,7 +214,7 @@ const MyPage = () => {
         <TopBar
           leftContent={<LogoText>마이페이지</LogoText>}
           rightContent={
-            isOwnProfile && ( // 본인 프로필일 경우에만 설정 버튼 표시
+            isOwnProfile && (
               <button onClick={handleSettingClick}>
                 <SettingIcon color="#392111" />
               </button>
@@ -116,26 +225,46 @@ const MyPage = () => {
         />
         <ComponentContainer>
           <ProfileEdit
-            profileImage={userProfile.profileImage}
-            username={userProfile.username}
+            profileImage={
+              userProfile?.profileImage
+                ? `http://localhost/api${userProfile.profileImage}`
+                : 'http://localhost/api/profileImages/default-profile-image.png'
+            }
+            username={userProfile?.username}
             onEditClick={handleProfileEdit}
-            isOwnProfile={isOwnProfile} // 본인 프로필 여부 전달
+            isOwnProfile={isOwnProfile}
           />
           <InfoBoxContainer>
             <InfoBox
-              averageScore={userStats.averageScore}
-              coins={userStats.coins}
-              matchCount={userStats.matchCount}
+              averageScore={userStats?.averageScore}
+              coins={pointBalance !== null ? pointBalance : userStats?.coins}
+              matchCount={userStats?.matchCount}
             />
           </InfoBoxContainer>
           <MatchingGraphContainer>
-            <MatchingGraph categoryData={categoryData} />
+            <MatchingGraph categoryData={categoryData || {}} />
           </MatchingGraphContainer>
           <TagReview tags={reviewTags} />
-          <DetailReview
-            reviews={userReviews}
-            onViewAllClick={handleViewAllReviewsClick}
-          />
+          {userReviews.length === 0 ? (
+            <div
+              style={{
+                background: 'whitesmoke',
+                borderRadius: 12,
+                padding: '32px 0',
+                textAlign: 'center',
+                color: '#aaa',
+                fontSize: 14,
+                margin: '16px 0',
+              }}
+            >
+              아직 받은 평가가 없어요 : (
+            </div>
+          ) : (
+            <DetailReview
+              reviews={userReviews}
+              onViewAllClick={handleViewAllReviewsClick}
+            />
+          )}
         </ComponentContainer>
       </ContentContainer>
       <NavigationComponent />
