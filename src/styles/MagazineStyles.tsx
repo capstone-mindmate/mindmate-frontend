@@ -22,23 +22,28 @@ export const MagazineItemContainer = styled.div`
     box-shadow 0.3s ease;
   background-color: #ffffff;
   cursor: pointer;
-  width: calc((100% - 32px) / 5);
+  /* 기본: 5개 컬럼 (아래에서 계산 수정) */
+  width: calc((100% - 32px) / 5); /* 8px gap × 4 = 32px 제외 */
   aspect-ratio: 3/4;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 8px;
   flex-shrink: 0;
   max-width: 180px;
 
+  /* 미디어 쿼리 수정 - 4개 컬럼 */
   @media all and (max-width: 884px) {
-    width: calc((100% - 24px) / 4);
+    width: calc((100% - 24px) / 4); /* 8px gap × 3 = 24px 제외 */
   }
 
+  /* 미디어 쿼리 수정 - 3개 컬럼 */
   @media all and (max-width: 600px) {
-    width: calc((100% - 16px) / 3);
+    width: calc((100% - 16px) / 3); /* 8px gap × 2 = 16px 제외 */
+    max-width: none; /* 최대 너비 제한 해제 */
   }
 
+  /* 미디어 쿼리 수정 - 2개 컬럼 */
   @media all and (max-width: 478px) {
-    width: calc((100% - 8px) / 2);
+    width: calc((100% - 8px) / 2); /* 8px gap × 1 = 8px 제외 */
   }
 
   &:hover {

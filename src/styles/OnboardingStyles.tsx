@@ -39,7 +39,6 @@ export const pageContainerStyle = css`
 `
 
 export const headerStyle = css`
-  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,7 +48,7 @@ export const headerStyle = css`
 export const contentContainerStyle = css`
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 44px);
+  height: 100%;
   flex: 1;
 `
 
@@ -245,17 +244,17 @@ export const progressDotStyle = (isActive: boolean) => css`
 
 // 버튼 스타일
 export const buttonContainerStyle = css`
-  padding: 0 0 40px;
+  padding: 0 0 0px;
   width: 90%;
   margin: 0 24px;
   justify-content: center;
   ${media.tablet(`
-    padding: 0 0 32px;
+    padding: 0 0 0px;
     margin: 0 24px;
   `)}
 
   ${media.mobile(`
-    padding: 0 0 24px;
+    padding: 0 0 0px;
   `)}
 `
 

@@ -9,7 +9,7 @@ import {
   ImageInput,
   CategorySelect,
   ReviewNoticeTooltip,
-} from './MagazineWriteStyles'
+} from './styles/MagazineWriteStyles'
 import TopBar from '../../components/topbar/Topbar'
 import {
   insertImageToQuill,
@@ -27,7 +27,7 @@ import {
 import {
   emoticonButtonStyles,
   emoticonPickerOverlayStyles,
-} from './EmoticonButtonStyles'
+} from './styles/EmoticonButtonStyles'
 import { css } from '@emotion/react'
 import { SmileIcon } from '../../components/icon/iconComponents'
 
@@ -324,7 +324,7 @@ const MagazineWrite: React.FC = () => {
 
   // 뒤로가기 버튼 핸들러
   const handleBackClick = () => {
-    navigate(-1)
+    navigate('/magazinelist')
   }
 
   // 등록 버튼 핸들러 - 새로운 API 형식에 맞게 수정

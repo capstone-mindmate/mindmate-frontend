@@ -11,6 +11,7 @@ import Review from '../pages/Review/ReviewPage.tsx'
 import MagazineList from '../pages/Magazine/MagazineList.tsx'
 import MagazineWrite from '../pages/Magazine/MagazineWrite.tsx'
 import Magazine from '../pages/Magazine/Magazine.tsx'
+import MyList from '../pages/Magazine/MyList.tsx'
 
 import DetailReviewPage from '../pages/Mypage/DetailReviewPage.tsx'
 import Report from '../pages/Mypage/ReportPage.tsx'
@@ -169,6 +170,10 @@ export const router = createBrowserRouter([
   {
     path: '/magazine',
     element: <Magazine />,
+  },
+  {
+    path: '/magazine/mylist',
+    element: <MyList />,
   },
   {
     path: '*',
