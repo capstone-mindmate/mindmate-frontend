@@ -3,9 +3,9 @@ import { css } from '@emotion/react'
 
 // 반응형 디자인을 위한 브레이크포인트 정의
 const breakpoints = {
-  mobile: '375px',
-  tablet: '479px',
-  desktop: '767px',
+  mobile: '478px',
+  tablet: '600px',
+  desktop: '884px',
 }
 
 // 미디어 쿼리 헬퍼 함수
@@ -27,45 +27,60 @@ const media = {
   `,
 }
 
+export const RootContainer = css`
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`
+
+export const OnboardingContainer = css`
+  width: 884px;
+  height: 100%;
+  box-sizing: border-box;
+
+  ${media.tablet(`
+    width: 100%;
+  `)}
+`
+
 // 페이지 컨테이너
 export const pageContainerStyle = css`
-  min-height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background-color: white;
-  padding: 0;
+  padding: 0 24px;
   box-sizing: border-box;
-  overflow: hidden;
-`
-
-export const headerStyle = css`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 20px;
+  position: relative;
 `
 
 export const contentContainerStyle = css`
   display: flex;
   flex-direction: column;
+  align-items: center;
   height: 100%;
-  flex: 1;
+  margin-top: 40px;
+  position: relative;
+  overflow: hidden;
 `
 
 // 슬라이더 스타일
 export const containerStyle = css`
   position: relative;
   width: 100%;
-  flex: 1;
-  overflow: hidden;
 `
 
 export const sliderWrapperStyle = css`
   position: relative;
   width: 100%;
-  height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  position: relative;
+  height: auto;
 `
 
 // 추가된 슬라이드 컨텐츠 스타일 함수
@@ -76,8 +91,6 @@ export const slideContentStyle = (
   isDragging: boolean
 ) => css`
   width: 100%;
-  height: 100%;
-  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -94,21 +107,20 @@ export const slideContentStyle = (
 `
 
 export const textContainerStyle = css`
-  padding: 20px 20px 20px 20px;
+  // padding: 20px 20px 20px 20px;
   text-align: left;
   width: 100%;
   margin-top: 0px;
-  margin-left: 24px;
   box-sizing: border-box;
 
   ${media.tablet(`
-    padding: 16px;
-    margin-top: 30px;
+    // padding: 16px;
+    // margin-top: 30px;
   `)}
 
   ${media.mobile(`
-    padding: 12px;
-    margin-top: 20px;
+    // padding: 12px;
+    // margin-top: 20px;
   `)}
 `
 
@@ -165,7 +177,7 @@ export const emoticonContainerStyle = css`
   justify-content: center;
   align-items: center;
   width: 100%;
-  flex: 1;
+
   padding: 20px 0;
   position: relative;
 
@@ -244,17 +256,19 @@ export const progressDotStyle = (isActive: boolean) => css`
 
 // 버튼 스타일
 export const buttonContainerStyle = css`
-  padding: 0 0 0px;
-  width: 90%;
-  margin: 0 24px;
+  // padding: 0 0 70px;
+  width: 100%;
+  // margin: 0 24px;
   justify-content: center;
+  position: absolute;
+  bottom: 50px;
   ${media.tablet(`
-    padding: 0 0 0px;
-    margin: 0 24px;
+    // padding: 0 0 70px;
+    // margin: 0 24px;
   `)}
 
   ${media.mobile(`
-    padding: 0 0 0px;
+    // padding: 0 0 100px;
   `)}
 `
 
