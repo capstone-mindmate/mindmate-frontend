@@ -1,15 +1,61 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import styled from '@emotion/styled'
 import TopBar from '../../components/topbar/Topbar'
-import { ChatBubbleIcon, StarIcon } from '../../components/icon/iconComponents'
+import { StarIcon } from '../../components/icon/iconComponents'
+import {
+  MagazineDetailContainer,
+  CoverImage,
+  TitleOverlay,
+  MagazineTitle,
+  MagazineSubtitle,
+  ContentContainer,
+  MagazineContent,
+  AuthorProfileContainer,
+  AuthorProfileImage,
+  AuthorProfileInfo,
+  NameRow,
+  AuthorProfileName,
+  AuthorProfileDepartment,
+  AuthorDate,
+  AuthorProfileArrow,
+  BottomToolbar,
+  ToolbarButton,
+  LikeCount,
+} from './styles/MagazineStyles'
+
+// API 응답 데이터 타입 정의
+interface MagazineContent {
+  id: number
+  type: string
+  text: string
+  imageUrl: string | null
+  emoticonUrl: string | null
+  emoticonName: string | null
+  contentOrder: number
+}
 
 interface MagazineData {
-  id: string | number
+  id: number
   title: string
   subtitle: string
-  content: string
-  featuredImageUrl: string | null
+  contents: MagazineContent[]
+  authorName: string
+  authorId: number
+  authorDepartment: string
+  authorProfileImage: string
+  likeCount: number
+  status: string
+  category: string
+  createdAt: string
+  updatedAt: string
+  author: boolean
+  liked: boolean
+}
+
+// 좋아요 응답 타입
+interface LikeResponse {
+  liked: boolean
+  likeCount: number
 }
 
 const Magazine: React.FC = () => {
@@ -17,54 +63,192 @@ const Magazine: React.FC = () => {
   const navigate = useNavigate()
   const [magazine, setMagazine] = useState<MagazineData | null>(null)
   const [featuredImage, setFeaturedImage] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
-    // 실제 구현에서는 API 호출로 데이터를 가져옵니다
-    // 지금은 목업 데이터를 사용합니다
+    // Todo: API 호출
     const mockData: MagazineData = {
-      id: id || '1',
+      id: parseInt(id || '1'),
       title: '친구 사이에도 거리두기가 필요해',
       subtitle: '인간관계 때문에 고민중이라면 필독 👀',
-      content:
-        '<p>친구 사이에도 누명이가 존재한다는 사실을 인지하세요. 그럼 확실히 고민이 줄어들긴합니다.</p><p>히히히 😊</p><p>매롱매롱</p><p>누가 힘들게 하면 마음속으로<br>참을 인 16번 써버리고 놓아주세요.. 🌸</p><p>그게 최곱니다요!!</p>',
-      featuredImageUrl: '/public/image.png',
+      contents: [
+        {
+          id: 1,
+          type: 'TEXT',
+          text: '<p>친구 사이에도 누명이가 존재한다는 사실을 인지하세요. 그럼 확실히 고민이 줄어들긴합니다.</p>',
+          imageUrl: null,
+          emoticonUrl: null,
+          emoticonName: null,
+          contentOrder: 1,
+        },
+        {
+          id: 2,
+          type: 'TEXT',
+          text: '<p>히히히 😊</p>',
+          imageUrl: null,
+          emoticonUrl: null,
+          emoticonName: null,
+          contentOrder: 2,
+        },
+        {
+          id: 3,
+          type: 'TEXT',
+          text: '<p>매롱매롱</p>',
+          imageUrl: null,
+          emoticonUrl: null,
+          emoticonName: null,
+          contentOrder: 3,
+        },
+        {
+          id: 4,
+          type: 'TEXT',
+          text: '<p>누가 힘들게 하면 마음속으로<br>참을 인 16번 써버리고 놓아주세요.. 🌸</p>',
+          imageUrl: null,
+          emoticonUrl: null,
+          emoticonName: null,
+          contentOrder: 4,
+        },
+        {
+          id: 5,
+          type: 'TEXT',
+          text: '<p>그게 최곱니다요!!</p>',
+          imageUrl: null,
+          emoticonUrl: null,
+          emoticonName: null,
+          contentOrder: 5,
+        },
+        {
+          id: 6,
+          type: 'IMAGE',
+          text: null,
+          imageUrl: '/public/image.png',
+          emoticonUrl: null,
+          emoticonName: null,
+          contentOrder: 6,
+        },
+        {
+          id: 7,
+          type: 'EMOTICON',
+          text: null,
+          imageUrl: null,
+          emoticonUrl: '/public/emoticon.png',
+          emoticonName: '웃는 얼굴',
+          contentOrder: 7,
+        },
+      ],
+      authorName: '김멋사',
+      authorId: 12345,
+      authorDepartment: '컴퓨터공학과',
+      authorProfileImage: '/public/profile.png',
+      likeCount: 42,
+      status: 'PUBLISHED',
+      category: '진로',
+      createdAt: '2025-05-07T10:11:35.857Z',
+      updatedAt: '2025-05-07T10:11:35.857Z',
+      author: false,
+      liked: false,
     }
 
     setMagazine(mockData)
 
-    // 첫 번째 이미지를 대표 이미지로 설정
-    // 실제 코드에서는 magazine.featuredImageUrl을 사용하거나 content에서 추출
-    extractFeaturedImage(mockData.content)
+    // 컨텐츠 중 이미지가 있는지 확인하고 대표 이미지로 설정
+    extractFeaturedImage(mockData.contents)
   }, [id])
 
-  // HTML 내용에서 첫 번째 이미지 URL을 추출하는 함수
-  const extractFeaturedImage = (htmlContent: string) => {
-    if (!htmlContent) return
-
-    // 임시 DOM에 HTML 삽입
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(htmlContent, 'text/html')
-
-    // 모든 이미지 태그 찾기
-    const images = doc.querySelectorAll('img')
-
-    if (images.length > 0) {
-      // 첫 번째 이미지의 src 속성 가져오기
-      setFeaturedImage(images[0].src)
+  // 컨텐츠에서 첫 번째 이미지 URL을 추출하는 함수
+  const extractFeaturedImage = (contents: MagazineContent[]) => {
+    const imageContent = contents.find(
+      (content) => content.type === 'IMAGE' && content.imageUrl
+    )
+    if (imageContent && imageContent.imageUrl) {
+      setFeaturedImage(imageContent.imageUrl)
+    } else {
+      setFeaturedImage('/public/image.png') // 기본 이미지
     }
   }
 
-  // 뒤로가기 버튼 핸들러
+  // 컨텐츠를 HTML로 변환하는 함수
+  const renderContentAsHTML = () => {
+    if (!magazine || !magazine.contents) return ''
+
+    return magazine.contents
+      .sort((a, b) => a.contentOrder - b.contentOrder)
+      .map((content) => {
+        switch (content.type) {
+          case 'TEXT':
+            return content.text || ''
+          case 'IMAGE':
+            return content.imageUrl
+              ? `<img src="${content.imageUrl}" alt="콘텐츠 이미지" />`
+              : ''
+          case 'EMOTICON':
+            return content.emoticonUrl
+              ? `<img src="${content.emoticonUrl}" alt="${content.emoticonName || '이모티콘'}" />`
+              : ''
+          default:
+            return ''
+        }
+      })
+      .join('')
+  }
+
+  // 날짜를 포맷팅하는 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}년 ${month}월 ${day}일`
+  }
+
+  const handleAuthorClick = () => {
+    // 작성자 프로필 페이지로 이동
+    if (magazine) {
+      navigate(`/profile/${magazine.authorId}`)
+    }
+  }
+
   const handleBackClick = () => {
-    navigate('/magazine')
+    navigate('/magazinelist')
   }
 
-  const handleStarClick = () => {
-    console.log('좋아요')
-  }
+  // POST /api/magazine/{magazineId}/like API를 사용한 좋아요 토글 함수
+  const handleStarClick = async () => {
+    if (!magazine || isLoading) return
 
-  const handleCommentClick = () => {
-    console.log('댓글')
+    try {
+      setIsLoading(true)
+
+      // API 호출 - POST /api/magazine/{magazineId}/like
+      const response = await fetch(`/api/magazine/${magazine.id}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // 쿠키 포함
+      })
+
+      if (!response.ok) {
+        throw new Error('좋아요 처리 실패')
+      }
+
+      // 응답 처리
+      const data: LikeResponse = await response.json()
+
+      // 상태 업데이트 - 좋아요 상태와 개수를 업데이트
+      setMagazine((prevState) => {
+        if (!prevState) return null
+        return {
+          ...prevState,
+          liked: data.liked,
+          likeCount: data.likeCount,
+        }
+      })
+    } catch (error) {
+      console.error('좋아요 처리 중 오류 발생:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   if (!magazine) {
@@ -73,7 +257,11 @@ const Magazine: React.FC = () => {
 
   return (
     <MagazineDetailContainer>
-      <TopBar title="매거진" showBackButton onBackClick={handleBackClick} />
+      <TopBar
+        title={magazine.category}
+        showBackButton
+        onBackClick={handleBackClick}
+      />
 
       <CoverImage featuredImage={featuredImage}>
         <TitleOverlay>
@@ -84,121 +272,60 @@ const Magazine: React.FC = () => {
 
       <ContentContainer>
         <MagazineContent
-          dangerouslySetInnerHTML={{ __html: magazine.content }}
+          dangerouslySetInnerHTML={{ __html: renderContentAsHTML() }}
         />
+
+        <AuthorProfileContainer onClick={handleAuthorClick}>
+          <AuthorProfileImage>
+            <img
+              src={magazine.authorProfileImage}
+              alt={`${magazine.authorName}의 프로필`}
+            />
+          </AuthorProfileImage>
+          <AuthorProfileInfo>
+            <NameRow>
+              <AuthorProfileName>{magazine.authorName}</AuthorProfileName>
+              <AuthorProfileDepartment>
+                {magazine.authorDepartment}
+              </AuthorProfileDepartment>
+            </NameRow>
+            <AuthorDate>{formatDate(magazine.createdAt)}</AuthorDate>
+          </AuthorProfileInfo>
+          <AuthorProfileArrow>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="#CCCCCC"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </AuthorProfileArrow>
+        </AuthorProfileContainer>
       </ContentContainer>
       <BottomToolbar>
-        <ToolbarButton onClick={handleStarClick}>
-          <StarIcon width={22} height={22} color="#333333" />
-        </ToolbarButton>
-        <ToolbarButton onClick={handleCommentClick}>
-          <ChatBubbleIcon width={20} height={20} color="#333333" />
+        <ToolbarButton
+          onClick={handleStarClick}
+          disabled={isLoading}
+          active={magazine.liked}
+        >
+          <StarIcon
+            width={22}
+            height={22}
+            color={magazine.liked ? '#FFB800' : '#333333'}
+          />
+          <LikeCount>{magazine.likeCount}</LikeCount>
         </ToolbarButton>
       </BottomToolbar>
     </MagazineDetailContainer>
   )
 }
-
-const MagazineDetailContainer = styled.div`
-  width: 100%;
-  max-width: 884px;
-  margin: 0 auto;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-  overflow: hidden;
-  overflow-y: auto;
-`
-
-const CoverImage = styled.div<{ featuredImage: string | null }>`
-  width: 100%;
-  height: 40vh;
-  min-height: 300px;
-  background-image: ${({ featuredImage }) =>
-    featuredImage ? `url(${featuredImage})` : 'url(/public/image.png)'};
-  background-size: cover;
-  background-position: center;
-  position: relative;
-`
-
-const TitleOverlay = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 20px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-  color: white;
-`
-
-const MagazineTitle = styled.h1`
-  margin: 0 0 8px 0;
-  font-size: 28px;
-  font-weight: 700;
-  word-break: keep-all; /* 단어 유지 */
-  max-width: 70%; /* 컨테이너 너비의 70%까지만 사용 */
-  color: #ffffff;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-`
-
-const MagazineSubtitle = styled.h2`
-  margin: 0;
-  font-size: 16px;
-  font-weight: 400;
-  color: #ffffff;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-  opacity: 0.9;
-`
-
-const ContentContainer = styled.div`
-  flex: 1;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 100px;
-`
-
-const MagazineContent = styled.div`
-  font-size: 16px;
-  line-height: 1.6;
-  color: #333333;
-  flex: 1;
-
-  img {
-    max-width: 100%;
-    height: auto;
-    margin: 16px 0;
-  }
-
-  p {
-    margin-bottom: 16px;
-  }
-`
-
-const BottomToolbar = styled.div`
-  display: flex;
-  padding: 0px 16px;
-  border-top: 1px solid #d9d9d9;
-  bottom: 0;
-  width: 100%;
-  background-color: #ffffff;
-  position: fixed;
-`
-
-const ToolbarButton = styled.button`
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-  margin-bottom: 0px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:last-child {
-    margin-right: 0;
-  }
-`
 
 export default Magazine

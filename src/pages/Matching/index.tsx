@@ -294,7 +294,8 @@ const Matching = () => {
           z-index: 1000;
           display: flex;
           align-items: center;
-          padding: ${isSearchActive ? '0 16px' : '0'};
+          padding: ${isSearchActive ? '0 24px' : '0'};
+          margin: ${isSearchActive ? '7px 0' : '0'};
           transition: all 0.3s ease;
           overflow: hidden;
           box-sizing: border-box;
@@ -409,7 +410,7 @@ const Matching = () => {
                   cursor: pointer;
                 `}
               >
-                <SearchIcon color="#392111" />
+                <SearchIcon color="#392111" width={21.5} height={21.5} />
               </div>
               <ListIcon
                 color="#392111"
@@ -502,7 +503,7 @@ const Matching = () => {
           ) : (
             <div
               css={{
-                padding: '20px',
+                padding: '40px 0',
                 textAlign: 'center',
                 width: '100%',
                 color: '#888',

@@ -28,7 +28,7 @@ export const TopFixedContent = styled.div<{ fixedType: 'normal' | 'matched' }>`
   right: 0;
   left: 0;
   margin: auto;
-  ${({ fixedType }) => (fixedType === 'normal' ? 'top: 0;' : 'top: 57px;')}
+  ${({ fixedType }) => (fixedType === 'normal' ? 'top: 0;' : 'top: 56px;')}
   z-index: 100;
   background-color: #ffffff;
 
@@ -106,7 +106,7 @@ export const CategoryDetailContainer = styled.div`
   flex-direction: row;
   gap: 6px;
   margin-top: 16px;
-  padding: 0 24px;
+  padding: 0 16px;
 `
 
 export const MatchItemsContainer = styled.div<{
@@ -117,7 +117,7 @@ export const MatchItemsContainer = styled.div<{
   flex-direction: column;
   gap: 4px;
   align-items: flex-start;
-  padding-top: ${({ pageType }) => (pageType === 'normal' ? '140px' : '101px')};
+  padding-top: ${({ pageType }) => (pageType === 'normal' ? '140px' : '57px')};
   padding-bottom: 90px;
 `
 
