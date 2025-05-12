@@ -72,7 +72,7 @@ export const TopBarTitle = styled.div`
   font-size: 20px;
   font-weight: 600;
   line-height: 1.5;
-  margin: 0 8px;
+  margin: 0 4px;
   user-select: none;
 `
 

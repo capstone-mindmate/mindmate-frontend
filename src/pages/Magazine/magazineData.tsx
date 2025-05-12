@@ -203,13 +203,4 @@ export const dummyMagazineItems: MagazineItem[] = [
     likeCount: 128,
     createdAt: '2025-05-11T14:50:00Z',
   },
-  {
-    id: 12,
-    title: '면접 준비 완벽 가이드',
-    detail: '합격률 높이는 면접 노하우',
-    imageSrc: '/public/image.png',
-    category: 'EMPLOYMENT',
-    likeCount: 150,
-    createdAt: '2025-05-12T11:15:00Z',
-  },
 ]
