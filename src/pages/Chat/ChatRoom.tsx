@@ -69,6 +69,24 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const [availableEmoticons, setAvailableEmoticons] = useState<any[]>([])
   const [customForms, setCustomForms] = useState<any[]>([])
   const [toastBoxes, setToastBoxes] = useState<any[]>([])
+  const myUserId = user?.id || user?.userId
+
+  // 메시지 파싱 함수 (type별로 필요한 필드 보완)
+  const parseMessage = (msg: any): Message => {
+    const senderId = msg.senderId ?? msg.userId ?? msg.creatorId
+    // type, content, emoticonType 등 파싱
+    let type = msg.type
+    if (typeof type === 'string') type = type.toUpperCase()
+    return {
+      ...msg,
+      isMe: senderId === myUserId,
+      type,
+      timestamp: msg.timestamp || msg.createdAt || '',
+      content: msg.content || msg.message || '',
+      emoticonType: msg.emoticonType || msg.emoticonName || msg.emoticonId,
+      isRead: msg.isRead ?? false,
+    }
+  }
 
   // 1. WebSocket 연결 및 topic 구독
   useEffect(() => {
@@ -153,7 +171,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         )
         if (!res.ok) throw new Error('메시지 목록을 불러오지 못했습니다.')
         const data = await res.json()
-        setMessages(Array.isArray(data.messages) ? data.messages : [])
+        setMessages(
+          Array.isArray(data.messages) ? data.messages.map(parseMessage) : []
+        )
       } catch (e) {
         console.error('메시지 조회 실패:', e)
         setMessages([])
@@ -181,10 +201,11 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     fetchEmoticons()
   }, [chatId])
 
-  // 3. 각 topic 핸들러
+  // 3. 각 topic 핸들러 (isMe 계산 및 읽음 처리)
   const onMessage = (msg: any) => {
     const data = JSON.parse(msg.body)
-    setMessages((prev) => [...prev, data])
+    setMessages((prev) => [...prev, parseMessage(data)])
+    markAsRead()
   }
   const onRead = (msg: any) => {
     /* 읽음 처리 UI 반영 */
@@ -195,6 +216,8 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const onCustomForm = (msg: any) => {
     const data = JSON.parse(msg.body)
     setCustomForms((prev) => [...prev, data])
+    setMessages((prev) => [...prev, parseMessage(data)])
+    markAsRead()
   }
   const onToastBox = (msg: any) => {
     const data = JSON.parse(msg.body)
@@ -202,7 +225,17 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   }
   const onEmoticon = (msg: any) => {
     const data = JSON.parse(msg.body)
-    setMessages((prev) => [...prev, data])
+    setMessages((prev) => [...prev, parseMessage(data)])
+    markAsRead()
+  }
+
+  // 읽음 처리 함수
+  const markAsRead = () => {
+    stompClientRef.current?.send(
+      '/app/chat.read',
+      {},
+      JSON.stringify({ roomId: chatId })
+    )
   }
 
   // 4. 메시지/이모티콘/리액션/커스텀폼 전송 함수

@@ -11,11 +11,12 @@ export const RootContainer = styled.div`
   position: relative;
 `
 
+// 05.13 채팅 내역이 짤려서 수정합니다.
 export const ChatContainer = styled.div`
   width: 884px;
   height: 100%;
   position: relative;
-  padding: 57px 24px 0 24px;
+  padding: 57px 24px 80px 24px;
   box-sizing: border-box;
 
   ${media.tablet} {
