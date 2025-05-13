@@ -27,11 +27,13 @@ export const BubbleWrapper = styled.div<{
   isMe: boolean
   isContinuous?: boolean
   isEmoticon?: boolean
+  isLastMessage?: boolean
 }>`
   display: flex;
   width: 100%;
   justify-content: ${(props) => (props.isMe ? 'flex-end' : 'flex-start')};
   margin: ${(props) => {
+    if (props.isLastMessage) return '10px 0px 100px 0px'
     if (props.isContinuous) {
       // 이모티콘이면서 연속된 메시지인 경우 위쪽 마진 줄이기
       return props.isEmoticon ? '0px 0px 10px 0px' : '0px 0px 10px 0px'

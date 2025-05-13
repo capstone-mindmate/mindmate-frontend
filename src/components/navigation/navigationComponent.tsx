@@ -12,6 +12,7 @@ import {
 import { useMessageStore } from '../../store/messageStore'
 import { useSocketMessage } from '../../hooks/useSocketMessage'
 import { media } from '../../styles/breakpoints'
+import { useUserStatus } from '../../hooks/useUserStatus'
 
 interface NavItem {
   path: string
@@ -74,7 +75,7 @@ const navigationStyle = {
 
 const NavigationComponent: React.FC = () => {
   const location = useLocation()
-  const unreadCount = useMessageStore((state) => state.unreadCount)
+  const { unreadCount } = useUserStatus()
 
   // 소켓 연결
   useSocketMessage()
@@ -99,12 +100,12 @@ const NavigationComponent: React.FC = () => {
           `}
         >
           <ChatBubbleIcon color={color} />
-          {unreadCount > 0 || ( // 소켓 연결되면 &&(and)로 바꾸기
+          {unreadCount > 0 && (
             <div css={navigationStyle.alertContainer}>
               <ChatAlertIcon
                 width={24}
                 height={24}
-                alertCount={12} //  alertCount={unreadCount} 소켓 연결되면 이걸로
+                alertCount={unreadCount}
                 fontSize={12}
               />
             </div>

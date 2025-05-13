@@ -18,6 +18,8 @@ export const ChatContainer = styled.div`
   position: relative;
   padding: 57px 24px 80px 24px;
   box-sizing: border-box;
+  overflow: scroll;
+  scroll-behavior: smooth;
 
   ${media.tablet} {
     width: 100%;

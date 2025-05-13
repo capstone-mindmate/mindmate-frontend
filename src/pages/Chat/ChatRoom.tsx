@@ -66,10 +66,13 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
   const stompClientRef = useRef<any>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
+  const [isAtBottom, setIsAtBottom] = useState(true)
   const [availableEmoticons, setAvailableEmoticons] = useState<any[]>([])
   const [customForms, setCustomForms] = useState<any[]>([])
   const [toastBoxes, setToastBoxes] = useState<any[]>([])
   const myUserId = user?.id || user?.userId
+  const typingTimeoutRef = useRef<any>(null)
 
   // 메시지 파싱 함수 (type별로 필요한 필드 보완)
   const parseMessage = (msg: any): Message => {
@@ -204,11 +207,25 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   // 3. 각 topic 핸들러 (isMe 계산 및 읽음 처리)
   const onMessage = (msg: any) => {
     const data = JSON.parse(msg.body)
-    setMessages((prev) => [...prev, parseMessage(data)])
+    setMessages((prev) => {
+      if (prev.some((m) => m.id === data.id)) return prev
+      return [...prev, parseMessage(data)]
+    })
     markAsRead()
   }
   const onRead = (msg: any) => {
-    /* 읽음 처리 UI 반영 */
+    const data = JSON.parse(msg.body)
+
+    console.log('onRead messageId:', data.messageId, typeof data.messageId)
+    setMessages((prev) => {
+      console.log(
+        'messages ids:',
+        prev.map((m) => [m.id, typeof m.id])
+      )
+      return prev.map(
+        (m) => (m.id == data.messageId ? { ...m, isRead: true } : m) // ==로 비교(타입 불일치 방지)
+      )
+    })
   }
   const onReaction = (msg: any) => {
     /* 리액션 UI 반영 */
@@ -229,14 +246,116 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     markAsRead()
   }
 
-  // 읽음 처리 함수
+  // 읽음 처리 함수 (안전하게)
   const markAsRead = () => {
-    stompClientRef.current?.send(
-      '/app/chat.read',
-      {},
-      JSON.stringify({ roomId: chatId })
-    )
+    if (stompClientRef.current && stompClientRef.current.connected && chatId) {
+      stompClientRef.current.send(
+        '/app/chat.read',
+        {},
+        JSON.stringify({ roomId: chatId })
+      )
+    }
   }
+
+  // 채팅방 입장(마운트) 시 읽음 처리
+  useEffect(() => {
+    if (isConnected && chatId) {
+      markAsRead()
+    }
+  }, [isConnected, chatId])
+
+  // 브라우저 탭 활성화 시 읽음 처리
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && isConnected && chatId) {
+        markAsRead()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [isConnected, chatId])
+
+  // 채팅창 맨 아래 도달 시 읽음 처리
+  useEffect(() => {
+    if (!chatEndRef.current) return
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && isConnected && chatId) {
+          markAsRead()
+        }
+      },
+      { threshold: 1 }
+    )
+    observer.observe(chatEndRef.current)
+    return () => {
+      observer.disconnect()
+    }
+  }, [isConnected, chatId, messages.length])
+
+  // 타이핑 이벤트 전송
+  const handleTyping = (typing: boolean) => {
+    setIsTyping(typing)
+    if (stompClientRef.current && stompClientRef.current.connected && chatId) {
+      stompClientRef.current.send(
+        '/app/chat.typing',
+        {},
+        JSON.stringify({ roomId: chatId, typing })
+      )
+    }
+  }
+
+  // 타이핑 이벤트 수신 핸들러
+  const onTyping = (msg: any) => {
+    const data = JSON.parse(msg.body)
+    if (data.senderId !== myUserId) {
+      setIsTyping(true)
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+      typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 2000)
+    }
+  }
+
+  // WebSocket 구독/해제 useEffect (중복 방지)
+  useEffect(() => {
+    if (
+      !isConnected ||
+      !chatId ||
+      !stompClientRef.current ||
+      !stompClientRef.current.connected
+    )
+      return
+    const subscriptions = [
+      stompClientRef.current.subscribe(`/topic/chat.room.${chatId}`, onMessage),
+      stompClientRef.current.subscribe(
+        `/topic/chat.room.${chatId}.read`,
+        onRead
+      ),
+      stompClientRef.current.subscribe(
+        `/topic/chat.room.${chatId}.reaction`,
+        onReaction
+      ),
+      stompClientRef.current.subscribe(
+        `/topic/chat.room.${chatId}.customform`,
+        onCustomForm
+      ),
+      stompClientRef.current.subscribe(
+        `/topic/chat.room.${chatId}.toastbox`,
+        onToastBox
+      ),
+      stompClientRef.current.subscribe(
+        `/topic/chat.room.${chatId}.emoticon`,
+        onEmoticon
+      ),
+      stompClientRef.current.subscribe(
+        `/topic/chat.room.${chatId}.typing`,
+        onTyping
+      ),
+    ]
+    return () => {
+      subscriptions.forEach((sub) => sub.unsubscribe())
+    }
+  }, [isConnected, chatId])
 
   // 4. 메시지/이모티콘/리액션/커스텀폼 전송 함수
   const sendMessage = (content: string) => {
@@ -275,6 +394,44 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     )
   }
 
+  // 스크롤 위치 감지
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!chatContainerRef.current) return
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
+      setIsAtBottom(scrollHeight - scrollTop - clientHeight < 100)
+    }
+    const container = chatContainerRef.current
+    if (container) {
+      container.addEventListener('scroll', handleScroll)
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, [])
+
+  // 새 메시지 오면, 최하단에 있을 때만 자동 스크롤
+  useEffect(() => {
+    if (isAtBottom && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages, isAtBottom])
+
+  // 1. 시간 포맷 함수 수정
+  function formatKoreanTime(timestamp: string) {
+    if (!timestamp) return ''
+    const date = new Date(timestamp)
+    let hours = date.getHours()
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const isAM = hours < 12
+    const period = isAM ? '오전' : '오후'
+    if (hours === 0) hours = 12
+    else if (hours > 12) hours = hours - 12
+    return `${period} ${hours}시${minutes}분`
+  }
+
   // 5. UI 렌더링 (type별 분기)
   return (
     <RootContainer>
@@ -298,7 +455,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           { text: '채팅 제거', onClick: () => {} },
         ]}
       />
-      <ChatContainer>
+      <ChatContainer ref={chatContainerRef}>
         {isUserLoading ? (
           <LoadingText>사용자 정보 로딩 중...</LoadingText>
         ) : isConnecting ? (
@@ -318,7 +475,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                   <Bubble
                     key={message.id}
                     isMe={message.isMe}
-                    timestamp={message.timestamp}
+                    timestamp={formatKoreanTime(message.timestamp)}
                     showTime={true}
                     isLastMessage={index === messages.length - 1}
                     isRead={message.isRead}
@@ -349,7 +506,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                   <Bubble
                     key={message.id}
                     isMe={message.isMe}
-                    timestamp={message.timestamp}
+                    timestamp={formatKoreanTime(message.timestamp)}
                     showTime={true}
                     isLastMessage={index === messages.length - 1}
                     isRead={message.isRead}
@@ -383,7 +540,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         <ChatBar
           onSendMessage={sendMessage}
           onSendEmoticon={sendEmoticon}
-          onTyping={setIsTyping}
+          onTyping={handleTyping}
           disabled={!isConnected}
           chatId={chatId}
         />
