@@ -99,7 +99,7 @@ const departmentOptions = [
 const categoryMap: Record<string, string> = {
   ACADEMIC: '학업',
   CAREER: '진로',
-  RELATIONSHIP: '대인관계',
+  RELATIONSHIP: '인간관계',
   MENTAL_HEALTH: '건강',
   CAMPUS_LIFE: '학교생활',
   PERSONAL_GROWTH: '자기계발',
@@ -112,7 +112,7 @@ const categoryMap: Record<string, string> = {
 const categoryEngMap: Record<string, string> = {
   학업: 'ACADEMIC',
   진로: 'CAREER',
-  대인관계: 'RELATIONSHIP',
+  인간관계: 'RELATIONSHIP',
   건강: 'MENTAL_HEALTH',
   학교생활: 'CAMPUS_LIFE',
   자기계발: 'PERSONAL_GROWTH',
@@ -312,12 +312,52 @@ const Matching = () => {
     setIsSpeakerActive(isActive)
   }
 
-  const handleListenerSelect = () => {
-    // 리스너 랜덤 매칭 호출
+  const handleListenerSelect = async () => {
+    try {
+      const res = await fetchWithRefresh(
+        'http://localhost/api/matchings/auto',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userRole: 'LISTENER',
+            anonymous: true,
+            showDepartment: true, // 필요시 상태로 관리
+          }),
+        }
+      )
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message)
+      }
+      showToast('랜덤 매칭이 완료되었습니다!', 'success')
+    } catch (e: any) {
+      showToast(e.message, 'error')
+    }
   }
 
-  const handleSpeakerSelect = () => {
-    // 스피커 랜덤 매칭 호출
+  const handleSpeakerSelect = async () => {
+    try {
+      const res = await fetchWithRefresh(
+        'http://localhost/api/matchings/auto',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userRole: 'SPEAKER',
+            anonymous: true, // 필요시 상태로 관리
+            showDepartment: true, // 필요시 상태로 관리
+          }),
+        }
+      )
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message)
+      }
+      showToast('랜덤 매칭이 완료되었습니다!', 'success')
+    } catch (e: any) {
+      showToast(e.message, 'error')
+    }
   }
 
   const handleOpenModal = async (item: MatchItemType) => {
