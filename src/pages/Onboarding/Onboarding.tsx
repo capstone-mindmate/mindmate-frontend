@@ -1,4 +1,5 @@
 /** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react'
 import { useState, useEffect, TouchEvent, MouseEvent } from 'react'
 import Emoticon from '../../components/emoticon/Emoticon'
 import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
@@ -6,7 +7,6 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import {
   pageContainerStyle,
-  headerStyle,
   contentContainerStyle,
   containerStyle,
   sliderWrapperStyle,
@@ -23,6 +23,8 @@ import {
   slideContentStyle,
   textFadeStyle,
   emoticonSlideStyle,
+  RootContainer,
+  OnboardingContainer,
 } from '../../styles/OnboardingStyles'
 import { useNavigate } from 'react-router-dom'
 import { setTokenCookie } from '../../utils/fetchWithRefresh'
@@ -66,8 +68,8 @@ function OnboardingContent() {
 
   // 반응형 이모티콘 크기 설정
   const getEmoticonSize = () => {
-    if (width <= 375) return 'xxlarge'
-    if (width <= 479) return 'xxlarge'
+    if (width <= 478) return 'xxlarge'
+    if (width <= 600) return 'xxlarge'
     return 'huge'
   }
 
@@ -302,21 +304,9 @@ function OnboardingContent() {
   const emoticonSize = getEmoticonSize()
 
   return (
-    <div
-      style={{
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{ width: '100%', maxWidth: '767px', boxSizing: 'border-box' }}
-      >
+    <div css={RootContainer}>
+      <div css={OnboardingContainer}>
         <div css={pageContainerStyle}>
-          {/* 헤더 */}
-          <div css={headerStyle} />
-
           {/* 콘텐츠 영역 */}
           <div css={contentContainerStyle}>
             {/* 슬라이더 영역 */}
