@@ -68,6 +68,7 @@ function ChatBar({
 
   const handleEmoticonShopClick = () => {
     // showToast('이모티콘샵으로 이동합니다', 'info')
+    navigate('/emoticons')
     setShowEmoticonPicker(false)
   }
 

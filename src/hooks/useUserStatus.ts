@@ -28,7 +28,7 @@ export function useUserStatus() {
 
   useEffect(() => {
     fetchUnread()
-    intervalRef.current = window.setInterval(fetchUnread, 10000)
+    intervalRef.current = window.setInterval(fetchUnread, 2000)
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }

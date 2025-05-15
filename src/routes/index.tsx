@@ -35,9 +35,11 @@ import CustomFormView from '../pages/Chat/CustomFormView'
 import ChatHome from '../pages/Chat/ChatHome'
 import ChatRoom from '../pages/Chat/ChatRoom'
 import { useAuthStore } from '../stores/userStore'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Navigate, useParams } from 'react-router-dom'
+import { useSocketMessage } from '../hooks/useSocketMessage'
 
+// 경로별 컴포넌트 렌더링을 위한 헬퍼 함수
 const ChatRoomRoute = () => {
   const { id } = useParams()
   return <ChatRoom chatId={id} />
@@ -49,13 +51,28 @@ const CustomFormMakeRoute = () => {
 }
 
 const CustomFormViewRoute = () => {
-  const { id } = useParams()
-  return <CustomFormView matchId={id} />
+  const { formId, matchId } = useParams()
+  return <CustomFormView formId={formId} matchId={matchId} />
 }
+
+// 전역 인증 여부 추적
+let socketInitialized = false
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, hydrated, setUser } = useAuthStore()
   const navigate = useNavigate()
+
+  // 웹소켓 연결 - 한 번만 초기화하도록 상태 관리
+  const { isConnected } = useSocketMessage()
+  const [initializing, setInitializing] = useState(!socketInitialized)
+
+  // 웹소켓 초기화 완료 추적
+  useEffect(() => {
+    if (isConnected && initializing) {
+      socketInitialized = true
+      setInitializing(false)
+    }
+  }, [isConnected, initializing])
 
   // hydration 후 user가 null이고 localStorage에 user가 있으면 복원 시도 (임시)
   useEffect(() => {
@@ -82,9 +99,11 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
     return null
   }
 
+  // 인증 확인
   if (!user) {
     return <Navigate to="/onboarding" replace />
   }
+
   return <>{children}</>
 }
 
@@ -218,7 +237,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/chat/custom-form/view/:id',
+    path: '/chat/custom-form/view/:formId/:matchId',
     element: (
       <RequireAuth>
         <CustomFormViewRoute />

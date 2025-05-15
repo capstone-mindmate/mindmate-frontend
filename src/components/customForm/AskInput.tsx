@@ -5,6 +5,8 @@ import { CloseIcon } from '../icon/iconComponents'
 
 interface AskInputProps {
   placeHolder: string
+  value: string
+  onChange: (value: string) => void
   onCloseBtnClick: () => void
 }
 
@@ -52,16 +54,20 @@ const askInputStyles = {
   `,
 }
 
-const AskInput = ({ placeHolder, onCloseBtnClick }: AskInputProps) => {
-  const [inputValue, setInputValue] = useState('')
-  const hasValue = inputValue.length > 0
+const AskInput = ({
+  placeHolder,
+  value,
+  onChange,
+  onCloseBtnClick,
+}: AskInputProps) => {
+  const hasValue = value.length > 0
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value)
+    onChange(e.target.value)
   }
 
   const handleCloseClick = () => {
-    setInputValue('')
+    onChange('')
     onCloseBtnClick()
   }
 
@@ -70,7 +76,7 @@ const AskInput = ({ placeHolder, onCloseBtnClick }: AskInputProps) => {
       <input
         type="text"
         placeholder={placeHolder}
-        value={inputValue}
+        value={value}
         onChange={handleInputChange}
         css={askInputStyles.input(hasValue)}
       />
