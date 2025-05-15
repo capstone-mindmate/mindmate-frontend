@@ -26,12 +26,13 @@ export const RegisterContainer = styled.div`
 
 export const RegisterStepContainer = styled.div`
   width: 100%;
+  height: 100%;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  @media (max-width: 884px) {
+  ${media.tablet} {
     width: 100%;
   }
 `

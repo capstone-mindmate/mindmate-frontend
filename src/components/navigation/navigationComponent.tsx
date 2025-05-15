@@ -124,7 +124,7 @@ const NavigationComponent: React.FC = () => {
   useEffect(() => {
     const handleUnreadCountUpdate = (e: CustomEvent) => {
       const { count } = e.detail as { count: number }
-      console.log('네비게이션: 이벤트로 읽지 않은 메시지 수 업데이트', count)
+      // console.log('네비게이션: 이벤트로 읽지 않은 메시지 수 업데이트', count)
       updateUnreadCount(count)
     }
 
@@ -152,7 +152,7 @@ const NavigationComponent: React.FC = () => {
     const wasChatPage = location.pathname.includes('/chat')
 
     if (!isChatPage && wasChatPage && isConnected) {
-      console.log('네비게이션: 채팅 페이지에서 나감, 읽지 않은 메시지 수 요청')
+      // console.log('네비게이션: 채팅 페이지에서 나감, 읽지 않은 메시지 수 요청')
       fetchTotalUnreadCount(true) // 강제 업데이트
     }
   }, [location.pathname, isConnected, fetchTotalUnreadCount])
@@ -161,7 +161,7 @@ const NavigationComponent: React.FC = () => {
   useEffect(() => {
     if (!stompClient || !isConnected) return
 
-    console.log('네비게이션: 소켓 연결됨, 초기 읽지 않은 메시지 수 요청')
+    // console.log('네비게이션: 소켓 연결됨, 초기 읽지 않은 메시지 수 요청')
     // 최초 한 번만 요청하도록 스톰프 클라이언트와 연결 상태를 의존성으로 설정
     // 강제 업데이트 옵션 추가
     fetchTotalUnreadCount(true)
@@ -170,15 +170,15 @@ const NavigationComponent: React.FC = () => {
   // totalUnreadCount가 업데이트되면 동기화
   useEffect(() => {
     // 최초 한 번 실행 시에만 콘솔 출력
-    console.log('네비게이션: totalUnreadCount 업데이트됨', totalUnreadCount)
+    // console.log('네비게이션: totalUnreadCount 업데이트됨', totalUnreadCount)
 
     // 값이 0이 아닌 경우에만 업데이트 (초기값 또는 오류 방지)
     if (totalUnreadCount !== undefined && totalUnreadCount > 0) {
-      console.log('네비게이션: 읽지 않은 메시지 수 업데이트', totalUnreadCount)
+      // console.log('네비게이션: 읽지 않은 메시지 수 업데이트', totalUnreadCount)
       updateUnreadCount(totalUnreadCount)
     } else if (totalUnreadCount === 0 && !isFirstLoad) {
       // 첫 로딩이 아닐 때만 0으로 설정 (플리커링 방지)
-      console.log('네비게이션: 읽지 않은 메시지 수 0으로 설정')
+      // console.log('네비게이션: 읽지 않은 메시지 수 0으로 설정')
       updateUnreadCount(0)
     }
   }, [totalUnreadCount, updateUnreadCount, isFirstLoad])
@@ -186,9 +186,9 @@ const NavigationComponent: React.FC = () => {
   // 페이지 로드 시 한 번 강제 요청
   useEffect(() => {
     if (isConnected) {
-      console.log(
-        '네비게이션: 컴포넌트 마운트 시 읽지 않은 메시지 수 강제 요청'
-      )
+      // console.log(
+      //   '네비게이션: 컴포넌트 마운트 시 읽지 않은 메시지 수 강제 요청'
+      // )
       fetchTotalUnreadCount(true)
     }
   }, [isConnected, fetchTotalUnreadCount])

@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useSocketMessage } from '../../hooks/useSocketMessage'
 import { useToast } from '../../components/toast/ToastProvider'
 
@@ -22,9 +22,12 @@ interface CustomFormMakeProps {
 
 const CustomFormMake = ({ matchId }: CustomFormMakeProps) => {
   const navigate = useNavigate()
-  const { stompClient, isConnected } = useSocketMessage()
+  const { stompClient } = useSocketMessage()
   const { showToast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const location = useLocation()
+  const otherProfileImageFromNav = location.state?.profileImage
+  const otherUserNameFromNav = location.state?.userName
 
   // 질문 목록 상태
   const [askList, setAskList] = useState<string[]>(['', '', ''])
@@ -77,7 +80,12 @@ const CustomFormMake = ({ matchId }: CustomFormMakeProps) => {
         })
 
         // 채팅방으로 이동
-        navigate(`/chat/${matchId}`)
+        navigate(`/chat/${matchId}`, {
+          state: {
+            profileImage: otherProfileImageFromNav,
+            userName: otherUserNameFromNav,
+          },
+        })
         return
       }
 
@@ -94,7 +102,13 @@ const CustomFormMake = ({ matchId }: CustomFormMakeProps) => {
       if (res.ok) {
         const data = await res.json()
         console.log('커스텀 폼 생성 성공:', data)
-        navigate(`/chat/${matchId}`, { state: { newCustomForm: data } })
+        navigate(`/chat/${matchId}`, {
+          state: {
+            profileImage: otherProfileImageFromNav,
+            userName: otherUserNameFromNav,
+            newCustomForm: data,
+          },
+        })
       } else {
         throw new Error('커스텀 폼 생성에 실패했습니다.')
       }
@@ -112,7 +126,12 @@ const CustomFormMake = ({ matchId }: CustomFormMakeProps) => {
         title="설문지 작성"
         showBackButton={true}
         onBackClick={() => {
-          navigate(`/chat/${matchId}`)
+          navigate(`/chat/${matchId}`, {
+            state: {
+              profileImage: otherProfileImageFromNav,
+              userName: otherUserNameFromNav,
+            },
+          })
         }}
         actionText="완료"
         isActionDisabled={isSubmitting}

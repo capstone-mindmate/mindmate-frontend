@@ -1,49 +1,24 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
-
-// 반응형 디자인을 위한 브레이크포인트 정의
-const breakpoints = {
-  mobile: '478px',
-  tablet: '600px',
-  desktop: '884px',
-}
-
-// 미디어 쿼리 헬퍼 함수
-const media = {
-  mobile: (styles: string) => `
-    @media (max-width: ${breakpoints.mobile}) {
-      ${styles}
-    }
-  `,
-  tablet: (styles: string) => `
-    @media (max-width: ${breakpoints.tablet}) {
-      ${styles}
-    }
-  `,
-  desktop: (styles: string) => `
-    @media (max-width: ${breakpoints.desktop}) {
-      ${styles}
-    }
-  `,
-}
+import { media } from './breakpoints'
 
 export const RootContainer = css`
-  width: 100%;
+  width: 884px;
   height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+
+  ${media.tablet} {
+    width: 100%;
+  }
 `
 
 export const OnboardingContainer = css`
-  width: 884px;
+  width: 100%;
   height: 100%;
   box-sizing: border-box;
-
-  ${media.tablet(`
-    width: 100%;
-  `)}
 `
 
 // 페이지 컨테이너
@@ -113,15 +88,15 @@ export const textContainerStyle = css`
   margin-top: 0px;
   box-sizing: border-box;
 
-  ${media.tablet(`
+  ${media.tablet} {
     // padding: 16px;
     // margin-top: 30px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     // padding: 12px;
     // margin-top: 20px;
-  `)}
+  }
 `
 
 //텍스트 페이드 효과
@@ -142,15 +117,15 @@ export const head2BoldStyle = css`
   overflow-wrap: break-word; // 긴 단어 줄바꿈
   word-wrap: break-word; // 긴 단어 줄바꿈
 
-  ${media.tablet(`
+  ${media.tablet} {
     font-size: 22px;
     margin-bottom: 6px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     font-size: 20px;
     margin-bottom: 4px;
-  `)}
+  }
 `
 
 export const body2ReStyle = css`
@@ -162,13 +137,13 @@ export const body2ReStyle = css`
   overflow-wrap: break-word; // 긴 단어 줄바꿈
   word-wrap: break-word; // 긴 단어 줄바꿈
 
-  ${media.tablet(`
+  ${media.tablet} {
     font-size: 13px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     font-size: 12px;
-  `)}
+  }
 `
 
 // 이모티콘
@@ -181,13 +156,13 @@ export const emoticonContainerStyle = css`
   padding: 20px 0;
   position: relative;
 
-  ${media.tablet(`
+  ${media.tablet} {
     padding: 16px 0;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     padding: 12px 0;
-  `)}
+  }
 `
 
 // 추가된 이모티콘 슬라이드 스타일
@@ -211,15 +186,15 @@ export const progressBarContainerStyle = css`
   margin-bottom: 20px;
   margin-top: 20px;
 
-  ${media.tablet(`
+  ${media.tablet} {
     margin-bottom: 16px;
     margin-top: 16px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     margin-bottom: 12px;
     margin-top: 12px;
-  `)}
+  }
 `
 
 export const progressBarDotsContainerStyle = css`
@@ -227,9 +202,9 @@ export const progressBarDotsContainerStyle = css`
   gap: 8px;
   justify-content: center;
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     gap: 6px;
-  `)}
+  }
 `
 
 export const progressDotStyle = (isActive: boolean) => css`
@@ -241,17 +216,17 @@ export const progressDotStyle = (isActive: boolean) => css`
   border: none;
   cursor: pointer;
 
-  ${media.tablet(`
+  ${media.tablet} {
     width: ${isActive ? '30px' : '7px'};
     height: 10px;
     border-radius: 7px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     width: ${isActive ? '25px' : '6px'};
     height: 8px;
     border-radius: 6px;
-  `)}
+  }
 `
 
 // 버튼 스타일
@@ -262,14 +237,14 @@ export const buttonContainerStyle = css`
   justify-content: center;
   position: absolute;
   bottom: 50px;
-  ${media.tablet(`
+  ${media.tablet} {
     // padding: 0 0 70px;
     // margin: 0 24px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     // padding: 0 0 100px;
-  `)}
+  }
 `
 
 export const googleButtonStyle = css`
@@ -285,15 +260,15 @@ export const googleButtonStyle = css`
   font-size: 14px;
   color: #333;
 
-  ${media.tablet(`
+  ${media.tablet} {
     height: 40px;
     font-size: 13px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     height: 36px;
     font-size: 12px;
-  `)}
+  }
 `
 
 export const iconStyle = css`
@@ -301,13 +276,13 @@ export const iconStyle = css`
   width: 18px;
   height: 18px;
 
-  ${media.tablet(`
+  ${media.tablet} {
     width: 16px;
     height: 16px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     width: 14px;
     height: 14px;
-  `)}
+  }
 `

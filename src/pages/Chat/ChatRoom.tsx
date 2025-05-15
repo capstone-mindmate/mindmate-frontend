@@ -27,6 +27,7 @@ import {
 
 import CustomFormBubbleSend from '../../components/chat/CustomFormBubbleSend'
 import CustomFormBubbleReceive from '../../components/chat/CustomFormBubbleReceive'
+import { a } from 'vitest/dist/chunks/suite.d.FvehnV49.js'
 
 // 메시지 타입 정의
 interface BaseMessage {
@@ -88,10 +89,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const [isRoomConnected, setIsRoomConnected] = useState(false)
   const [isLoadingMessages, setIsLoadingMessages] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const otherUserNameFromNav = location.state?.userName
-  const [otherUserName, setOtherUserName] = useState(
-    otherUserNameFromNav || '상대방'
-  )
   const [isTyping, setIsTyping] = useState(false)
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -100,38 +97,60 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const [availableEmoticons, setAvailableEmoticons] = useState<any[]>([])
   const [customForms, setCustomForms] = useState<any[]>([])
   const [toastBoxes, setToastBoxes] = useState<any[]>([])
-  const myUserId = user?.id || user?.userId
+  const myUserId = user?.userId
   const typingTimeoutRef = useRef<any>(null)
   const otherProfileImageFromNav = location.state?.profileImage
+  const otherUserNameFromNav = location.state?.userName
+  const [otherUserName, setOtherUserName] = useState(
+    otherUserNameFromNav || '상대방'
+  )
   const subscriptionsRef = useRef<any[]>([])
   const loadAttemptRef = useRef(0)
+  const matchingIdFromNav = location.state?.matchingId
+
+  const messageRefs = useRef<{ [id: string]: HTMLDivElement | null }>({})
 
   // 메시지 파싱 함수 (type별로 필요한 필드 보완)
-  const parseMessage = (msg: any): Message => {
-    // 서버에서 emoticonId, emoticonName, emoticonUrl 등으로 내려올 수 있음
+  const parseMessage = (
+    msg: any
+  ): Message & {
+    isCustomFormMine?: boolean
+    isCustomFormAnswered?: boolean
+    isCustomFormResponder?: boolean
+  } => {
     let type = msg.type
     if (typeof type === 'string') type = type.toUpperCase()
 
+    // user가 없거나 userId가 없으면 안내
+    if (!myUserId) {
+      console.warn('내 유저 정보가 올바르지 않습니다. user:', user)
+    }
+
     const baseMessage = {
       id: msg.id || msg.messageId || `msg-${Date.now()}`,
-      isMe: (msg.senderId ?? msg.userId ?? msg.creatorId) === myUserId,
+      isMe: msg.senderId === myUserId, // userId만 비교
       timestamp: msg.timestamp || msg.createdAt || '',
       isRead: msg.isRead ?? false,
     }
 
     // 타입에 따라 다른 메시지 객체 반환
     if (type === 'CUSTOM_FORM') {
+      const customForm = msg.customForm || {
+        id: msg.formId || `custom-form-${Date.now()}`,
+        items: msg.items || [],
+        answered: msg.answered || false,
+        creatorId: msg.creatorId,
+        responderId: msg.responderId,
+      }
       return {
         ...baseMessage,
         type: 'CUSTOM_FORM',
         content: msg.content || msg.message || '커스텀 폼',
-        // 항상 customForm 객체 제공 (없는 경우에도 기본값 설정)
-        customForm: msg.customForm || {
-          id: msg.formId || `custom-form-${Date.now()}`,
-          items: msg.items || [],
-          answered: msg.answered || false,
-        },
-      } as CustomFormMessage
+        customForm,
+        isCustomFormMine: customForm.creatorId === myUserId,
+        isCustomFormAnswered: !!customForm.answered,
+        isCustomFormResponder: customForm.responderId === myUserId,
+      }
     } else if (type === 'EMOTICON') {
       return {
         ...baseMessage,
@@ -258,14 +277,10 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     loadAttemptRef.current += 1
 
     try {
-      // 지수 백오프: 재시도 시 대기 시간 증가
       if (loadAttemptRef.current > 1) {
         const backoffDelay = Math.min(
           1000 * Math.pow(1.5, loadAttemptRef.current - 1),
           10000
-        )
-        console.log(
-          `메시지 로드 ${loadAttemptRef.current}번째 시도, ${backoffDelay}ms 대기 후 재시도...`
         )
         await new Promise((resolve) => setTimeout(resolve, backoffDelay))
       }
@@ -292,22 +307,13 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       setMessages(
         Array.isArray(data.messages) ? data.messages.map(parseMessage) : []
       )
-      // 성공 시 시도 횟수 리셋
       loadAttemptRef.current = 0
       setErrorMessage(null)
     } catch (e) {
       const error = e as Error
       console.error('메시지 조회 실패:', error)
-
       if (loadAttemptRef.current < 3) {
-        // 최대 3번 시도
-        console.log(`메시지 로드 실패, ${loadAttemptRef.current}/3회 시도`)
-        // 자동 재시도를 위한 상태만 업데이트 (UI에는 오류 표시 안함)
-        if (loadAttemptRef.current < 3) {
-          setTimeout(() => fetchMessages(), 1000 * loadAttemptRef.current)
-        } else {
-          setErrorMessage(error.message)
-        }
+        setTimeout(() => fetchMessages(), 1000 * loadAttemptRef.current)
       } else {
         setErrorMessage(error.message)
       }
@@ -359,16 +365,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const onRead = (msg: any) => {
     try {
       const data = JSON.parse(msg.body)
-      console.log('onRead messageId:', data.messageId, typeof data.messageId)
-      setMessages((prev) => {
-        console.log(
-          'messages ids:',
-          prev.map((m) => [m.id, typeof m.id])
-        )
-        return prev.map(
-          (m) => (m.id == data.messageId ? { ...m, isRead: true } : m) // ==로 비교(타입 불일치 방지)
-        )
-      })
+      if (data.userId !== myUserId) {
+        setMessages((prev) => prev.map((m) => ({ ...m, isRead: true })))
+      }
     } catch (error) {
       console.error('읽음 처리 알림 오류:', error)
     }
@@ -378,7 +377,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const onCustomForm = (msg: any) => {
     try {
       const data = JSON.parse(msg.body)
-      console.log('커스텀 폼 메시지 수신:', data)
 
       // 데이터 형식 검증 및 정규화
       if (!data.id) {
@@ -402,7 +400,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         if (!chatId) return false
 
         try {
-          console.log('채팅방 ID로 모든 커스텀폼 조회:', chatId)
           const response = await fetchWithRefresh(
             `http://localhost/api/custom-forms/chat-room/${chatId}`,
             {
@@ -413,7 +410,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
           if (response.ok) {
             const allForms = await response.json()
-            console.log('채팅방 커스텀폼 목록 조회 성공:', allForms)
 
             // 가장 최근 폼부터 검색
             if (Array.isArray(allForms) && allForms.length > 0) {
@@ -434,7 +430,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
               // 가장 가까운 타임스탬프의 폼 선택
               const matchedForm = allForms[0]
-              console.log('메시지와 시간이 가장 가까운 폼:', matchedForm)
 
               if (matchedForm) {
                 // 폼 데이터 상태 업데이트
@@ -513,7 +508,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           if (response.ok) {
             // 서버 응답 성공
             const formData = await response.json()
-            console.log('폼 데이터 조회 성공:', formData)
 
             // 유효한 서버 데이터로 customForm 업데이트
             data.customForm = {
@@ -631,7 +625,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const onEmoticon = (msg: any) => {
     try {
       const data = JSON.parse(msg.body)
-      console.log('onEmoticon received:', data)
       setMessages((prev) => [...prev, parseMessage(data)])
       markAsRead()
     } catch (error) {
@@ -664,25 +657,25 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       } catch (error) {
         console.error('읽음 처리 오류:', error)
         // 웹소켓 실패 시 REST API로 읽음 처리 시도
-        markAsReadFallback()
+        // markAsReadFallback()
       }
     } else if (chatId) {
       // 웹소켓 연결 안되면 REST API로 읽음 처리
-      markAsReadFallback()
+      // markAsReadFallback()
     }
   }
 
   // REST API를 사용한 읽음 처리 대체 함수
-  const markAsReadFallback = async () => {
-    try {
-      await fetchWithRefresh(`http://localhost/api/chat/rooms/${chatId}/read`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-    } catch (error) {
-      console.error('REST API 읽음 처리 실패:', error)
-    }
-  }
+  // const markAsReadFallback = async () => {
+  //   try {
+  //     await fetchWithRefresh(`http://localhost/api/chat/rooms/${chatId}/read`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //     })
+  //   } catch (error) {
+  //     console.error('REST API 읽음 처리 실패:', error)
+  //   }
+  // }
 
   // 브라우저 탭 활성화 시 읽음 처리
   useEffect(() => {
@@ -774,7 +767,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
   // 이모티콘 전송 함수
   const sendEmoticon = (emoticonId: string | number) => {
-    console.log('sendEmoticon called:', emoticonId, chatId)
     if (stompClient && stompClient.connected && chatId) {
       try {
         stompClient.publish({
@@ -783,36 +775,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         })
       } catch (error) {
         console.error('이모티콘 전송 오류:', error)
-        // 실패 시 REST API 대체 전송 로직 추가 가능
-      }
-    }
-  }
-
-  // 커스텀 폼 전송 함수
-  const sendCustomForm = (questions: string[]) => {
-    if (stompClient && stompClient.connected && chatId) {
-      try {
-        stompClient.publish({
-          destination: '/app/chat.customform.create',
-          body: JSON.stringify({ chatRoomId: chatId, questions }),
-        })
-      } catch (error) {
-        console.error('커스텀 폼 전송 오류:', error)
-        // 실패 시 REST API 대체 전송 로직 추가 가능
-      }
-    }
-  }
-
-  // 커스텀 폼 응답 전송 함수
-  const respondCustomForm = (formId: number, answers: string[]) => {
-    if (stompClient && stompClient.connected && chatId) {
-      try {
-        stompClient.publish({
-          destination: '/app/chat.customform.respond',
-          body: JSON.stringify({ formId, answers }),
-        })
-      } catch (error) {
-        console.error('커스텀 폼 응답 전송 오류:', error)
         // 실패 시 REST API 대체 전송 로직 추가 가능
       }
     }
@@ -868,6 +830,30 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     fetchMessages()
   }
 
+  // 디버그용 IntersectionObserver: 메시지가 화면에 들어오면 콘솔에 정보 출력
+  useEffect(() => {
+    if (!messages.length) return
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const messageId = entry.target.getAttribute('data-message-id')
+            if (messageId) {
+              messages.find((m) => m.id === messageId)
+            }
+          }
+        })
+      },
+      { threshold: 0.7 }
+    )
+
+    Object.values(messageRefs.current).forEach((ref) => {
+      if (ref) observer.observe(ref)
+    })
+
+    return () => observer.disconnect()
+  }, [messages])
+
   return (
     <RootContainer>
       <TopBar
@@ -909,7 +895,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
               style={{
                 marginTop: '16px',
                 padding: '8px 16px',
-                backgroundColor: '#f39c12',
+                backgroundColor: '#392111',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
@@ -924,10 +910,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
             {messages.map((message: any, index) => {
               // 상대방 프로필 이미지 추출
               const otherProfileImage =
-                message.profileImage ||
-                message.senderProfileImage ||
-                otherProfileImageFromNav ||
-                '/public/image.png'
+                otherProfileImageFromNav || '/default-profile-image.png'
 
               // 시스템 메시지는 렌더링 안함
               if (message.type === 'SYSTEM') {
@@ -937,25 +920,37 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
               // 이모티콘 메시지
               if (message.type === 'EMOTICON') {
                 return (
-                  <Bubble
-                    key={`${message.id}-emoticon-${message.timestamp || ''}`}
-                    isMe={message.isMe}
-                    timestamp={formatKoreanTime(message.timestamp)}
-                    showTime={true}
-                    isLastMessage={index === messages.length - 1}
-                    isRead={message.isRead}
-                    isContinuous={false}
-                    profileImage={message.isMe ? undefined : otherProfileImage}
+                  <div
+                    key={message.id}
+                    ref={(el) => {
+                      messageRefs.current[message.id] = el
+                    }}
+                    data-message-id={message.id}
                   >
-                    <EmoticonWrapper>
-                      <EmoticonComponent
-                        type={message.emoticonType}
-                        size="large"
-                        inChat={true}
-                        alt={`${message.emoticonType} 이모티콘`}
-                      />
-                    </EmoticonWrapper>
-                  </Bubble>
+                    <Bubble
+                      isMe={message.isMe}
+                      timestamp={formatKoreanTime(message.timestamp)}
+                      showTime={true}
+                      isLastMessage={index === messages.length - 1}
+                      isRead={message.isRead}
+                      isContinuous={false}
+                      profileImage={
+                        message.isMe
+                          ? undefined
+                          : otherProfileImageFromNav ||
+                            '/default-profile-image.png'
+                      }
+                    >
+                      <EmoticonWrapper>
+                        <EmoticonComponent
+                          type={message.emoticonType}
+                          size="large"
+                          inChat={true}
+                          alt={`${message.emoticonType} 이모티콘`}
+                        />
+                      </EmoticonWrapper>
+                    </Bubble>
+                  </div>
                 )
               }
 
@@ -974,7 +969,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                       // 채팅방의 모든 폼 데이터 조회
                       if (chatId) {
-                        console.log('채팅방 ID로 모든 커스텀폼 조회:', chatId)
                         const response = await fetchWithRefresh(
                           `http://localhost/api/custom-forms/chat-room/${chatId}`,
                           {
@@ -985,10 +979,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                         if (response.ok) {
                           const allForms = await response.json()
-                          console.log(
-                            '채팅방 커스텀폼 목록 조회 성공:',
-                            allForms
-                          )
 
                           // 메시지와 일치하는 커스텀폼 찾기
                           let matchedForm = null
@@ -1012,11 +1002,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                             // 가장 가까운 타임스탬프의 폼 선택
                             matchedForm = allForms[0]
-
-                            console.log(
-                              '메시지와 시간이 가장 가까운 폼:',
-                              matchedForm
-                            )
                           }
 
                           if (matchedForm) {
@@ -1061,16 +1046,28 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                             // 상대방이 보낸 폼이고 아직 내가 답변 안했으면 답변 페이지로
                             if (!message.isMe && !isAnswered) {
+                              const formId =
+                                message.customForm?.id || matchingIdFromNav
                               navigate(
-                                `/chat/custom-form/view/${matchedForm.id}/${chatId}`
+                                `/chat/custom-form/view/${formId}/${chatId}`,
+                                {
+                                  state: {
+                                    profileImage: otherProfileImage,
+                                    userName: otherUserName,
+                                  },
+                                }
                               )
                               return
                             }
 
-                            // 이미 답변한 폼이면 결과 보기
-                            showToast(
-                              '설문지 답변 기능이 준비 중입니다.',
-                              'info'
+                            navigate(
+                              `/chat/custom-form/done/${matchedForm.id}/${chatId}`,
+                              {
+                                state: {
+                                  profileImage: otherProfileImage,
+                                  userName: otherUserName,
+                                },
+                              }
                             )
                             return true
                           }
@@ -1106,7 +1103,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                     if (response.ok) {
                       const formData = await response.json()
-                      console.log('폼 데이터 확인 성공:', formData)
 
                       // 폼 데이터 상태 업데이트
                       setCustomForms((prev) => {
@@ -1153,12 +1149,24 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                       // 상대방이 보낸 폼이고 아직 내가 답변 안했으면 답변 페이지로
                       if (!message.isMe && !isAnswered) {
-                        navigate(`/chat/custom-form/view/${formId}/${chatId}`)
+                        const formId =
+                          message.customForm?.id || matchingIdFromNav
+                        navigate(`/chat/custom-form/view/${formId}/${chatId}`, {
+                          state: {
+                            profileImage: otherProfileImage,
+                            userName: otherUserName,
+                          },
+                        })
                         return
                       }
 
                       // 이미 답변한 폼이면 결과 보기
-                      showToast('설문지 답변 기능이 준비 중입니다.', 'info')
+                      navigate(`/chat/custom-form/done/${formId}/${chatId}`, {
+                        state: {
+                          profileImage: otherProfileImage,
+                          userName: otherUserName,
+                        },
+                      })
                     } else {
                       // API 응답 실패 시 채팅방 ID로 폼 데이터 조회
                       console.error(
@@ -1195,12 +1203,23 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                   // 상대방이 보낸 폼이고 아직 내가 답변 안했으면 답변 페이지로
                   if (!message.isMe && !answered) {
-                    navigate(`/chat/custom-form/view/${formId}/${chatId}`)
+                    const formId = message.customForm?.id || matchingIdFromNav
+                    navigate(`/chat/custom-form/view/${formId}/${chatId}`, {
+                      state: {
+                        profileImage: otherProfileImage,
+                        userName: otherUserName,
+                      },
+                    })
                     return
                   }
 
                   // 이미 답변한 폼이면 결과 보기
-                  showToast('설문지 답변 기능이 준비 중입니다.', 'info')
+                  navigate(`/chat/custom-form/done/${formId}/${chatId}`, {
+                    state: {
+                      profileImage: otherProfileImage,
+                      userName: otherUserName,
+                    },
+                  })
                 }
 
                 // customForm 필드가 없으면 CustomFormBubbleSend 컴포넌트로 표시
@@ -1214,7 +1233,10 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                       <CustomFormBubbleSend
                         isMe={message.isMe}
                         profileImage={
-                          message.isMe ? undefined : otherProfileImage
+                          message.isMe
+                            ? undefined
+                            : otherProfileImageFromNav ||
+                              '/default-profile-image.png'
                         }
                         timestamp={formatKoreanTime(message.timestamp)}
                         showTime={true}
@@ -1242,7 +1264,10 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                       <CustomFormBubbleReceive
                         isMe={message.isMe}
                         profileImage={
-                          message.isMe ? undefined : otherProfileImage
+                          message.isMe
+                            ? undefined
+                            : otherProfileImageFromNav ||
+                              '/default-profile-image.png'
                         }
                         timestamp={formatKoreanTime(message.timestamp)}
                         showTime={true}
@@ -1265,7 +1290,10 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                       <CustomFormBubbleSend
                         isMe={message.isMe}
                         profileImage={
-                          message.isMe ? undefined : otherProfileImage
+                          message.isMe
+                            ? undefined
+                            : otherProfileImageFromNav ||
+                              '/default-profile-image.png'
                         }
                         timestamp={formatKoreanTime(message.timestamp)}
                         showTime={true}
@@ -1287,18 +1315,30 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
               // 기본 텍스트 메시지
               return (
-                <Bubble
-                  key={`${message.id}-text-${message.timestamp || ''}`}
-                  isMe={message.isMe}
-                  timestamp={formatKoreanTime(message.timestamp)}
-                  showTime={true}
-                  isLastMessage={index === messages.length - 1}
-                  isRead={message.isRead}
-                  isContinuous={false}
-                  profileImage={message.isMe ? undefined : otherProfileImage}
+                <div
+                  key={message.id}
+                  ref={(el) => {
+                    messageRefs.current[message.id] = el
+                  }}
+                  data-message-id={message.id}
                 >
-                  {message.content}
-                </Bubble>
+                  <Bubble
+                    isMe={message.isMe}
+                    timestamp={formatKoreanTime(message.timestamp)}
+                    showTime={true}
+                    isLastMessage={index === messages.length - 1}
+                    isRead={message.isRead}
+                    isContinuous={false}
+                    profileImage={
+                      message.isMe
+                        ? undefined
+                        : otherProfileImageFromNav ||
+                          '/default-profile-image.png'
+                    }
+                  >
+                    {message.content}
+                  </Bubble>
+                </div>
               )
             })}
             {isTyping && (
@@ -1306,7 +1346,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                 isMe={false}
                 timestamp=""
                 showTime={false}
-                profileImage="/public/image.png"
+                profileImage={
+                  otherProfileImageFromNav || '/default-profile-image.png'
+                }
               >
                 <div style={{ padding: '4px 8px' }}>
                   <span style={{ fontSize: '14px' }}>입력 중...</span>
@@ -1325,7 +1367,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           disabled={
             !stompClient || !isConnected || isLoadingMessages || !!errorMessage
           }
-          chatId={chatId}
+          chatId={matchingIdFromNav}
         />
       </ChatBarWrapper>
     </RootContainer>

@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect, useRef } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { useSocketMessage } from '../../hooks/useSocketMessage'
 import { useToast } from '../../components/toast/ToastProvider'
@@ -26,10 +26,14 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<any>(null)
 
+  const location = useLocation()
   const navigate = useNavigate()
   const chatRoomId = matchId
   const { stompClient, isConnected } = useSocketMessage()
   const { showToast } = useToast()
+
+  const otherProfileImageFromNav = location.state?.profileImage
+  const otherUserNameFromNav = location.state?.userName
 
   // 폼 상세 조회
   useEffect(() => {
@@ -105,7 +109,12 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
         })
 
         // 채팅방으로 이동
-        navigate(`/chat/${chatRoomId}`)
+        navigate(`/chat/${chatRoomId}`, {
+          state: {
+            profileImage: otherProfileImageFromNav,
+            userName: otherUserNameFromNav,
+          },
+        })
         return
       }
 
@@ -126,7 +135,12 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
       if (res.ok) {
         // 시스템 메시지도 REST API로 전송
         await sendSystemMessageREST(chatRoomId)
-        navigate(`/chat/${chatRoomId}`)
+        navigate(`/chat/${chatRoomId}`, {
+          state: {
+            profileImage: otherProfileImageFromNav,
+            userName: otherUserNameFromNav,
+          },
+        })
       } else {
         throw new Error('설문지 응답에 실패했습니다.')
       }
@@ -179,7 +193,14 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
       <TopBar
         title="답변 작성"
         showBackButton={true}
-        onBackClick={() => navigate(`/chat/${chatRoomId}`)}
+        onBackClick={() =>
+          navigate(`/chat/${chatRoomId}`, {
+            state: {
+              profileImage: otherProfileImageFromNav,
+              userName: otherUserNameFromNav,
+            },
+          })
+        }
         isActionDisabled={!hasAllAnswers() || isSubmitting}
         actionText="완료"
         onActionClick={handleSubmit}

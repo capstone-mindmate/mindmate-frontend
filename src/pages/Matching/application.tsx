@@ -9,50 +9,7 @@ import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { css } from '@emotion/react'
 
 import { RootContainer, MatchingContainer, ApplicationList } from './style'
-
-// 더미 신청자 데이터
-const dummyApplicationsData = [
-  {
-    id: 1,
-    profileImage: '/public/image.png',
-    name: '열정가득 대학생',
-    department: '소프트웨어학과',
-    makeDate: '2023-04-26',
-    message:
-      '안녕하세요! 해당 주제에 대해 관심이 많아 신청합니다. 함께 이야기 나누고 싶습니다.',
-    isAccepted: false,
-  },
-  {
-    id: 2,
-    profileImage: '/public/image.png',
-    name: '알고리즘 좋아요',
-    department: '컴퓨터공학과',
-    makeDate: '2023-04-25',
-    message:
-      '저도 같은 고민을 하고 있어서 함께 이야기 나누고 싶어요. 최근에 관련 분야 인턴을 했었는데 도움이 될 것 같습니다!',
-    isAccepted: false,
-  },
-  {
-    id: 3,
-    profileImage: '/public/image.png',
-    name: '미래의 개발자',
-    department: '정보통신학과',
-    makeDate: '2023-04-25',
-    message:
-      '해당 주제에 대해 의견을 나누고 싶습니다. 비슷한 경험이 있어서 서로 도움이 될 것 같아요.',
-    isAccepted: false,
-  },
-  {
-    id: 4,
-    profileImage: '/public/image.png',
-    name: '취업준비생',
-    department: '소프트웨어학과',
-    makeDate: '2023-04-24',
-    message:
-      '같은 고민을 하고 있어서 신청합니다. 함께 이야기하면 좋은 해결책을 찾을 수 있을 것 같아요!',
-    isAccepted: false,
-  },
-]
+import { useToast } from '../../components/toast/ToastProvider'
 
 interface MatchedApplicationProps {}
 
@@ -81,6 +38,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
   const [selectedApplication, setSelectedApplication] =
     useState<WaitingUser | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const { showToast } = useToast()
 
   useEffect(() => {
     // 매칭 신청자 목록 조회 API 호출
@@ -101,7 +59,10 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
         )
 
         if (!res.ok) {
-          throw new Error('매칭 신청자 목록을 불러오지 못했습니다.')
+          const errorData = await res.json()
+          throw new Error(
+            errorData.message || '매칭 신청자 목록을 불러오지 못했습니다.'
+          )
         }
 
         const data = await res.json()
@@ -110,8 +71,8 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
         } else {
           setApplications([])
         }
-      } catch (error) {
-        console.error('매칭 신청자 목록 조회 실패:', error)
+      } catch (error: any) {
+        showToast(error.message, 'error')
       } finally {
         setIsLoading(false)
       }
@@ -146,17 +107,29 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
       )
 
       if (!res.ok) {
-        throw new Error('매칭 수락에 실패했습니다.')
+        const errorData = await res.json()
+        throw new Error(errorData.message || '매칭 수락에 실패했습니다.')
       }
 
       // 성공 시 모달 닫기 및 리스트 새로고침
       handleCloseModal()
 
-      // 성공 메시지 또는 알림 표시 (실제 구현 필요)
-      navigate('/matching/matched')
-    } catch (error) {
-      console.error('매칭 수락 실패:', error)
-      alert('매칭 수락에 실패했습니다. 다시 시도해주세요.')
+      // 성공 메시지 표시 및 5초 카운트다운
+      let countdown = 5
+      const timer = setInterval(() => {
+        countdown--
+        if (countdown > 0) {
+          showToast(`${countdown}초 뒤에 닫힙니다.`, 'success')
+        } else {
+          clearInterval(timer)
+          navigate('/matching/matched')
+        }
+      }, 1000)
+
+      // 초기 메시지 표시
+      showToast(`${countdown}초 뒤에 닫힙니다.`, 'success')
+    } catch (error: any) {
+      showToast(error.message, 'error')
     }
   }
 
@@ -195,7 +168,12 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
 
   return (
     <RootContainer>
-      <TopBar title="매칭 신청 정보" showBackButton actionText="" />
+      <TopBar
+        title="매칭 신청 정보"
+        showBackButton
+        actionText=""
+        onBackClick={() => navigate('/matching')}
+      />
       <MatchingContainer>
         <ApplicationList pageType="matched">
           {isLoading ? (

@@ -32,6 +32,7 @@ interface ChatItemType {
   isRead: boolean
   unreadCount: number
   isCompleted: boolean
+  matchingId: number
 }
 
 const ChatHome = ({ matchId }: ChatHomeProps) => {
@@ -109,9 +110,12 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
   const handleChatItemClick = (
     itemId: string,
     profileImage: string,
-    userName: string
+    userName: string,
+    matchingId: number
   ) => {
-    navigate(`/chat/${itemId}`, { state: { profileImage, userName } })
+    navigate(`/chat/${itemId}`, {
+      state: { profileImage, userName, matchingId },
+    })
   }
 
   // 채팅방 목록 로드 함수 (실패 시 재시도 로직 포함)
@@ -173,6 +177,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
           isRead: (item.unreadCount ?? 0) === 0,
           unreadCount: item.unreadCount ?? 0,
           isCompleted: item.chatRoomStatus === 'CLOSED',
+          matchingId: item.matchingId ?? 0,
         }))
         setChatItems(mapped)
         // 성공적으로 로드되면 시도 횟수 리셋
@@ -293,7 +298,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
               style={{
                 marginTop: '16px',
                 padding: '8px 16px',
-                backgroundColor: '#f39c12',
+                backgroundColor: '#392111',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
@@ -317,13 +322,15 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
               isRead={item.isRead}
               unreadCount={item.unreadCount}
               borderBottom={index < filteredChatItems.length - 1}
-              onClick={() =>
+              onClick={() => {
+                console.log('matchingId:', item.matchingId)
                 handleChatItemClick(
                   item.id,
                   'http://localhost/api' + item.profileImage,
-                  item.userName
+                  item.userName,
+                  item.matchingId
                 )
-              }
+              }}
             />
           ))
         ) : (
@@ -334,7 +341,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
               color: '#888',
             }}
           >
-            해당하는 채팅방이 없습니다.
+            채팅방이 없습니다.
           </div>
         )}
       </ChatContainer>

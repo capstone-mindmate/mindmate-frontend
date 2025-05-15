@@ -36,8 +36,9 @@ import ChatHome from '../pages/Chat/ChatHome'
 import ChatRoom from '../pages/Chat/ChatRoom'
 import { useAuthStore } from '../stores/userStore'
 import { useEffect, useState } from 'react'
-import { useNavigate, Navigate, useParams } from 'react-router-dom'
+import { useNavigate, Navigate, useParams, useLocation } from 'react-router-dom'
 import { useSocketMessage } from '../hooks/useSocketMessage'
+import CustomFormDone from '../pages/Chat/CustomFormDone'
 
 // 경로별 컴포넌트 렌더링을 위한 헬퍼 함수
 const ChatRoomRoute = () => {
@@ -46,12 +47,23 @@ const ChatRoomRoute = () => {
 }
 
 const CustomFormMakeRoute = () => {
-  const { id } = useParams()
-  return <CustomFormMake matchId={id} />
+  const { matchId } = useParams()
+  return <CustomFormMake matchId={matchId} />
+}
+
+const CustomFormDoneRoute = () => {
+  const { formId, matchId: matchIdFromParams } = useParams()
+  const location = useLocation()
+  const matchIdFromState = location.state?.matchingId
+  const matchId = matchIdFromParams || matchIdFromState
+  return <CustomFormDone formId={formId} matchId={matchId} />
 }
 
 const CustomFormViewRoute = () => {
-  const { formId, matchId } = useParams()
+  const { formId, matchId: matchIdFromParams } = useParams()
+  const location = useLocation()
+  const matchIdFromState = location.state?.matchingId
+  const matchId = matchIdFromParams || matchIdFromState
   return <CustomFormView formId={formId} matchId={matchId} />
 }
 
@@ -229,7 +241,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/chat/custom-form/make/:id',
+    path: '/chat/custom-form/make/:matchId',
     element: (
       <RequireAuth>
         <CustomFormMakeRoute />
@@ -241,6 +253,14 @@ export const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <CustomFormViewRoute />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/chat/custom-form/done/:formId/:matchId',
+    element: (
+      <RequireAuth>
+        <CustomFormDoneRoute />
       </RequireAuth>
     ),
   },

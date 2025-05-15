@@ -10,8 +10,13 @@ async function fetchMe() {
     credentials: 'include',
   })
 
-  if (!res.ok) throw new Error(res.statusText)
-  return res.json()
+  try {
+    if (!res.ok) throw new Error(res.statusText)
+    return res.json()
+  } catch (error) {
+    console.error('프로필 조회 실패:', error)
+    throw error
+  }
 }
 
 export function useUserQuery() {

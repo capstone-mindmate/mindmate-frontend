@@ -49,13 +49,17 @@ const initializeConnection = (token: string): Promise<Client | null> => {
         },
         debug: (str) => {
           if (import.meta.env.MODE !== 'production') {
-            console.log('STOMP: ' + str)
+            // console.log('STOMP: ' + str)
           }
         },
         // reconnectDelay에 함수 대신 고정 값 지정
         reconnectDelay: 5000,
         // 커스텀 재연결 핸들러
         beforeConnect: () => {
+          // 항상 최신 토큰으로 갱신
+          stompClient.connectHeaders = {
+            Authorization: `Bearer ${getTokenCookie('accessToken')}`,
+          }
           const delay = Math.min(
             INITIAL_RECONNECT_DELAY * Math.pow(1.5, connectionAttempts),
             MAX_RECONNECT_DELAY
@@ -69,7 +73,7 @@ const initializeConnection = (token: string): Promise<Client | null> => {
 
       // 연결 시 콜백
       stompClient.onConnect = (frame) => {
-        console.log('웹소켓 연결 성공:', frame)
+        // console.log('웹소켓 연결 성공:', frame)
         connectionAttempts = 0 // 연결 성공 시 시도 횟수 리셋
         globalStompClient = stompClient
         resolve(stompClient)
@@ -77,7 +81,7 @@ const initializeConnection = (token: string): Promise<Client | null> => {
 
       // 오류 처리
       stompClient.onStompError = (frame) => {
-        console.error('STOMP 오류:', frame.headers, frame.body)
+        // console.error('STOMP 오류:', frame.headers, frame.body)
         resolve(null)
       }
 
@@ -89,7 +93,7 @@ const initializeConnection = (token: string): Promise<Client | null> => {
 
           // 최대 시도 횟수 초과 시 (5회)
           if (connectionAttempts >= 5) {
-            console.error('웹소켓 연결 최대 시도 횟수 초과, 연결 중단')
+            // console.error('웹소켓 연결 최대 시도 횟수 초과, 연결 중단')
             resolve(null)
           }
         }
@@ -98,7 +102,7 @@ const initializeConnection = (token: string): Promise<Client | null> => {
       // 연결 활성화
       stompClient.activate()
     } catch (error) {
-      console.error('웹소켓 초기화 오류:', error)
+      // console.error('웹소켓 초기화 오류:', error)
       resolve(null)
     }
   })
@@ -128,7 +132,7 @@ export const useSocketMessage = () => {
     unreadCountTimerRef.current = setInterval(() => {
       // 소켓으로부터 메시지를 받지 못한 경우에만 REST API 사용
       if (!hasReceivedUnreadCountRef.current) {
-        console.log('소켓 응답 없음, REST API로 읽지 않은 메시지 수 백업 요청')
+        // console.log('소켓 응답 없음, REST API로 읽지 않은 메시지 수 백업 요청')
         fetchTotalUnreadCount(token, true) // 강제 API 호출 플래그 전달
       }
 
@@ -180,7 +184,7 @@ export const useSocketMessage = () => {
               (message) => {
                 try {
                   const data = JSON.parse(message.body)
-                  console.log('전체 읽지 않은 메시지:', data)
+                  // console.log('전체 읽지 않은 메시지:', data)
 
                   // 읽지 않은 메시지 수가 숫자인지 확인하고 업데이트
                   // data가 다양한 형식으로 올 수 있으므로 여러 필드 체크
@@ -203,11 +207,11 @@ export const useSocketMessage = () => {
                     count = data.unreadCount
                   }
 
-                  console.log('REST API에서 파싱된 읽지 않은 메시지 수:', count)
+                  // console.log('REST API에서 파싱된 읽지 않은 메시지 수:', count)
 
                   // 이전 값과 같으면 무시
                   if (count === lastUnreadCount) {
-                    console.log('동일한 값으로 업데이트 무시:', count)
+                    // console.log('동일한 값으로 업데이트 무시:', count)
                     return
                   }
 
@@ -226,7 +230,7 @@ export const useSocketMessage = () => {
                   // 소켓으로부터 메시지를 받았음을 표시
                   hasReceivedUnreadCountRef.current = true
                 } catch (e) {
-                  console.error('전체 읽지 않은 메시지 파싱 오류:', e)
+                  // console.error('전체 읽지 않은 메시지 파싱 오류:', e)
                 }
               }
             )
@@ -239,20 +243,13 @@ export const useSocketMessage = () => {
               (message) => {
                 try {
                   const data = JSON.parse(message.body)
-                  console.log('채팅방 읽지 않은 메시지:', data)
+                  // console.log('채팅방 읽지 않은 메시지:', data)
                   // roomId와 unreadCount가 있는지 확인
                   if (data.roomId && typeof data.unreadCount === 'number') {
                     updateRoomUnreadCount(data.roomId, data.unreadCount)
-
-                    // 마지막 API 요청 시간으로부터 충분한 시간이 지났을 때만 요청
-                    const now = Date.now()
-                    if (now - lastApiRequestTime > API_REQUEST_THROTTLE) {
-                      lastApiRequestTime = now
-                      fetchTotalUnreadCount(tokenToUse, true) // 채팅방 메시지 변경 시 강제 갱신
-                    }
                   }
                 } catch (e) {
-                  console.error('채팅방 읽지 않은 메시지 파싱 오류:', e)
+                  // console.error('채팅방 읽지 않은 메시지 파싱 오류:', e)
                 }
               }
             )
@@ -277,13 +274,13 @@ export const useSocketMessage = () => {
           startUnreadCountPolling(tokenToUse)
         } else {
           // 소켓 연결 실패 시 REST API로 대체
-          console.log(
-            '소켓 연결 실패, REST API로 전체 읽지 않은 메시지 수 요청'
-          )
+          // console.log(
+          //   '소켓 연결 실패, REST API로 전체 읽지 않은 메시지 수 요청'
+          // )
           fetchTotalUnreadCount(tokenToUse, true)
         }
       } catch (error) {
-        console.error('웹소켓 연결 오류:', error)
+        // console.error('웹소켓 연결 오류:', error)
 
         // 연결 실패 시에도 읽지 않은 메시지 수는 REST API로 요청
         if (tokenToUse) {
@@ -319,7 +316,7 @@ export const useSocketMessage = () => {
           body: JSON.stringify({ status: 'OFFLINE', activeRoomId: null }),
         })
       } catch (e) {
-        console.error('상태 변경 메시지 전송 실패:', e)
+        // console.error('상태 변경 메시지 전송 실패:', e)
       }
 
       // 모든 구독 해제
@@ -329,7 +326,7 @@ export const useSocketMessage = () => {
             sub.unsubscribe()
           }
         } catch (e) {
-          console.error('구독 해제 실패:', e)
+          // console.error('구독 해제 실패:', e)
         }
       })
 
@@ -363,9 +360,9 @@ export const useSocketMessage = () => {
       !forceUpdate &&
       currentTime - lastApiRequestTime < API_REQUEST_THROTTLE
     ) {
-      console.log(
-        `API 제한: 마지막 요청 후 ${API_REQUEST_THROTTLE / 1000}초 내에 재요청 방지`
-      )
+      // console.log(
+      //   `API 제한: 마지막 요청 후 ${API_REQUEST_THROTTLE / 1000}초 내에 재요청 방지`
+      // )
       return
     }
 
@@ -374,9 +371,9 @@ export const useSocketMessage = () => {
       !forceUpdate &&
       currentTime - lastRequestTimeRef.current < API_REQUEST_THROTTLE
     ) {
-      console.log(
-        `컴포넌트 제한: 마지막 요청 후 ${API_REQUEST_THROTTLE / 1000}초 내에 재요청 방지`
-      )
+      // console.log(
+      //   `컴포넌트 제한: 마지막 요청 후 ${API_REQUEST_THROTTLE / 1000}초 내에 재요청 방지`
+      // )
       return
     }
 
@@ -385,7 +382,7 @@ export const useSocketMessage = () => {
     lastRequestTimeRef.current = currentTime
 
     try {
-      console.log('전체 읽지 않은 메시지 수 REST API 요청')
+      // console.log('전체 읽지 않은 메시지 수 REST API 요청')
       const response = await fetch('http://localhost/api/chat/unread/total', {
         method: 'GET',
         headers: {
@@ -415,11 +412,11 @@ export const useSocketMessage = () => {
           count = data.unreadCount
         }
 
-        console.log('REST API에서 파싱된 읽지 않은 메시지 수:', count)
+        // console.log('REST API에서 파싱된 읽지 않은 메시지 수:', count)
 
         // 이전 값과 같으면 업데이트 안 함
         if (count === lastUnreadCount) {
-          console.log('동일한 값으로 업데이트 무시:', count)
+          // console.log('동일한 값으로 업데이트 무시:', count)
           return
         }
 
@@ -436,7 +433,7 @@ export const useSocketMessage = () => {
         hasReceivedUnreadCountRef.current = true
       } else if (response.status === 429) {
         // 429 에러(Too Many Requests) 처리
-        console.log('요청 제한 초과: 잠시 후 다시 시도합니다.')
+        // console.log('요청 제한 초과: 잠시 후 다시 시도합니다.')
         const retryAfter = response.headers.get('Retry-After')
         const retryTime = retryAfter ? parseInt(retryAfter) * 1000 : 30000 // 기본 30초로 늘림
 
@@ -448,13 +445,13 @@ export const useSocketMessage = () => {
           // 강제 업데이트는 하지 않음(불필요한 재요청 방지)
         }, retryTime)
       } else {
-        console.error(
-          '전체 읽지 않은 메시지 수 요청 실패: HTTP 상태 코드',
-          response.status
-        )
+        // console.error(
+        //   '전체 읽지 않은 메시지 수 요청 실패: HTTP 상태 코드',
+        //   response.status
+        // )
       }
     } catch (e) {
-      console.error('전체 읽지 않은 메시지 수 요청 실패:', e)
+      // console.error('전체 읽지 않은 메시지 수 요청 실패:', e)
     }
   }
 
