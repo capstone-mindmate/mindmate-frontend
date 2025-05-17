@@ -67,6 +67,18 @@ const CustomFormViewRoute = () => {
   return <CustomFormView formId={formId} matchId={matchId} />
 }
 
+const ReportRoute = () => {
+  const { reportedUserId, targetUserId, fromPage } = useParams()
+
+  return (
+    <Report
+      reportedUserId={reportedUserId}
+      targetUserId={targetUserId}
+      fromPage={fromPage}
+    />
+  )
+}
+
 // 전역 인증 여부 추적
 let socketInitialized = false
 
@@ -337,39 +349,55 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/report',
+    path: '/report/:reportedUserId/:targetUserId/:fromPage',
     element: (
       <RequireAuth>
-        <Report />
+        <ReportRoute />
       </RequireAuth>
     ),
   },
   {
     path: '/magazinelist',
-    element: <MagazineList />,
+    element: (
+      <RequireAuth>
+        <MagazineList />
+      </RequireAuth>
+    ),
   },
   {
     path: '/magazine/write',
-    element: <MagazineWrite />,
+    element: (
+      <RequireAuth>
+        <MagazineWrite />
+      </RequireAuth>
+    ),
   },
   {
     path: '/magazine',
-    element: <Magazine />,
+    element: (
+      <RequireAuth>
+        <Magazine />
+      </RequireAuth>
+    ),
   },
   {
     path: '/magazine/mylist',
-    element: <MyList />,
+    element: (
+      <RequireAuth>
+        <MyList />
+      </RequireAuth>
+    ),
   },
   {
     path: '*',
     element: <div>404 Not Found</div>,
   },
   {
-    path: '/report',
-    element: <Report />,
-  },
-  {
     path: '/notification',
-    element: <Notification />,
+    element: (
+      <RequireAuth>
+        <Notification />
+      </RequireAuth>
+    ),
   },
 ])

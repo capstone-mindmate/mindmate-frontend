@@ -35,6 +35,7 @@ interface BaseMessage {
   isMe: boolean
   timestamp: string
   isRead: boolean
+  senderId: string
 }
 
 interface TextMessage extends BaseMessage {
@@ -107,8 +108,14 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const subscriptionsRef = useRef<any[]>([])
   const loadAttemptRef = useRef(0)
   const matchingIdFromNav = location.state?.matchingId
+  // 상대방 userId 추출
+  const otherUserId =
+    location.state?.oppositeId || messages.find((m) => !m.isMe)?.senderId || ''
 
   const messageRefs = useRef<{ [id: string]: HTMLDivElement | null }>({})
+
+  const [isLoadingPrev, setIsLoadingPrev] = useState(false)
+  const [hasMorePrev, setHasMorePrev] = useState(true)
 
   // 메시지 파싱 함수 (type별로 필요한 필드 보완)
   const parseMessage = (
@@ -131,6 +138,21 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       isMe: msg.senderId === myUserId, // userId만 비교
       timestamp: msg.timestamp || msg.createdAt || '',
       isRead: msg.isRead ?? false,
+      senderId: msg.senderId, // 추가
+    }
+
+    // 이모티콘 메시지: emoticonId, emoticonUrl, emoticonName이 있으면 type을 강제 지정
+    if (msg.emoticonId && msg.emoticonUrl && msg.emoticonName) {
+      return {
+        ...baseMessage,
+        type: 'EMOTICON',
+        content: '', // 이모티콘은 텍스트 없음
+        emoticonId: msg.emoticonId,
+        emoticonName: msg.emoticonName,
+        emoticonUrl: msg.emoticonUrl,
+        emoticonType: msg.emoticonName as EmoticonType,
+        senderName: msg.senderName,
+      } as EmoticonMessage
     }
 
     // 타입에 따라 다른 메시지 객체 반환
@@ -625,6 +647,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const onEmoticon = (msg: any) => {
     try {
       const data = JSON.parse(msg.body)
+      console.log('emo data : ', data)
       setMessages((prev) => [...prev, parseMessage(data)])
       markAsRead()
     } catch (error) {
@@ -854,6 +877,55 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     return () => observer.disconnect()
   }, [messages])
 
+  const fetchPreviousMessages = async () => {
+    if (!chatId || isLoadingPrev || !hasMorePrev || messages.length === 0)
+      return
+    setIsLoadingPrev(true)
+    const oldestId = messages[0]?.id
+    if (!oldestId) {
+      setIsLoadingPrev(false)
+      setHasMorePrev(false)
+      return
+    }
+    try {
+      const res = await fetchWithRefresh(
+        `http://localhost/api/chat/rooms/${chatId}/messages/before/${oldestId}?size=30`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+      if (!res.ok) throw new Error('이전 메시지 불러오기 실패')
+      const data = await res.json()
+      if (Array.isArray(data) && data.length > 0) {
+        // 중복 제거
+        const newMsgs = data
+          .map(parseMessage)
+          .filter((msg) => !messages.some((m) => m.id === msg.id))
+        setMessages((prev) => [...newMsgs, ...prev])
+        if (data.length < 30) setHasMorePrev(false)
+      } else {
+        setHasMorePrev(false)
+      }
+    } catch (e) {
+      setHasMorePrev(false)
+    } finally {
+      setIsLoadingPrev(false)
+    }
+  }
+
+  useEffect(() => {
+    const container = chatContainerRef.current
+    if (!container) return
+    const handleScroll = () => {
+      if (container.scrollTop === 0 && hasMorePrev && !isLoadingPrev) {
+        fetchPreviousMessages()
+      }
+    }
+    container.addEventListener('scroll', handleScroll)
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [messages, hasMorePrev, isLoadingPrev])
+
   return (
     <RootContainer>
       <TopBar
@@ -871,7 +943,12 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         isOpen={isBottomSheetOpen}
         onClose={() => setIsBottomSheetOpen(false)}
         menuItems={[
-          { text: '신고', onClick: () => {} },
+          {
+            text: '신고',
+            onClick: () => {
+              navigate(`/report/${myUserId}/${otherUserId}/MATCHING`)
+            },
+          },
           { text: '종료 요청', onClick: () => {} },
           { text: '채팅 제거', onClick: () => {} },
         ]}
@@ -907,6 +984,25 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           </div>
         ) : (
           <>
+            {isLoadingPrev && (
+              <div
+                style={{ textAlign: 'center', padding: '8px', color: '#888' }}
+              >
+                이전 메시지 불러오는 중...
+              </div>
+            )}
+            {!hasMorePrev && messages.length > 0 && (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '8px',
+                  color: '#aaa',
+                  fontSize: '13px',
+                }}
+              >
+                더 이상 불러올 메시지가 없습니다.
+              </div>
+            )}
             {messages.map((message: any, index) => {
               // 상대방 프로필 이미지 추출
               const otherProfileImage =

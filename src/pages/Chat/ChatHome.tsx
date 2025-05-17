@@ -33,6 +33,7 @@ interface ChatItemType {
   unreadCount: number
   isCompleted: boolean
   matchingId: number
+  oppositeId: number
 }
 
 const ChatHome = ({ matchId }: ChatHomeProps) => {
@@ -111,10 +112,11 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
     itemId: string,
     profileImage: string,
     userName: string,
-    matchingId: number
+    matchingId: number,
+    oppositeId: number
   ) => {
     navigate(`/chat/${itemId}`, {
-      state: { profileImage, userName, matchingId },
+      state: { profileImage, userName, matchingId, oppositeId },
     })
   }
 
@@ -164,6 +166,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
           id: String(item.roomId),
           profileImage: item.oppositeImage ?? '',
           userName: item.oppositeName ?? '본인',
+          oppositeId: item.oppositeId,
           lastTime: item.lastMessageTime
             ? new Date(item.lastMessageTime).toLocaleTimeString('ko-KR', {
                 hour: '2-digit',
@@ -328,7 +331,8 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
                   item.id,
                   'http://localhost/api' + item.profileImage,
                   item.userName,
-                  item.matchingId
+                  item.matchingId,
+                  item.oppositeId
                 )
               }}
             />

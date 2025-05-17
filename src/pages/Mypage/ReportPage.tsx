@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import TopBar from '../../components/topbar/Topbar'
 import { ReportItem, ReportButton } from '../../components/buttons/reportButton'
 import ModalComponent from '../../components/modal/modalComponent'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import {
   ContentContainer,
   ReportPageContainer,
@@ -13,6 +14,13 @@ import {
   CharCounter,
   ReportButtonContainer,
 } from './ReportPageStyles'
+import { expect } from 'chai'
+
+interface CustomFormViewProps {
+  reportedUserId: string | undefined
+  targetUserId: string | undefined
+  fromPage: string | undefined
+}
 
 // 신고 사유 옵션 데이터
 const REPORT_OPTIONS = [
@@ -28,9 +36,24 @@ const REPORT_OPTIONS = [
 
 const MAX_CHARS = 1000
 
-const ReportPage = () => {
+// 신고 사유 코드 매핑
+const REPORT_REASON_MAP: Record<string, string> = {
+  '욕설, 폭언, 비방 및 혐오표현을 사용해요': 'ABUSIVE_LANGUAGE',
+  '성적 수치심을 유발하거나 노출해요': 'SEXUAL_CONTENT',
+  '도배 또는 반복적인 내용이에요': 'SPAM',
+  '스팸 또는 악성 링크가 포함되어 있어요': 'MALICIOUS_LINK',
+  '상업적 목적의 과도한 홍보예요': 'ADVERTISING',
+  '개인정보를 불법으로 요구하거나 유출했어요': 'PRIVACY_VIOLATION',
+  '불법 정보 또는 행위를 조장해요': 'ILLEGAL_ACTIVITY',
+  '기타 문제가 있어 신고하고 싶어요': 'ETC',
+}
+
+const ReportPage = ({
+  reportedUserId,
+  targetUserId,
+  fromPage,
+}: CustomFormViewProps) => {
   const navigate = useNavigate()
-  const location = useLocation()
 
   // 선택된 신고 사유들을 추적합니다
   const [selectedReports, setSelectedReports] = useState<string[]>([])
@@ -69,16 +92,31 @@ const ReportPage = () => {
   }
 
   // 신고하기 버튼 클릭 핸들러
-  const handleReportSubmit = () => {
-    // 선택된 신고 사유가 있을 때만 제출 가능
+  const handleReportSubmit = async () => {
     if (selectedReports.length > 0) {
-      console.log('신고 제출 완료!')
-      console.log('선택된 신고 사유:', selectedReports)
-      console.log('추가 신고 텍스트:', reportText)
-
-      // Todo: 서버로 데이터 전송 로직 추가
-
-      // 신고 완료 모달 표시
+      const reportReason = REPORT_REASON_MAP[selectedReports[0]] || 'ETC'
+      const body = {
+        reportedUserId,
+        reportReason,
+        additionalComment: reportText,
+        reportTarget: fromPage,
+        targetId: targetUserId,
+      }
+      try {
+        const res = await fetchWithRefresh('http://localhost/api/report', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        })
+        if (!res.ok) {
+          throw new Error('신고 제출 실패')
+        }
+        setIsModalOpen(true)
+      } catch (error) {
+        console.error('신고 제출 실패:', error)
+      }
       setIsModalOpen(true)
     }
   }
