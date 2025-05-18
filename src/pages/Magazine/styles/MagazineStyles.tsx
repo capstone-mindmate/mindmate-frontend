@@ -1,4 +1,11 @@
 import styled from '@emotion/styled'
+import { css, keyframes } from '@emotion/react'
+
+// 좋아요 버튼 애니메이션 키프레임
+const starAnimation = keyframes`
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+`
 
 // 스타일 컴포넌트 정의
 export const MagazineDetailContainer = styled.div`
@@ -60,19 +67,98 @@ export const ContentContainer = styled.div`
 `
 
 export const MagazineContent = styled.div`
+  color: #333;
   font-size: 16px;
   line-height: 1.6;
-  color: #333333;
-  flex: 1;
+  margin-bottom: 30px;
 
   img {
     max-width: 100%;
     height: auto;
-    margin: 16px 0;
+    display: block;
+    margin: 15px 0;
+    border-radius: 8px;
   }
 
   p {
-    margin-bottom: 16px;
+    margin: 15px 0;
+  }
+
+  /* Quill 에디터 스타일 추가 */
+  strong,
+  b {
+    font-weight: bold;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  u {
+    text-decoration: underline;
+  }
+
+  /* 글자 크기 스타일 - 여러 방식으로 강화 */
+  /* 클래스 기반 */
+  .ql-size-small {
+    font-size: 0.75em !important;
+  }
+
+  .ql-size-large {
+    font-size: 1.5em !important;
+  }
+
+  .ql-size-huge {
+    font-size: 2em !important;
+  }
+
+  /* 스타일 속성 기반 */
+  [style*='font-size: 0.75em'] {
+    font-size: 0.75em !important;
+  }
+
+  [style*='font-size: 1.5em'] {
+    font-size: 1.5em !important;
+  }
+
+  [style*='font-size: 2em'] {
+    font-size: 2em !important;
+  }
+
+  /* span 태그 기반 */
+  span.ql-size-small {
+    font-size: 0.75em !important;
+  }
+
+  span.ql-size-large {
+    font-size: 1.5em !importsssant;
+  }
+
+  span.ql-size-huge {
+    font-size: 2em !important;
+  }
+
+  /* 정렬 스타일 */
+  .ql-align-center {
+    text-align: center;
+  }
+
+  .ql-align-right {
+    text-align: right;
+  }
+
+  .ql-align-justify {
+    text-align: justify;
+  }
+
+  /* 이모티콘 스타일 */
+  .magazine-emoticon {
+    display: inline-block;
+    width: 70px;
+    height: 70px;
+    vertical-align: middle;
+    margin: 0 5px;
   }
 `
 
@@ -149,27 +235,55 @@ export const BottomToolbar = styled.div`
   position: fixed;
 `
 
-export const ToolbarButton = styled.button<{ active?: boolean }>`
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
+// 애니메이션 버튼 래퍼
+export const AnimatedButtonWrapper = styled.div`
+  ${({ active }: { active: boolean }) =>
+    active &&
+    css`
+      svg {
+        animation: ${starAnimation} 0.3s ease;
+      }
+    `}
+`
+
+// 툴바 버튼
+export const ToolbarButton = styled.button<{ active: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  background: none;
+  border: none;
+  padding: 8px 15px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
 
-  &:last-child {
-    margin-right: 0;
-  }
+  ${({ active }) =>
+    active &&
+    css`
+      svg {
+        animation: ${starAnimation} 0.3s ease;
+      }
+    `}
 
   &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 `
 
+// 좋아요 수
 export const LikeCount = styled.span`
-  font-size: 14px;
-  color: #333333;
-  margin-left: 4px;
+  margin-left: 6px;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
 `

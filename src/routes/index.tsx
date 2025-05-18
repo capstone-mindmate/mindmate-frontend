@@ -314,7 +314,7 @@ export const router = createBrowserRouter([
     element: <MagazineWrite />,
   },
   {
-    path: '/magazine',
+    path: '/magazine/:id',
     element: <Magazine />,
   },
   {

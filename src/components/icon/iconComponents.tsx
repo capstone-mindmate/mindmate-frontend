@@ -473,12 +473,13 @@ export const SmileIcon: React.FC<IconProps> = ({
   </div>
 )
 
-export const StarIcon: React.FC<IconProps> = ({
+export const StarIcon: React.FC<IconProps & { filled?: boolean }> = ({
   width = 24,
   height = 24,
   color = '#000000',
   className = '',
   strokeWidth = 2,
+  filled = false,
 }) => (
   <div className="icon-container" css={containerStyle}>
     <svg
@@ -486,7 +487,7 @@ export const StarIcon: React.FC<IconProps> = ({
       width={width}
       height={height}
       viewBox="0 0 24 24"
-      fill="none"
+      fill={filled ? color : 'none'}
       xmlns="http://www.w3.org/2000/svg"
       css={iconStyle}
     >
