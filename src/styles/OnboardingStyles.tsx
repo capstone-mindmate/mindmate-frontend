@@ -3,22 +3,22 @@ import { css } from '@emotion/react'
 import { media } from './breakpoints'
 
 export const RootContainer = css`
-  width: 884px;
+  width: 100%;
   height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+`
+
+export const OnboardingContainer = css`
+  width: 884px;
+  height: 100%;
+  box-sizing: border-box;
 
   ${media.tablet} {
     width: 100%;
   }
-`
-
-export const OnboardingContainer = css`
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
 `
 
 // 페이지 컨테이너

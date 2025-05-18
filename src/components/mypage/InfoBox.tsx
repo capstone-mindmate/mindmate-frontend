@@ -30,7 +30,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({
             <StarIcon />
           </StarIconWrapper>
           <ScoreTextWrapper>
-            <Value>{averageScore}</Value>
+            <Value>{averageScore.toFixed(2)}</Value>
           </ScoreTextWrapper>
         </ScoreValue>
       </Section>
