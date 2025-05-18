@@ -75,7 +75,7 @@ const DetailReviewPage: React.FC = () => {
         const reviewData = await reviewRes.json()
         setReviewsData(
           (reviewData.content || []).map((r: any) => ({
-            profileImage: r.reviewerProfileImage,
+            profileImage: 'http://localhost/api' + r.reviewerProfileImage,
             username: r.reviewerNickname,
             rating: r.rating,
             date: r.createdAt

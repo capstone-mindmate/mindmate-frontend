@@ -46,7 +46,7 @@ export const InputContainer = styled.div`
   }
 `
 
-export const StyledInput = styled.input`
+export const StyledInput = styled.input<{ disabled?: boolean }>`
   width: 100%;
   padding: 12px 45px 12px 15px;
   border: 1px solid #eeeeee;
@@ -58,9 +58,9 @@ export const StyledInput = styled.input`
   outline: none;
   background-color: #f5f5f5;
   text-align: left;
-
+  cursor: ${(props) => (props.disabled ? 'default' : 'text')};
   &::placeholder {
-    color: #a3a3a3;
+    color: ${(props) => (props.disabled ? '#dadada' : '#a3a3a3')};
     text-align: left;
   }
 `

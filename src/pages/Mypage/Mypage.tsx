@@ -19,6 +19,30 @@ import { useAuthStore } from '../../stores/userStore'
 import { useEffect, useState } from 'react'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
+const categoryMap: Record<string, string> = {
+  ACADEMIC: '학업',
+  CAREER: '진로',
+  RELATIONSHIP: '인간관계',
+  MENTAL_HEALTH: '건강',
+  CAMPUS_LIFE: '학교생활',
+  PERSONAL_GROWTH: '자기계발',
+  FINANCIAL: '경제',
+  EMPLOYMENT: '취업',
+  OTHER: '기타',
+}
+
+const categoryEngMap: Record<string, string> = {
+  학업: 'ACADEMIC',
+  진로: 'CAREER',
+  인간관계: 'RELATIONSHIP',
+  건강: 'MENTAL_HEALTH',
+  학교생활: 'CAMPUS_LIFE',
+  자기계발: 'PERSONAL_GROWTH',
+  경제: 'FINANCIAL',
+  취업: 'EMPLOYMENT',
+  기타: 'OTHER',
+}
+
 const MyPage = () => {
   const navigate = useNavigate()
   const { user } = useAuthStore()
@@ -65,7 +89,17 @@ const MyPage = () => {
             coins: profileData.points,
             matchCount: profileData.totalCounselingCount,
           })
-          setCategoryData(profileData.categoryCounts)
+          // categoryData를 한글로 변환
+          const convertedCategoryData = Object.entries(
+            profileData.categoryCounts || {}
+          ).reduce(
+            (acc, [key, value]) => ({
+              ...acc,
+              [categoryMap[key] || key]: value,
+            }),
+            {}
+          )
+          setCategoryData(convertedCategoryData)
           // 리뷰 태그(임시: 태그 카운트)
           if (profileData.tagCounts) {
             setReviewTags(
@@ -79,7 +113,7 @@ const MyPage = () => {
           // 상세 리뷰 (응답의 reviews 배열 활용)
           setUserReviews(
             (profileData.reviews || []).map((r: any) => ({
-              profileImage: r.reviewerProfileImage,
+              profileImage: 'http://localhost/api' + r.reviewerProfileImage,
               username: r.reviewerNickname,
               rating: r.rating,
               date: r.createdAt
@@ -122,7 +156,17 @@ const MyPage = () => {
             coins: profileData.points,
             matchCount: profileData.totalCounselingCount,
           })
-          setCategoryData(profileData.categoryCounts)
+          // categoryData를 한글로 변환
+          const convertedCategoryData = Object.entries(
+            profileData.categoryCounts || {}
+          ).reduce(
+            (acc, [key, value]) => ({
+              ...acc,
+              [categoryMap[key] || key]: value,
+            }),
+            {}
+          )
+          setCategoryData(convertedCategoryData)
           // 리뷰 태그, 상세 리뷰 등 추가 API 호출
           // 리뷰 태그(임시: 태그 카운트)
           if (profileData.tagCounts) {

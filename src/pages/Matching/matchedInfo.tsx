@@ -22,7 +22,7 @@ import { useToast } from '../../components/toast/ToastProvider'
 const categoryMap: Record<string, string> = {
   ACADEMIC: '학업',
   CAREER: '진로',
-  RELATIONSHIP: '대인관계',
+  RELATIONSHIP: '인간관계',
   MENTAL_HEALTH: '건강',
   CAMPUS_LIFE: '학교생활',
   PERSONAL_GROWTH: '자기계발',
@@ -35,7 +35,7 @@ const categoryMap: Record<string, string> = {
 const categoryEngMap: Record<string, string> = {
   학업: 'ACADEMIC',
   진로: 'CAREER',
-  대인관계: 'RELATIONSHIP',
+  인간관계: 'RELATIONSHIP',
   건강: 'MENTAL_HEALTH',
   학교생활: 'CAMPUS_LIFE',
   자기계발: 'PERSONAL_GROWTH',
@@ -148,9 +148,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
   const [matchingRooms, setMatchingRooms] = useState<any[]>([])
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedApplication, setSelectedApplication] = useState<
-    (typeof appliedMatchingRooms)[0] | null
-  >(null)
+  const [selectedApplication, setSelectedApplication] = useState<any>(null)
   const [matchingDetail, setMatchingDetail] = useState<MatchingDetail | null>(
     null
   )
@@ -180,11 +178,18 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
             throw new Error('내가 만든 매칭방을 불러오지 못했습니다.')
           const data = await res.json()
           if (Array.isArray(data.content)) {
-            // 카테고리 한글로 변환
+            // 카테고리 한글로 변환 및 matchType 변환
             const mappedData = data.content.map((item: any) => ({
               ...item,
               category: categoryMap[item.category] || item.category,
               matchType: item.creatorRole === 'SPEAKER' ? '스피커' : '리스너',
+              // 내가 만든 매칭방에는 메시지 없음
+              message: '',
+              username: '', // 필요시 추가 정보
+              profileImage: '', // 필요시 추가 정보
+              makeDate: '', // 필요시 추가 정보
+              borderSet: true, // 필요시 추가 정보
+              applicationStatus: '', // 필요시 추가 정보
             }))
             setMatchingRooms(mappedData)
           } else {
@@ -209,12 +214,59 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
           if (!res.ok) throw new Error('신청보낸 매칭방을 불러오지 못했습니다.')
           const data = await res.json()
           if (Array.isArray(data.content)) {
-            // 카테고리 한글로 변환
-            const mappedData = data.content.map((item: any) => ({
-              ...item,
-              category: categoryMap[item.category] || item.category,
-              matchType: item.creatorRole === 'SPEAKER' ? '스피커' : '리스너',
-            }))
+            // 매칭 정보와 메시지 분리, 카테고리 한글로 변환 및 matchType 변환
+            // 추가 정보가 필요하면 /api/matchings/{id}로 상세 조회
+            const fetchDetails = async (item: any) => {
+              try {
+                const detailRes = await fetchWithRefresh(
+                  `http://localhost/api/matchings/${item.matching.id}`,
+                  {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                  }
+                )
+                if (!detailRes.ok) throw new Error()
+                const detail = await detailRes.json()
+                return {
+                  ...item.matching,
+                  ...detail,
+                  category:
+                    categoryMap[item.matching.category] ||
+                    item.matching.category,
+                  matchType:
+                    item.matching.creatorRole === 'SPEAKER'
+                      ? '스피커'
+                      : '리스너',
+                  message: item.applicationMessage || '',
+                  username: detail.creatorNickname, // 필요시 추가 정보
+                  profileImage:
+                    'http://localhost/api' + detail.creatorProfileImage, // 필요시 추가 정보
+                  makeDate: formatDate(detail.createdAt), // 필요시 추가 정보
+                  borderSet: true, // 필요시 추가 정보
+                  applicationStatus: detail.status, // 필요시 추가 정보
+                }
+              } catch {
+                // 상세 조회 실패 시 기본 정보만 사용
+                return {
+                  ...item.matching,
+                  category:
+                    categoryMap[item.matching.category] ||
+                    item.matching.category,
+                  matchType:
+                    item.matching.creatorRole === 'SPEAKER'
+                      ? '스피커'
+                      : '리스너',
+                  message: item.applicationMessage || '',
+                  username: '',
+                  profileImage: '',
+                  makeDate: '',
+                  borderSet: true,
+                  applicationStatus: '',
+                }
+              }
+            }
+            // 상세 정보 병합 (병렬 처리)
+            const mappedData = await Promise.all(data.content.map(fetchDetails))
             setMatchingRooms(mappedData)
           } else {
             setMatchingRooms([])
@@ -228,39 +280,39 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
   }
 
   // 매칭 상세 정보 로드
-  const fetchMatchingDetail = async (matchingId: number) => {
-    setIsDetailLoading(true)
-    try {
-      const res = await fetchWithRefresh(
-        `http://localhost/api/matchings/${matchingId}`,
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+  // const fetchMatchingDetail = async (matchingId: number) => {
+  //   setIsDetailLoading(true)
+  //   try {
+  //     const res = await fetchWithRefresh(
+  //       `http://localhost/api/matchings/${matchingId}`,
+  //       {
+  //         method: 'GET',
+  //         headers: { 'Content-Type': 'application/json' },
+  //       }
+  //     )
 
-      if (!res.ok) throw new Error('매칭 상세 정보를 불러오지 못했습니다.')
+  //     if (!res.ok) throw new Error('매칭 상세 정보를 불러오지 못했습니다.')
 
-      const data = await res.json()
-      // 카테고리 한글로 변환
-      const mappedData = {
-        ...data,
-        category: categoryMap[data.category] || data.category,
-      }
-      setMatchingDetail(mappedData)
+  //     const data = await res.json()
+  //     // 카테고리 한글로 변환
+  //     const mappedData = {
+  //       ...data,
+  //       category: categoryMap[data.category] || data.category,
+  //     }
+  //     setMatchingDetail(mappedData)
 
-      // 매칭 생성자 프로필 로드
-      await fetchCreatorProfile(data.creatorId)
-    } catch (e) {
-      if (e instanceof Error) {
-        showToast(e.message, 'error')
-      } else {
-        showToast('매칭 상세 정보를 불러오는 중 오류가 발생했습니다.', 'error')
-      }
-    } finally {
-      setIsDetailLoading(false)
-    }
-  }
+  //     // 매칭 생성자 프로필 로드
+  //     await fetchCreatorProfile(data.creatorId)
+  //   } catch (e) {
+  //     if (e instanceof Error) {
+  //       showToast(e.message, 'error')
+  //     } else {
+  //       showToast('매칭 상세 정보를 불러오는 중 오류가 발생했습니다.', 'error')
+  //     }
+  //   } finally {
+  //     setIsDetailLoading(false)
+  //   }
+  // }
 
   // 프로필 상세 정보 로드
   const fetchCreatorProfile = async (userId: number) => {
@@ -294,8 +346,6 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
     if (selectedCategory === '내가 만든 매칭방') {
       navigate('/matching/application', { state: { item } })
     } else {
-      // 상세정보 API 호출 후 모달 오픈
-      fetchMatchingDetail(item.id)
       handleOpenModal(item)
     }
   }
@@ -309,12 +359,6 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
     setIsModalOpen(false)
     setMatchingDetail(null)
     setCreatorProfile(null)
-  }
-
-  const handleMatchApplicationClick = (
-    application: (typeof appliedMatchingRooms)[0]
-  ) => {
-    handleOpenModal(application)
   }
 
   const handleMatchingCancelRequest = async () => {
@@ -418,7 +462,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
           }}
           messageProps={{
             onMessageChange: () => {},
-            messageValue: '',
+            messageValue: selectedApplication.message || '',
           }}
         />
       )
@@ -444,7 +488,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
         }}
         messageProps={{
           onMessageChange: () => {},
-          messageValue: '',
+          messageValue: selectedApplication.message || '',
         }}
       />
     )

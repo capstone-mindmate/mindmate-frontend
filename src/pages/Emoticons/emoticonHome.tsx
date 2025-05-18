@@ -173,7 +173,10 @@ const EmoticonHome = () => {
       <EmoticonsContainer>
         <ProfileContainer>
           <EmoticonProfile
-            profileImage={profile?.profileImage || '/public/image.png'}
+            profileImage={
+              'http://localhost/api' + profile?.profileImage ||
+              'http://localhost/api/profileImages/default-profile-image.png'
+            }
             name={profile?.nickname || '프로필이름'}
             heldCoins={pointBalance ?? 0}
           />

@@ -10,6 +10,16 @@ export function getTokenCookie(key: string) {
     ?.split('=')[1]
 }
 
+import { useAuthStore } from '../stores/userStore'
+
+declare global {
+  interface Window {
+    clearUser?: () => void
+  }
+}
+
+let isSessionExpired = false
+
 export async function fetchWithRefresh(input: RequestInfo, init?: RequestInit) {
   const accessToken = getTokenCookie('accessToken')
 
@@ -57,6 +67,22 @@ export async function fetchWithRefresh(input: RequestInfo, init?: RequestInit) {
         credentials: 'include',
       })
     } else {
+      // 세션 만료 처리: 한 번만 실행
+      if (!isSessionExpired) {
+        isSessionExpired = true
+        setTokenCookie('', 'accessToken', -1)
+        setTokenCookie('', 'refreshToken', -1)
+        localStorage.removeItem('auth-store')
+        if (
+          typeof window !== 'undefined' &&
+          typeof window.clearUser === 'function'
+        ) {
+          window.clearUser()
+        }
+        // alert('세션이 만료되었습니다. 다시 로그인 해주세요.')
+        localStorage.clear()
+        window.location.href = '/onboarding'
+      }
       throw new Error('토큰 갱신 실패')
     }
   }

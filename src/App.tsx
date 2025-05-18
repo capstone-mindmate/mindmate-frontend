@@ -1,18 +1,15 @@
 import { RouterProvider } from 'react-router-dom'
 import { router } from './routes'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useUserQuery } from './hooks/useUserQuery'
-
-function AppInner() {
-  useUserQuery()
-  return <RouterProvider router={router} />
-}
+import { useAuthStore } from './stores/userStore'
 
 function App() {
   const queryClient = new QueryClient()
+  window.clearUser = useAuthStore.getState().clearUser
+
   return (
     <QueryClientProvider client={queryClient}>
-      <AppInner />
+      <RouterProvider router={router} />
     </QueryClientProvider>
   )
 }

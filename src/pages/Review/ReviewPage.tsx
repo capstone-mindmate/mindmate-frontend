@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import TopBar from '../../components/topbar/Topbar'
 import Star from '../../components/review/Star'
 import ReviewButton from '../../components/buttons/reviewButton'
@@ -14,23 +14,44 @@ import {
   CharCounter,
   SubmitButton,
 } from './ReviewPageStyles.tsx'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 // 리뷰 버튼 데이터
 const REVIEW_OPTIONS = [
-  { id: 1, text: '⚡️ 응답이 빨라요' },
-  { id: 2, text: '❤️‍🩹 공감을 잘해줘요' },
-  { id: 3, text: '🤝🏻 신뢰할 수 있는 대화였어요' },
-  { id: 4, text: '🎯 솔직하고 현실적인 조언을 해줘요' },
-  { id: 5, text: '💡 새로운 관점을 제시해줘요' },
-  { id: 6, text: '☕️ 편안한 분위기에서 이야기할 수 있었어요' },
+  { id: 1, text: '⚡️ 응답이 빨라요', tag: '응답이 빨라요' },
+  { id: 2, text: '❤️‍🩹 공감을 잘해줘요', tag: '공감을 잘해줘요' },
+  {
+    id: 3,
+    text: '🤝🏻 신뢰할 수 있는 대화였어요',
+    tag: '신뢰할 수 있는 대화였어요',
+  },
+  {
+    id: 4,
+    text: '🎯 솔직하고 현실적인 조언을 해줘요',
+    tag: '솔직하고 현실적인 조언을 해줘요',
+  },
+  {
+    id: 5,
+    text: '💡 새로운 관점을 제시해줘요',
+    tag: '새로운 관점을 제시해줘요',
+  },
+  {
+    id: 6,
+    text: '☕️ 편안한 분위기에서 이야기할 수 있었어요',
+    tag: '편안한 분위기에서 이야기할 수 있었어요',
+  },
 ]
 
 const MAX_CHARS = 1000
 
-const ReviewPage = () => {
-  // URL 파라미터에서 id 값을 가져옵니다
-  const { id } = useParams()
-
+const ReviewPage = ({
+  chatId,
+  opponentName,
+}: {
+  chatId: string | undefined
+  opponentName: string | undefined
+}) => {
+  const navigate = useNavigate()
   // 별점 상태
   const [selectedRating, setSelectedRating] = useState(0)
 
@@ -65,15 +86,30 @@ const ReviewPage = () => {
   }
 
   // 등록하기 버튼 클릭 핸들러
-  const handleSubmit = () => {
-    // 유효성 검사
+  const handleSubmit = async () => {
     if (selectedRating > 0 && selectedReviews.length > 0) {
-      console.log('리뷰 제출 완료!')
-      console.log('별점:', selectedRating)
-      console.log('선택된 리뷰:', selectedReviews)
-      console.log('추가 리뷰 텍스트:', reviewText)
-
-      // Todo: 서버로 데이터 전송 로직 추가 가능
+      try {
+        const res = await fetchWithRefresh('http://localhost/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chatRoomId: Number(chatId),
+            rating: selectedRating,
+            comment: reviewText,
+            tags: selectedReviews
+              .map(
+                (reviewText) =>
+                  REVIEW_OPTIONS.find((opt) => opt.text === reviewText)?.tag
+              )
+              .filter(Boolean),
+          }),
+        })
+        if (!res.ok) throw new Error('리뷰 등록 실패')
+        alert('리뷰가 등록되었습니다!')
+        navigate('/chat')
+      } catch (e) {
+        alert('리뷰 등록에 실패했습니다.')
+      }
     }
   }
 
@@ -90,7 +126,7 @@ const ReviewPage = () => {
       />
       <ContentContainer>
         <TitleText>
-          {id}님과 나눈 이야기,
+          {opponentName}님과 나눈 이야기,
           <br />
           도움이 되었나요?
         </TitleText>

@@ -54,7 +54,7 @@ const MatchingGraph: React.FC<MatchingGraphProps> = ({ categoryData }) => {
 
   // 설명 텍스트
   const descriptionText = isAllZero
-    ? '서둘러 대화를 나눠보세요!'
+    ? '대화를 나눠보세요!'
     : `✸ ${topCategoriesText} 카테고리를 가장 많이 이용했어요!`
 
   return (
