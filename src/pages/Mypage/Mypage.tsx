@@ -113,7 +113,7 @@ const MyPage = () => {
           // 상세 리뷰 (응답의 reviews 배열 활용)
           setUserReviews(
             (profileData.reviews || []).map((r: any) => ({
-              profileImage: r.reviewerProfileImage,
+              profileImage: 'http://localhost/api' + r.reviewerProfileImage,
               username: r.reviewerNickname,
               rating: r.rating,
               date: r.createdAt

@@ -16,6 +16,7 @@ import EmoticonComponent, {
 } from '../../components/emoticon/Emoticon'
 import { useToast } from '../../components/toast/ToastProvider'
 import BottomSheet from '../../components/bottomSheet/BottomSheet'
+import ModalComponent from '../../components/modal/modalComponent'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 import { ChatContainer } from './styles/RootStyles'
@@ -116,6 +117,20 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
   const [isLoadingPrev, setIsLoadingPrev] = useState(false)
   const [hasMorePrev, setHasMorePrev] = useState(true)
+
+  const [closeModalType, setCloseModalType] = useState<
+    'NONE' | 'REQUEST' | 'RECEIVE'
+  >('NONE')
+
+  const [roomStatus, setRoomStatus] = useState<
+    'ACTIVE' | 'CLOSED' | 'CLOSE_REQUEST'
+  >('ACTIVE')
+
+  const [closeRequestRoleType, setCloseRequestRoleType] = useState<
+    'LISTENER' | 'SPEAKER'
+  >('LISTENER')
+
+  const [listener, setListener] = useState(false)
 
   // 메시지 파싱 함수 (type별로 필요한 필드 보완)
   const parseMessage = (
@@ -326,11 +341,15 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       }
 
       const data = await res.json()
+
       setMessages(
         Array.isArray(data.messages) ? data.messages.map(parseMessage) : []
       )
       loadAttemptRef.current = 0
       setErrorMessage(null)
+      setRoomStatus(data.roomStatus)
+      setCloseRequestRoleType(data.closeRequestRole)
+      setListener(data.listener)
     } catch (e) {
       const error = e as Error
       console.error('메시지 조회 실패:', error)
@@ -926,6 +945,93 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     return () => container.removeEventListener('scroll', handleScroll)
   }, [messages, hasMorePrev, isLoadingPrev])
 
+  // 종료 요청
+  const handleCloseRequest = async () => {
+    try {
+      await fetchWithRefresh(
+        `http://localhost/api/chat/rooms/${chatId}/close`,
+        { method: 'POST' }
+      )
+      setCloseModalType('REQUEST')
+      // 소켓으로 상대방에게 종료 요청 알림 (userId 포함)
+      stompClient?.publish &&
+        stompClient.publish({
+          destination: `/topic/chat.room.${chatId}.close.request`,
+          body: JSON.stringify({ roomId: chatId, userId: myUserId }),
+        })
+    } catch (e) {
+      showToast('종료 요청 실패', 'error')
+    }
+  }
+
+  // 종료 요청 수신 핸들러
+  const onCloseRequest = (msg: any) => {
+    try {
+      const data = JSON.parse(msg.body)
+      // 내 userId와 다를 때만 상대방 화면에서만 모달 표시
+      if (data.userId && data.userId !== myUserId) {
+        setCloseModalType('RECEIVE')
+      }
+    } catch {
+      // fallback: userId 정보 없으면 무시
+    }
+  }
+
+  // 종료 수락
+  const handleCloseAccept = async () => {
+    await fetchWithRefresh(
+      `http://localhost/api/chat/rooms/${chatId}/close/accept`,
+      { method: 'POST' }
+    )
+    setCloseModalType('NONE')
+    stompClient?.publish &&
+      stompClient.publish({
+        destination: `/topic/chat.room.${chatId}.close.accept`,
+        body: JSON.stringify({ roomId: chatId }),
+      })
+  }
+  // 종료 거절
+  const handleCloseReject = async () => {
+    await fetchWithRefresh(
+      `http://localhost/api/chat/rooms/${chatId}/close/reject`,
+      { method: 'POST' }
+    )
+    setCloseModalType('NONE')
+    stompClient?.publish &&
+      stompClient.publish({
+        destination: `/topic/chat.room.${chatId}.close.reject`,
+        body: JSON.stringify({ roomId: chatId }),
+      })
+  }
+
+  // 소켓 구독 추가
+  useEffect(() => {
+    if (!stompClient || !chatId) return
+    const closeRequestSub = stompClient.subscribe(
+      `/topic/chat.room.${chatId}.close.request`,
+      onCloseRequest
+    )
+    // 종료 수락 구독: 상대방이 수락하면 review로 이동
+    const closeAcceptSub = stompClient.subscribe(
+      `/topic/chat.room.${chatId}.close.accept`,
+      (msg: any) => {
+        navigate(`/review/${chatId}`, {
+          state: {
+            opponentName: otherUserName,
+          },
+        })
+      }
+    )
+    return () => {
+      closeRequestSub &&
+        closeRequestSub.unsubscribe &&
+        closeRequestSub.unsubscribe()
+      closeAcceptSub &&
+        closeAcceptSub.unsubscribe &&
+        closeAcceptSub.unsubscribe()
+    }
+  }, [stompClient, chatId])
+
   return (
     <RootContainer>
       <TopBar
@@ -949,7 +1055,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
               navigate(`/report/${myUserId}/${otherUserId}/MATCHING`)
             },
           },
-          { text: '종료 요청', onClick: () => {} },
+          { text: '종료 요청', onClick: handleCloseRequest },
           { text: '채팅 제거', onClick: () => {} },
         ]}
       />
@@ -1461,11 +1567,40 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           onSendEmoticon={sendEmoticon}
           onTyping={handleTyping}
           disabled={
-            !stompClient || !isConnected || isLoadingMessages || !!errorMessage
+            !stompClient ||
+            !isConnected ||
+            isLoadingMessages ||
+            !!errorMessage ||
+            roomStatus !== 'ACTIVE'
           }
           chatId={matchingIdFromNav}
         />
       </ChatBarWrapper>
+      {(closeModalType === 'REQUEST' || roomStatus === 'CLOSE_REQUEST') &&
+        ((closeRequestRoleType === 'LISTENER' && listener) ||
+          (closeRequestRoleType === 'SPEAKER' && !listener)) && (
+          <ModalComponent
+            modalType="채팅종료신청"
+            isOpen={true}
+            onClose={() => setCloseModalType('NONE')}
+            buttonText="확인"
+            buttonClick={() => setCloseModalType('NONE')}
+          />
+        )}
+
+      {(closeModalType === 'RECEIVE' || roomStatus === 'CLOSE_REQUEST') &&
+        ((closeRequestRoleType === 'LISTENER' && !listener) ||
+          (closeRequestRoleType === 'SPEAKER' && listener)) && (
+          <ModalComponent
+            modalType="채팅종료수락"
+            isOpen={true}
+            onClose={() => setCloseModalType('NONE')}
+            onAccept={handleCloseAccept}
+            onReject={handleCloseReject}
+            buttonText=""
+            buttonClick={() => {}}
+          />
+        )}
     </RootContainer>
   )
 }

@@ -38,6 +38,8 @@ interface ModalComponentProps {
     price: number
   }
   onProfileClick?: () => void
+  onAccept?: () => void
+  onReject?: () => void
 }
 
 const ModalComponent = ({
@@ -66,6 +68,8 @@ const ModalComponent = ({
     price: 10,
   },
   onProfileClick,
+  onAccept,
+  onReject,
 }: ModalComponentProps) => {
   const [showDetails, setShowDetails] = useState(false)
   const matchedInfoRef = useRef<HTMLDivElement>(null)
@@ -263,6 +267,26 @@ const ModalComponent = ({
     modalFooter: css`
       width: 100%;
       margin-top: 20px;
+    `,
+
+    closeChatFooter: css`
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 20px;
+    `,
+
+    chatCloseContainer: css`
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    `,
+
+    closeChatBtnContainer: css`
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
     `,
   }
 
@@ -622,7 +646,7 @@ const ModalComponent = ({
         </div>
       </div>
     )
-  } else if (modalType === '채팅종료') {
+  } else if (modalType === '채팅종료신청') {
     return (
       <div className="container" css={modalStyles.container}>
         <div className="modal-content" css={modalStyles.modalContent}>
@@ -635,9 +659,44 @@ const ModalComponent = ({
           >
             <CloseIcon color="#000000" width={24} height={24} />
           </div>
-          <div className="modal-header"></div>
-          <div className="modal-body"></div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>채팅 종료 요청 중입니다..</p>
+          </div>
+          <div className="modal-body" css={modalStyles.chatCloseContainer}>
+            <Emoticon type="love" size="xlarge" />
+          </div>
           <div className="modal-footer"></div>
+        </div>
+      </div>
+    )
+  } else if (modalType === '채팅종료수락') {
+    return (
+      <div className="container" css={modalStyles.container}>
+        <div className="modal-content" css={modalStyles.modalContent}>
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>채팅을 종료하시겠어요?</p>
+          </div>
+          <div className="modal-body" css={modalStyles.chatCloseContainer}>
+            <Emoticon type="thanks" size="xlarge" />
+          </div>
+          <div className="modal-footer" css={modalStyles.closeChatFooter}>
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton buttonText="닫기" onActiveChange={onReject} />
+            </div>
+
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton buttonText="수락" onActiveChange={onAccept} />
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -678,25 +737,6 @@ const ModalComponent = ({
               />
             </div>
           </div>
-        </div>
-      </div>
-    )
-  } else if (modalType === '채팅종료') {
-    return (
-      <div className="container" css={modalStyles.container}>
-        <div className="modal-content" css={modalStyles.modalContent}>
-          <div
-            className="close-btn"
-            css={modalStyles.closeBtn}
-            onClick={() => onClose()}
-            role="button"
-            aria-label="닫기"
-          >
-            <CloseIcon color="#000000" width={24} height={24} />
-          </div>
-          <div className="modal-header"></div>
-          <div className="modal-body"></div>
-          <div className="modal-footer"></div>
         </div>
       </div>
     )

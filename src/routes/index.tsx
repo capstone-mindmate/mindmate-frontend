@@ -7,7 +7,6 @@ import Matching from '../pages/Matching'
 import HomePage from '../pages/Home/Home.tsx'
 import MyPage from '../pages/Mypage/Mypage.tsx'
 import Notification from '../pages/Home/NotificationPage.tsx'
-import Review from '../pages/Review/ReviewPage.tsx'
 import MagazineList from '../pages/Magazine/MagazineList.tsx'
 import MagazineWrite from '../pages/Magazine/MagazineWrite.tsx'
 import Magazine from '../pages/Magazine/Magazine.tsx'
@@ -39,6 +38,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, Navigate, useParams, useLocation } from 'react-router-dom'
 import { useSocketMessage } from '../hooks/useSocketMessage'
 import CustomFormDone from '../pages/Chat/CustomFormDone'
+import ReviewPage from '../pages/Review/ReviewPage'
 
 // 경로별 컴포넌트 렌더링을 위한 헬퍼 함수
 const ChatRoomRoute = () => {
@@ -77,6 +77,13 @@ const ReportRoute = () => {
       fromPage={fromPage}
     />
   )
+}
+
+const ReviewRoute = () => {
+  const { chatId } = useParams()
+  const location = useLocation()
+  const opponentName = location.state?.opponentName
+  return <ReviewPage chatId={chatId} opponentName={opponentName} />
 }
 
 // 전역 인증 여부 추적
@@ -325,10 +332,10 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/review',
+    path: '/review/:chatId',
     element: (
       <RequireAuth>
-        <Review />
+        <ReviewRoute />
       </RequireAuth>
     ),
   },

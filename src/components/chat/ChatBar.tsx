@@ -119,6 +119,7 @@ function ChatBar({
                 type="text"
                 placeholder="메시지를 입력하세요"
                 value={message}
+                disabled={disabled}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
               />

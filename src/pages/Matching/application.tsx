@@ -114,20 +114,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
       // 성공 시 모달 닫기 및 리스트 새로고침
       handleCloseModal()
 
-      // 성공 메시지 표시 및 5초 카운트다운
-      let countdown = 5
-      const timer = setInterval(() => {
-        countdown--
-        if (countdown > 0) {
-          showToast(`${countdown}초 뒤에 닫힙니다.`, 'success')
-        } else {
-          clearInterval(timer)
-          navigate('/matching/matched')
-        }
-      }, 1000)
-
-      // 초기 메시지 표시
-      showToast(`${countdown}초 뒤에 닫힙니다.`, 'success')
+      navigate('/matching')
     } catch (error: any) {
       showToast(error.message, 'error')
     }
