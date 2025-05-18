@@ -139,14 +139,17 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         await new Promise((resolve) => setTimeout(resolve, backoffDelay))
       }
 
-      const res = await fetchWithRefresh('http://localhost/api/chat/rooms', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-      })
+      const res = await fetchWithRefresh(
+        'https://mindmate.shop/api/chat/rooms',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include',
+        }
+      )
 
       if (!res.ok) {
         if (res.status === 429) {
@@ -315,7 +318,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
           filteredChatItems.map((item, index) => (
             <ChatItem
               key={item.id}
-              profileImage={'http://localhost/api' + item.profileImage}
+              profileImage={'https://mindmate.shop/api' + item.profileImage}
               userName={item.userName}
               lastTime={item.lastTime}
               category={item.category}
@@ -329,7 +332,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
                 console.log('matchingId:', item.matchingId)
                 handleChatItemClick(
                   item.id,
-                  'http://localhost/api' + item.profileImage,
+                  'https://mindmate.shop/api' + item.profileImage,
                   item.userName,
                   item.matchingId,
                   item.oppositeId

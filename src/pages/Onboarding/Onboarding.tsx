@@ -114,20 +114,23 @@ function OnboardingContent() {
       ).then((res) => res.json())
 
       // 2. 회원가입 시도 (credentials: 'include')
-      const registerRes = await fetch('http://localhost/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: googleUserInfo.email,
-          password: TEMP_PASSWORD,
-          confirmPassword: TEMP_PASSWORD,
-          agreeToTerm: true,
-        }),
-      }).then((res) => res.json())
+      const registerRes = await fetch(
+        'https://mindmate.shop/api/auth/register',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: googleUserInfo.email,
+            password: TEMP_PASSWORD,
+            confirmPassword: TEMP_PASSWORD,
+            agreeToTerm: true,
+          }),
+        }
+      ).then((res) => res.json())
 
       // 3. 로그인 시도 (credentials: 'include')
-      const loginRes = await fetch('http://localhost/api/auth/login', {
+      const loginRes = await fetch('https://mindmate.shop/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -153,7 +156,7 @@ function OnboardingContent() {
               setTokenCookie(data.refreshToken, 'refreshToken')
 
               const res = await fetchWithRefresh(
-                `http://localhost/api/profiles`,
+                `https://mindmate.shop/api/profiles`,
                 {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },
@@ -172,7 +175,7 @@ function OnboardingContent() {
               setTokenCookie(data.refreshToken, 'refreshToken')
 
               const res = await fetchWithRefresh(
-                `http://localhost/api/profiles`,
+                `https://mindmate.shop/api/profiles`,
                 {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },

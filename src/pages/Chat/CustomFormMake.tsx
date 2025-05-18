@@ -90,14 +90,17 @@ const CustomFormMake = ({ matchId }: CustomFormMakeProps) => {
       }
 
       // 웹소켓 연결이 안되었을 경우 REST API 호출로 대체
-      const res = await fetchWithRefresh('http://localhost/api/custom-forms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chatRoomId: matchId,
-          questions: askList.filter((q) => q.trim()),
-        }),
-      })
+      const res = await fetchWithRefresh(
+        'https://mindmate.shop/api/custom-forms',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chatRoomId: matchId,
+            questions: askList.filter((q) => q.trim()),
+          }),
+        }
+      )
 
       if (res.ok) {
         const data = await res.json()

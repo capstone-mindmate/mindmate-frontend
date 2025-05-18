@@ -66,7 +66,7 @@ const MyPage = () => {
           setIsOwnProfile(true)
           if (user?.id) {
             profileRes = await fetchWithRefresh(
-              `http://localhost/api/profiles`,
+              `https://mindmate.shop/api/profiles`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -113,7 +113,8 @@ const MyPage = () => {
           // 상세 리뷰 (응답의 reviews 배열 활용)
           setUserReviews(
             (profileData.reviews || []).map((r: any) => ({
-              profileImage: 'http://localhost/api' + r.reviewerProfileImage,
+              profileImage:
+                'https://mindmate.shop/api' + r.reviewerProfileImage,
               username: r.reviewerNickname,
               rating: r.rating,
               date: r.createdAt
@@ -136,7 +137,7 @@ const MyPage = () => {
             return
           }
           profileRes = await fetchWithRefresh(
-            `http://localhost/api/profiles/users/${userId}`,
+            `https://mindmate.shop/api/profiles/users/${userId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -180,7 +181,7 @@ const MyPage = () => {
           }
           // 상세 리뷰
           const reviewRes = await fetchWithRefresh(
-            `http://localhost/api/reviews/profile/${profileData.id}`,
+            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -215,7 +216,7 @@ const MyPage = () => {
     const fetchPointBalance = async () => {
       try {
         const res = await fetchWithRefresh(
-          'http://localhost/api/points/balance',
+          'https://mindmate.shop/api/points/balance',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -271,8 +272,8 @@ const MyPage = () => {
           <ProfileEdit
             profileImage={
               userProfile?.profileImage
-                ? `http://localhost/api${userProfile.profileImage}`
-                : 'http://localhost/api/profileImages/default-profile-image.png'
+                ? `https://mindmate.shop/api${userProfile.profileImage}`
+                : 'https://mindmate.shop/api/profileImages/default-profile-image.png'
             }
             username={userProfile?.username}
             onEditClick={handleProfileEdit}

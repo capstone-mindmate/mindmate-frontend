@@ -128,7 +128,7 @@ const MagazineWrite: React.FC = () => {
 
     // 간단한 API 호출로 토큰 유효성 확인
     // todo: 수정
-    fetch('http://localhost/api/profiles', {
+    fetch('https://mindmate.shop/api/profiles', {
       headers: { Authorization: `Bearer ${accessToken}` },
       credentials: 'include',
     })

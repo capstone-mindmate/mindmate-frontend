@@ -75,7 +75,7 @@ const EmoticonHome = () => {
       try {
         // 프로필 정보
         let profileRes = await fetchWithRefresh(
-          'http://localhost/api/profiles',
+          'https://mindmate.shop/api/profiles',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -86,7 +86,7 @@ const EmoticonHome = () => {
 
         // 포인트 잔액
         let pointRes = await fetchWithRefresh(
-          'http://localhost/api/points/balance',
+          'https://mindmate.shop/api/points/balance',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -98,7 +98,7 @@ const EmoticonHome = () => {
 
         // 상점 이모티콘
         let shopRes = await fetchWithRefresh(
-          'http://localhost/api/emoticons/shop',
+          'https://mindmate.shop/api/emoticons/shop',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -109,7 +109,7 @@ const EmoticonHome = () => {
 
         // 내 이모티콘
         let myRes = await fetchWithRefresh(
-          'http://localhost/api/emoticons/my',
+          'https://mindmate.shop/api/emoticons/my',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -174,8 +174,8 @@ const EmoticonHome = () => {
         <ProfileContainer>
           <EmoticonProfile
             profileImage={
-              'http://localhost/api' + profile?.profileImage ||
-              'http://localhost/api/profileImages/default-profile-image.png'
+              'https://mindmate.shop/api' + profile?.profileImage ||
+              'https://mindmate.shop/api/profileImages/default-profile-image.png'
             }
             name={profile?.nickname || '프로필이름'}
             heldCoins={pointBalance ?? 0}

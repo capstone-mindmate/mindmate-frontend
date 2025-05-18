@@ -103,7 +103,7 @@ const ReportPage = ({
         targetId: targetUserId,
       }
       try {
-        const res = await fetchWithRefresh('http://localhost/api/report', {
+        const res = await fetchWithRefresh('https://mindmate.shop/api/report', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
