@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 
-// 프레임 메인 컨테이너
+// 프레임 메인 컨테이너 - 기존 사이즈 유지
 export const FrameContainer = styled.div`
   position: relative;
   border-radius: 8px;
@@ -15,18 +15,24 @@ export const FrameContainer = styled.div`
   height: 100%;
 `
 
-// 이미지 컨테이너
+// 이미지 컨테이너 - 비율 고정
 export const ImageContainer = styled.div`
   width: 100%;
-  height: 100%;
+  height: 0;
+  padding-bottom: 133.33%; /* 3:4 비율로 고정 (75%는 4:3 비율) */
   position: relative;
+  overflow: hidden;
 `
 
-// 이미지 요소
+// 이미지 요소 - 컨테이너에 맞게 absolute 포지셔닝하여 비율 유지
 export const FrameImage = styled.img`
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center; /* 이미지가 중앙에 위치하도록 설정 */
 `
 
 // 텍스트 오버레이 컨테이너

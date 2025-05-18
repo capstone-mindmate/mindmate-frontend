@@ -1,4 +1,17 @@
 import styled from '@emotion/styled'
+import { keyframes } from '@emotion/react'
+
+// 애니메이션 효과를 위한 키프레임
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`
 
 // 매거진 전체 컨테이너
 export const MagazineGrid = styled.div`
@@ -17,9 +30,6 @@ export const MagazineItemContainer = styled.div`
   position: relative;
   border-radius: 12px;
   overflow: hidden;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
   background-color: #ffffff;
   cursor: pointer;
   /* 기본: 5개 컬럼 (아래에서 계산 수정) */
@@ -29,6 +39,9 @@ export const MagazineItemContainer = styled.div`
   margin-bottom: 8px;
   flex-shrink: 0;
   max-width: 180px;
+
+  /* 기본 트랜지션 */
+  transition: all 0.3s ease;
 
   /* 미디어 쿼리 수정 - 4개 컬럼 */
   @media all and (max-width: 884px) {
@@ -121,4 +134,105 @@ export const ImageGradient = styled.div`
     rgba(0, 0, 0, 0) 60%
   );
   z-index: 1;
+`
+
+// 매거진 컨테이너에 애니메이션 효과 추가
+export const MagazineContainer = styled.div`
+  .magazine-transition-container {
+    animation: fadeIn 0.3s ease;
+  }
+
+  /* 정렬 변경 시 애니메이션용 컨테이너 */
+  .magazine-container {
+    transition: all 0.3s ease;
+  }
+`
+
+// 매거진 리스트 페이지에 추가할 스타일
+export const MagazineTransitionContainer = styled.div`
+  transition: opacity 0.3s ease;
+
+  &.transitioning {
+    opacity: 0.7;
+  }
+
+  /* 애니메이션 전환 효과를 위한 스타일 */
+  .magazine-item {
+    transition:
+      transform 0.5s ease,
+      opacity 0.5s ease;
+    will-change: transform, opacity;
+  }
+`
+
+// 포맷팅 지원
+export const MagazineContent = styled.div`
+  color: #333;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 15px 0;
+    border-radius: 8px;
+  }
+
+  p {
+    margin: 15px 0;
+  }
+
+  /* Quill 에디터 스타일 추가 */
+  strong,
+  b {
+    font-weight: bold;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  u {
+    text-decoration: underline;
+  }
+
+  /* 정렬 스타일 */
+  .ql-align-center {
+    text-align: center;
+  }
+
+  .ql-align-right {
+    text-align: right;
+  }
+
+  .ql-align-justify {
+    text-align: justify;
+  }
+
+  /* 크기 스타일 */
+  .ql-size-small {
+    font-size: 0.75em;
+  }
+
+  .ql-size-large {
+    font-size: 1.5em;
+  }
+
+  .ql-size-huge {
+    font-size: 2em;
+  }
+
+  /* 색상과 배경색 스타일은 인라인으로 적용됨 */
+
+  /* 이모티콘 스타일 */
+  .magazine-emoticon {
+    display: inline-block;
+    width: 70px;
+    height: 70px;
+    vertical-align: middle;
+    margin: 0 5px;
+  }
 `

@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { RootContainer, ChatContainer, LogoText } from './styles/RootStyles'
 import { CategoryFilterContainer } from './styles/ChatHomeStyles'
@@ -8,6 +9,9 @@ import TopBar from '../../components/topbar/Topbar'
 import NavigationComponent from '../../components/navigation/navigationComponent'
 import FilterButton from '../../components/buttons/filterButton'
 import ChatItem from '../../components/chat/pageComponent/ChatItem'
+import { fetchWithRefresh, getTokenCookie } from '../../utils/fetchWithRefresh'
+import { useAuthStore } from '../../stores/userStore'
+import { useUserQuery } from '../../hooks/useUserQuery'
 
 interface ChatHomeProps {
   matchId?: string
@@ -29,65 +33,14 @@ interface ChatItemType {
 }
 
 const ChatHome = ({ matchId }: ChatHomeProps) => {
-  // 채팅 목록 더미 데이터
-  const chatItems: ChatItemType[] = [
-    {
-      id: '1',
-      profileImage:
-        'https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg?wp=1&w=357&h=357',
-      userName: '홍길동',
-      lastTime: '19:52',
-      category: '진로',
-      userType: '리스너',
-      subject: '진로 고민 들어주세요',
-      message: '진짜 괜찮겠죠?,,ㅠ',
-      isRead: false,
-      unreadCount: 10,
-      isCompleted: false,
-    },
-    {
-      id: '2',
-      profileImage:
-        'https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg?wp=1&w=357&h=357',
-      userName: '석지원',
-      lastTime: '19:20',
-      category: '진로',
-      userType: '리스너',
-      subject: '살려주세요..',
-      message: '마감이 얼마 안남았어요..ㅠㅠ',
-      isRead: true,
-      unreadCount: 0,
-      isCompleted: false,
-    },
-    {
-      id: '3',
-      profileImage:
-        'https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg?wp=1&w=357&h=357',
-      userName: '김스피커',
-      lastTime: '18:45',
-      category: '인간관계',
-      userType: '스피커',
-      subject: '선배와의 관계',
-      message: '선배가 요새 연락을 안받아요',
-      isRead: true,
-      unreadCount: 2,
-      isCompleted: false,
-    },
-    {
-      id: '4',
-      profileImage:
-        'https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg?wp=1&w=357&h=357',
-      userName: '이완료',
-      lastTime: '어제',
-      category: '취업',
-      userType: '스피커',
-      subject: '취업 준비',
-      message: '감사합니다! 도움이 많이 됐어요.',
-      isRead: true,
-      unreadCount: 0,
-      isCompleted: true,
-    },
-  ]
+  // 사용자 인증 정보 가져오기
+  const { user } = useAuthStore()
+  // 사용자 정보 로드
+  const { isLoading: isUserLoading, error: userError } = useUserQuery()
+
+  // 채팅방 목록 상태
+  const [chatItems, setChatItems] = useState<ChatItemType[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   // 필터 상태 관리 (전체, 리스너, 스피커, 완료)
   const [activeFilter, setActiveFilter] = useState<string>('전체')
@@ -124,9 +77,77 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
     }
   }
 
+  const navigate = useNavigate()
+
   const handleChatItemClick = (itemId: string) => {
-    console.log('채팅 아이템 클릭 : ', itemId)
+    navigate(`/chat/${itemId}`)
   }
+
+  useEffect(() => {
+    // 토큰 확인 및 디버깅
+    const cookieToken = getTokenCookie('accessToken')
+    const tokenToUse = user?.accessToken || cookieToken
+
+    if (!tokenToUse) {
+      return
+    }
+
+    // 사용자 정보 로딩 중이면 API 호출 안함
+    if (isUserLoading) {
+      return
+    }
+
+    // 채팅방 목록 API 호출
+    const fetchChatRooms = async () => {
+      setIsLoading(true)
+      try {
+        const res = await fetchWithRefresh('http://localhost/api/chat/rooms', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${tokenToUse}`,
+          },
+          credentials: 'include',
+        })
+        if (!res.ok) throw new Error('채팅방 목록을 불러오지 못했습니다.')
+        const data = await res.json()
+        if (Array.isArray(data.content)) {
+          // 서버 응답을 ChatItemType[]로 변환
+          const mapped = data.content.map((item: any) => ({
+            id: String(item.roomId),
+            profileImage: item.oppositeImage ?? '',
+            userName: item.oppositeName ?? '본인',
+            lastTime: item.lastMessageTime
+              ? new Date(item.lastMessageTime).toLocaleTimeString('ko-KR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : '',
+            category: '', // 필요시 matchingTitle 등에서 추출
+            userType: item.userRole === 'SPEAKER' ? '스피커' : '리스너',
+            subject: item.matchingTitle ?? '',
+            message: item.lastMessage ?? '',
+            isRead: (item.unreadCount ?? 0) === 0,
+            unreadCount: item.unreadCount ?? 0,
+            isCompleted: item.chatRoomStatus === 'CLOSED',
+          }))
+          setChatItems(mapped)
+        } else {
+          setChatItems([])
+        }
+      } catch (e) {
+        console.error('채팅방 목록 불러오기 실패:', e)
+        setChatItems([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchChatRooms()
+
+    // 매번 API를 호출하지 않도록 의존성 배열에 user.id만 포함
+    // 사용자 정보(ID)가 변경될 때만 API 호출
+  }, [user?.id, isUserLoading])
 
   return (
     <RootContainer>
@@ -163,11 +184,21 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
       </CategoryFilterContainer>
 
       <ChatContainer>
-        {filteredChatItems.length > 0 ? (
+        {isLoading ? (
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '40px 20px',
+              color: '#888',
+            }}
+          >
+            채팅방 목록을 불러오는 중...
+          </div>
+        ) : filteredChatItems.length > 0 ? (
           filteredChatItems.map((item, index) => (
             <ChatItem
               key={item.id}
-              profileImage={item.profileImage}
+              profileImage={'http://localhost/api' + item.profileImage}
               userName={item.userName}
               lastTime={item.lastTime}
               category={item.category}

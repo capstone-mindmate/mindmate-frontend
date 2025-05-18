@@ -39,15 +39,16 @@ import {
   categoryMap,
   sortMap,
   sortDisplayMap,
-  dummyMagazineItems,
   MagazineItem,
   MagazineApiResponse,
 } from './magazinedata'
+import { getTokenCookie } from '../../utils/fetchWithRefresh'
 
 const MagazineList: React.FC = () => {
   const navigate = useNavigate()
   const searchInputRef = useRef<HTMLInputElement>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const lastLoadedPageRef = useRef<number>(0) // 마지막으로 로드한 페이지 추적
 
   // 상태 관리
   const [isSearchActive, setIsSearchActive] = useState(false)
@@ -57,128 +58,257 @@ const MagazineList: React.FC = () => {
   const [magazineItems, setMagazineItems] = useState<MagazineItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // 애니메이션 관련 상태
+  const [animationKey, setAnimationKey] = useState(0)
 
   // 무한 스크롤 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(0)
   const [pageSize] = useState(10)
 
-  // API 호출로 데이터 가져오기
+  // 로컬 데이터 캐싱
+  const [allMagazineItems, setAllMagazineItems] = useState<MagazineItem[]>([])
+
+  // 정렬 및 필터 적용하는 함수
+  const applySortAndFilter = () => {
+    if (allMagazineItems.length === 0) return
+
+    // 정렬 기능 구현
+    const sortedItems = [...allMagazineItems].sort((a, b) => {
+      if (sortBy === 'POPULARITY') {
+        return (b.likeCount || 0) - (a.likeCount || 0)
+      } else if (sortBy === 'LATEST') {
+        return (b.updatedAt?.getTime() || 0) - (a.updatedAt?.getTime() || 0)
+      } else {
+        return (a.updatedAt?.getTime() || 0) - (b.updatedAt?.getTime() || 0)
+      }
+    })
+
+    // 카테고리 필터링
+    const filteredItems = category
+      ? sortedItems.filter((item) => item.category === category)
+      : sortedItems
+
+    // 검색어 필터링
+    const searchedItems = searchQuery
+      ? filteredItems.filter(
+          (item) =>
+            item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (item.description || '')
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+        )
+      : filteredItems
+
+    // 매거진 아이템 업데이트
+    setMagazineItems(searchedItems)
+
+    // 애니메이션을 위한 키 업데이트
+    setAnimationKey((prev) => prev + 1)
+  }
+
   const fetchMagazines = async (page = currentPage, isInitialLoad = false) => {
     if (isLoading || (!hasMore && !isInitialLoad)) return
 
+    // 같은 페이지를 다시 요청하는 것 방지 (중복 요청 방지)
+    if (!isInitialLoad && page === lastLoadedPageRef.current) {
+      //console.log(`페이지 ${page} 이미 로드됨, 건너뜀`);
+      return
+    }
+
     setIsLoading(true)
+    setError(null)
+
     try {
       // 쿼리 파라미터 생성
       const params = new URLSearchParams()
-      if (category) params.append('category', category)
-      if (searchQuery) params.append('keyword', searchQuery)
-      params.append('sortBy', sortBy)
+      // 초기 로딩에는 필터 없이 모든 데이터 로드
+      if (!isInitialLoad) {
+        if (category) params.append('category', category)
+        if (searchQuery) params.append('keyword', searchQuery)
+        params.append('sortBy', sortBy)
+      }
       params.append('page', page.toString())
       params.append('size', pageSize.toString())
 
       // API URL
-      const apiUrl = `/api/magazines?${params.toString()}`
+      const apiUrl = `http://localhost/api/magazines?${params.toString()}`
 
-      // 실제 API 호출 (개발 중에는 주석 처리하고 아래 더미 데이터 사용)
-      // const response = await fetch(apiUrl)
-      // const data: MagazineApiResponse = await response.json()
-
-      // 개발을 위한 더미 데이터 생성
-      // 무한 스크롤 및 필터링/정렬 시뮬레이션
-      let filteredItems = [...dummyMagazineItems]
-
-      // 카테고리 필터링
-      if (category) {
-        filteredItems = filteredItems.filter(
-          (item) => (item.category as CategoryOption) === category
-        )
+      // 인증 토큰 가져오기
+      const accessToken = getTokenCookie('accessToken')
+      if (!accessToken) {
+        console.warn('인증 토큰이 없습니다.')
       }
 
-      // 검색어 필터링
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase()
-        filteredItems = filteredItems.filter(
-          (item) =>
-            item.title.toLowerCase().includes(query) ||
-            item.detail.toLowerCase().includes(query)
-        )
-      }
-
-      // 정렬 적용
-      if (sortBy === 'LATEST') {
-        // 최신순 정렬 (id 기준 내림차순으로 가정)
-        filteredItems.sort((a, b) => Number(b.id) - Number(a.id))
-      } else if (sortBy === 'OLDEST') {
-        // 오래된순 정렬 (id 기준 오름차순으로 가정)
-        filteredItems.sort((a, b) => Number(a.id) - Number(b.id))
-      } else {
-        // 인기순 정렬 (likeCount 기준으로 가정)
-        filteredItems.sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0))
-      }
-
-      // 페이지네이션 적용
-      const total = filteredItems.length
-      const start = page * pageSize
-      const end = start + pageSize
-      const paginatedItems = filteredItems.slice(start, end)
-
-      // 실제 API 응답 구조에 맞추어 더미 데이터 구성
-      const mockApiResponse: MagazineApiResponse = {
-        content: paginatedItems,
-        totalPages: Math.ceil(total / pageSize),
-        totalElements: total,
-        size: pageSize,
-        number: page,
-        first: page === 0,
-        last: page === Math.ceil(total / pageSize) - 1,
-        numberOfElements: paginatedItems.length,
-        empty: paginatedItems.length === 0,
-        pageable: {
-          offset: page * pageSize,
-          pageNumber: page,
-          pageSize: pageSize,
-          paged: true,
-          unpaged: false,
+      // API 호출
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error(
+          `API 호출 실패: ${response.status} ${response.statusText}`
+        )
       }
+
+      const data: MagazineApiResponse = await response.json()
+      //console.log('API 응답:', data)
+
+      // 마지막으로 로드한 페이지 업데이트
+      lastLoadedPageRef.current = page
 
       // 더 불러올 데이터가 있는지 확인
-      const newHasMore = page < mockApiResponse.totalPages - 1
+      const newHasMore = !data.last
       setHasMore(newHasMore)
 
-      // 데이터 업데이트 (초기 로드면 대체, 아니면 추가)
-      if (isInitialLoad) {
-        setMagazineItems(paginatedItems)
-      } else {
-        setMagazineItems((prev) => [...prev, ...paginatedItems])
-      }
+      // 데이터 매핑 - API 응답 구조에 맞게 매거진 아이템으로 변환
+      const fetchedItems: MagazineItem[] = data.content.map((item) => {
+        // 이미지 URL 추출 및 처리: IMAGE 타입 중 가장 작은 id를 가진 항목의 imageUrl 사용
+        let thumbnailUrl = ''
 
-      // 개발 환경에서 콘솔에 정보 출력
-      console.log('API 호출 파라미터:', {
-        category,
-        searchQuery,
-        sortBy,
-        page,
-        pageSize,
-        isInitialLoad,
+        // IMAGE 타입 콘텐츠만 필터링
+        const imageContents = item.contents.filter(
+          (content) => content.type === 'IMAGE' && content.imageUrl
+        )
+
+        // id 기준으로 정렬하여 가장 작은 id의 이미지 선택
+        if (imageContents.length > 0) {
+          // id 기준 오름차순 정렬
+          const sortedImageContents = [...imageContents].sort(
+            (a, b) => a.id - b.id
+          )
+          const smallestIdImage = sortedImageContents[0]
+
+          if (smallestIdImage && smallestIdImage.imageUrl) {
+            // 이미지 URL이 상대 경로인 경우 기본 URL 추가
+            thumbnailUrl = smallestIdImage.imageUrl.startsWith('http')
+              ? smallestIdImage.imageUrl
+              : `http://localhost/api${smallestIdImage.imageUrl}`
+          }
+        }
+
+        // 텍스트 콘텐츠 추출
+        const textContent = item.contents.find(
+          (content) => content.type === 'TEXT' && content.text
+        )
+
+        const description = textContent?.text || ''
+
+        // 매거진 아이템 생성
+        return {
+          id: item.id.toString(),
+          title: item.title,
+          detail: item.subtitle || '',
+          thumbnailUrl: thumbnailUrl,
+          category: item.category as CategoryOption,
+          likeCount: item.likeCount,
+          authorName: item.authorName,
+          authorId: item.authorId,
+          updatedAt: new Date(item.updatedAt),
+          description,
+        }
       })
-      console.log('API 응답 (모의):', mockApiResponse)
+
+      // 데이터 업데이트
+      if (isInitialLoad) {
+        // 초기 로드 시 모든 아이템을 캐시에 저장하고 정렬/필터 적용
+        setAllMagazineItems(fetchedItems)
+
+        // 정렬 및 필터 적용
+        const sortedFilteredItems = applySortAndFilterItems(fetchedItems)
+        setMagazineItems(sortedFilteredItems)
+      } else {
+        // 추가 페이지 로드 시 중복 제거 후 추가
+        setAllMagazineItems((prev) => {
+          // 기존 아이템 ID 목록
+          const existingIds = new Set(prev.map((item) => item.id))
+
+          // 중복되지 않는 새 아이템만 필터링
+          const newItems = fetchedItems.filter(
+            (item) => !existingIds.has(item.id)
+          )
+
+          // 로그로 확인
+          if (fetchedItems.length !== newItems.length) {
+            //console.log(`중복 아이템 ${fetchedItems.length - newItems.length}개 제거됨`);
+          }
+
+          return [...prev, ...newItems]
+        })
+
+        setMagazineItems((prev) => {
+          // 기존 아이템 ID 목록
+          const existingIds = new Set(prev.map((item) => item.id))
+
+          // 중복되지 않는 새 아이템만 필터링
+          const newItems = fetchedItems.filter(
+            (item) => !existingIds.has(item.id)
+          )
+
+          return [...prev, ...newItems]
+        })
+      }
     } catch (error) {
       console.error('매거진 목록 조회 오류:', error)
+      setError(
+        error instanceof Error
+          ? error.message
+          : '매거진 목록을 불러오는 중 오류가 발생했습니다'
+      )
+      setHasMore(false)
     } finally {
       setIsLoading(false)
     }
   }
 
-  // 필터 변경 시 데이터 다시 불러오기 (페이지 초기화)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setCurrentPage(0) // 필터 변경 시 첫 페이지로 리셋
-      setMagazineItems([]) // 기존 아이템 초기화
-      fetchMagazines(0, true) // 초기 데이터 로드
-    }, 300)
+  // 정렬 및 필터를 아이템에 적용하는 함수
+  const applySortAndFilterItems = (items: MagazineItem[]) => {
+    // 정렬 기능 구현
+    const sortedItems = [...items].sort((a, b) => {
+      if (sortBy === 'POPULARITY') {
+        return (b.likeCount || 0) - (a.likeCount || 0)
+      } else if (sortBy === 'LATEST') {
+        return (b.updatedAt?.getTime() || 0) - (a.updatedAt?.getTime() || 0)
+      } else {
+        return (a.updatedAt?.getTime() || 0) - (b.updatedAt?.getTime() || 0)
+      }
+    })
 
-    return () => clearTimeout(timer)
+    // 카테고리 필터링
+    const filteredItems = category
+      ? sortedItems.filter((item) => item.category === category)
+      : sortedItems
+
+    // 검색어 필터링
+    const searchedItems = searchQuery
+      ? filteredItems.filter(
+          (item) =>
+            item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (item.description || '')
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+        )
+      : filteredItems
+
+    return searchedItems
+  }
+
+  // 필터 변경 시 정렬 및 필터 다시 적용
+  useEffect(() => {
+    if (allMagazineItems.length > 0) {
+      // 클라이언트 측에서 정렬 및 필터링 처리
+      const filteredSortedItems = applySortAndFilterItems(allMagazineItems)
+      setMagazineItems(filteredSortedItems)
+
+      // 애니메이션을 위한 키 업데이트
+      setAnimationKey((prev) => prev + 1)
+    }
   }, [category, sortBy, searchQuery])
 
   // 무한 스크롤 Observer 설정
@@ -229,6 +359,9 @@ const MagazineList: React.FC = () => {
 
   // 초기 데이터 로드
   useEffect(() => {
+    // 컴포넌트 마운트 시 초기화
+    setCurrentPage(0)
+    lastLoadedPageRef.current = 0
     fetchMagazines(0, true)
   }, [])
 
@@ -239,7 +372,7 @@ const MagazineList: React.FC = () => {
 
   // 매거진 아이템 클릭 핸들러
   const handleMagazineItemClick = (item: MagazineItem) => {
-    console.log('클릭된 매거진 아이템:', item)
+    //console.log('클릭된 매거진 아이템:', item)
     navigate(`/magazine/${item.id}`)
   }
 
@@ -354,13 +487,17 @@ const MagazineList: React.FC = () => {
         </TopFixedContent>
 
         <MagazineContent>
-          {magazineItems.length > 0 ? (
-            <Magazine
-              items={magazineItems}
-              onItemClick={handleMagazineItemClick}
-              onBackClick={handleBackClick}
-            />
-          ) : !isLoading ? (
+          {error && <EmptyMessage>{error}</EmptyMessage>}
+
+          {!error && magazineItems.length > 0 ? (
+            <div key={animationKey} className="magazine-transition-container">
+              <Magazine
+                items={magazineItems}
+                onItemClick={handleMagazineItemClick}
+                onBackClick={handleBackClick}
+              />
+            </div>
+          ) : !isLoading && !error ? (
             <EmptyMessage>
               {searchQuery || category
                 ? '검색 결과가 없습니다.'

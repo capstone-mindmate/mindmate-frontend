@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import TopBar from '../../components/topbar/Topbar'
 import ApplicationInfo from '../../components/matching/applicationInfo'
 import ModalComponent from '../../components/modal/modalComponent'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 import { css } from '@emotion/react'
 
@@ -55,22 +56,71 @@ const dummyApplicationsData = [
 
 interface MatchedApplicationProps {}
 
+// API로부터 받아온 신청자 정보 타입
+interface WaitingUser {
+  id: number
+  waitingUserId: number
+  waitingUserNickname: string
+  waitingUserDepartment: string
+  waitingUserEntranceTime: number
+  waitingUserGraduation: boolean
+  waitingUserCounselingCount: number
+  waitingUserProfileImage: string
+  message: string
+  status: string
+  createdAt: string
+}
+
 const MatchedApplication = ({}: MatchedApplicationProps) => {
   const location = useLocation()
   const navigate = useNavigate()
   const { item } = location.state || {}
-  const [applications, setApplications] = useState(dummyApplicationsData)
+  const [applications, setApplications] = useState<WaitingUser[]>([])
   const [matchedRoom, setMatchedRoom] = useState(item || null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedApplication, setSelectedApplication] = useState<
-    (typeof dummyApplicationsData)[0] | null
-  >(null)
+  const [selectedApplication, setSelectedApplication] =
+    useState<WaitingUser | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    // API 호출 로직 추가하기
+    // 매칭 신청자 목록 조회 API 호출
+    const fetchWaitingUsers = async () => {
+      if (!matchedRoom || !matchedRoom.id) {
+        // 매칭방 정보가 없으면 더미 데이터 사용
+        return
+      }
+
+      setIsLoading(true)
+      try {
+        const res = await fetchWithRefresh(
+          `http://localhost/api/matchings/${matchedRoom.id}/waiting-users?page=0&size=20`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+
+        if (!res.ok) {
+          throw new Error('매칭 신청자 목록을 불러오지 못했습니다.')
+        }
+
+        const data = await res.json()
+        if (Array.isArray(data.content)) {
+          setApplications(data.content)
+        } else {
+          setApplications([])
+        }
+      } catch (error) {
+        console.error('매칭 신청자 목록 조회 실패:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchWaitingUsers()
   }, [matchedRoom])
 
-  const handleOpenModal = (application: (typeof dummyApplicationsData)[0]) => {
+  const handleOpenModal = (application: WaitingUser) => {
     setSelectedApplication(application)
     setIsModalOpen(true)
   }
@@ -79,14 +129,35 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
     setIsModalOpen(false)
   }
 
-  const handleMatchApplicationClick = (
-    application: (typeof dummyApplicationsData)[0]
-  ) => {
+  const handleMatchApplicationClick = (application: WaitingUser) => {
     handleOpenModal(application)
   }
 
-  const handleMatchingRequest = () => {
-    // 여기서 매칭 신청 콜하기
+  const handleMatchingRequest = async () => {
+    if (!selectedApplication || !matchedRoom) return
+
+    try {
+      const res = await fetchWithRefresh(
+        `http://localhost/api/matchings/${matchedRoom.id}/${selectedApplication.id}/acceptance`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+
+      if (!res.ok) {
+        throw new Error('매칭 수락에 실패했습니다.')
+      }
+
+      // 성공 시 모달 닫기 및 리스트 새로고침
+      handleCloseModal()
+
+      // 성공 메시지 또는 알림 표시 (실제 구현 필요)
+      navigate('/matching/matched')
+    } catch (error) {
+      console.error('매칭 수락 실패:', error)
+      alert('매칭 수락에 실패했습니다. 다시 시도해주세요.')
+    }
   }
 
   const renderModal = () => {
@@ -100,18 +171,23 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
         onClose={handleCloseModal}
         isOpen={isModalOpen}
         userProfileProps={{
-          profileImage: selectedApplication.profileImage,
-          name: selectedApplication.name,
-          department: selectedApplication.department,
-          makeDate: selectedApplication.makeDate,
+          profileImage:
+            'http://localhost/api' +
+            selectedApplication.waitingUserProfileImage,
+          name: selectedApplication.waitingUserNickname,
+          department: selectedApplication.waitingUserDepartment,
+          makeDate: new Date(
+            selectedApplication.createdAt
+          ).toLocaleDateString(),
+          userId: selectedApplication.waitingUserId,
         }}
         matchingInfoProps={{
-          title: 'asdf',
-          description: 'asdf',
+          title: matchedRoom?.title || '',
+          description: matchedRoom?.description || '',
         }}
         messageProps={{
           onMessageChange: () => {},
-          messageValue: 'asdf',
+          messageValue: selectedApplication.message,
         }}
       />
     )
@@ -122,21 +198,25 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
       <TopBar title="매칭 신청 정보" showBackButton actionText="" />
       <MatchingContainer>
         <ApplicationList pageType="matched">
-          {applications.length > 0 ? (
+          {isLoading ? (
+            <div>로딩 중...</div>
+          ) : applications.length > 0 ? (
             applications.map((application, index) => (
               <ApplicationInfo
                 key={application.id}
-                profileImage={application.profileImage}
-                name={application.name}
-                department={application.department}
-                makeDate={application.makeDate}
+                profileImage={
+                  'http://localhost/api' + application.waitingUserProfileImage
+                }
+                name={application.waitingUserNickname}
+                department={application.waitingUserDepartment}
+                makeDate={new Date(application.createdAt).toLocaleDateString()}
                 onClick={() => handleMatchApplicationClick(application)}
                 message={application.message}
                 borderSet={index < applications.length - 1}
               />
             ))
           ) : (
-            <div></div>
+            <div>신청자가 없습니다.</div>
           )}
         </ApplicationList>
       </MatchingContainer>

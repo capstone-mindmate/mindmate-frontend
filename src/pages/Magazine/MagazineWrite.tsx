@@ -16,7 +16,7 @@ import {
   getStorageOptimizedContent,
   ImageState,
 } from './MagazineImageHandler'
-//import { postMagazine } from './MagazineContentParser'
+import { postMagazine } from './MagazineContentParser'
 import { EmoticonType } from '../../components/emoticon/Emoticon'
 import EmoticonPicker from '../../components/emoticon/EmoticonPicker'
 import {
@@ -30,6 +30,7 @@ import {
 } from './styles/EmoticonButtonStyles'
 import { css } from '@emotion/react'
 import { SmileIcon } from '../../components/icon/iconComponents'
+import { getTokenCookie } from '../../utils/fetchWithRefresh'
 
 // 제목과 소제목 글자 수 제한 상수
 const TITLE_MAX_LENGTH = 18
@@ -88,6 +89,7 @@ const MagazineWrite: React.FC = () => {
   const [content, setContent] = useState('')
   const [isActive, setIsActive] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [authStatus, setAuthStatus] = useState<boolean | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const quillRef = useRef<ReactQuill>(null)
   const toolbarRef = useRef<HTMLDivElement | null>(null)
@@ -112,6 +114,40 @@ const MagazineWrite: React.FC = () => {
   const [fadeState, setFadeState] = useState('fade-in')
   // 카테고리 상태 추가
   const [category, setCategory] = useState('진로')
+
+  // 컴포넌트 마운트 시 인증 상태 확인
+  useEffect(() => {
+    // 인증 상태 확인
+    const accessToken = getTokenCookie('accessToken')
+    if (!accessToken) {
+      alert('로그인이 필요합니다.')
+      navigate('/onboarding')
+      return
+    }
+
+    // 간단한 API 호출로 토큰 유효성 확인
+    // todo: 수정
+    fetch('http://localhost/api/profiles', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      credentials: 'include',
+    })
+      .then((response) => {
+        if (response.ok) {
+          setAuthStatus(true)
+        } else {
+          console.error('인증 실패:', response.status)
+          setAuthStatus(false)
+          if (response.status === 401) {
+            alert('로그인 세션이 만료되었습니다.')
+            navigate('/onboarding')
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('인증 확인 오류:', error)
+        setAuthStatus(false)
+      })
+  }, [navigate])
 
   // 이미지 버튼 클릭 핸들러
   const handleImageClick = useCallback(() => {
@@ -139,7 +175,7 @@ const MagazineWrite: React.FC = () => {
       console.log('이모티콘 선택됨:', type)
 
       // 새로운 간소화된 함수 사용
-      insertEmoticonToEditor(quillRef, type, onclose)
+      insertEmoticonToEditor(quillRef, type, () => setShowEmoticonPicker(false))
 
       // 이모티콘 피커 닫기
       setShowEmoticonPicker(false)
@@ -327,15 +363,98 @@ const MagazineWrite: React.FC = () => {
     navigate('/magazinelist')
   }
 
-  // 등록 버튼 핸들러 - 새로운 API 형식에 맞게 수정
+  // 등록 버튼 핸들러 - 이미지 처리 개선
   const handleSubmit = async () => {
     if (!isActive || isSubmitting) return
 
     try {
       setIsSubmitting(true) // 제출 중 상태 설정
 
+      // 인증 상태 확인
+      const accessToken = getTokenCookie('accessToken')
+      if (!accessToken) {
+        alert('로그인이 필요합니다.')
+        navigate('/onboarding')
+        return
+      }
+
+      // 마지막 유효성 검사
+      if (!title.trim() || !subtitle.trim() || !content.trim()) {
+        alert('제목, 소제목, 내용은 필수 입력사항입니다.')
+        return
+      }
+
+      // HTML에서 이미지 태그 확인
+      // 이모티콘이 아닌 실제 이미지를 찾는 로직
+      const tempDiv = document.createElement('div')
+      tempDiv.innerHTML = content
+      const allImages = tempDiv.querySelectorAll('img')
+      const actualImages = Array.from(allImages).filter(
+        (img) => !img.classList.contains('magazine-emoticon')
+      )
+
+      if (actualImages.length === 0) {
+        alert('매거진에는 최소 1개의 이미지가 필요합니다.')
+        return
+      }
+
+      // 이미지에 data-image-id 속성이 올바르게 설정되어 있는지 확인
+      const imagesWithoutId = actualImages.filter(
+        (img) => !img.getAttribute('data-image-id')
+      )
+      if (imagesWithoutId.length > 0) {
+        console.log('ID가 없는 이미지 발견, 자동 설정 시도...')
+
+        // Quill 에디터에서 이미지에 ID 설정
+        const quill = quillRef.current?.getEditor()
+        if (quill) {
+          const editorImages = quill.root.querySelectorAll(
+            'img:not(.magazine-emoticon)'
+          )
+          let hasFixedImages = false
+
+          editorImages.forEach((img) => {
+            if (!img.hasAttribute('data-image-id')) {
+              // 이미지에 ID가 없는 경우 자동 생성
+              const newId = `img_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+              img.setAttribute('data-image-id', newId)
+              hasFixedImages = true
+              console.log('누락된 이미지 ID 추가:', newId)
+            }
+          })
+
+          // 에디터 내용이 변경된 경우 content 상태 업데이트
+          if (hasFixedImages) {
+            const updatedContent = quill.root.innerHTML
+            setContent(updatedContent)
+            console.log('이미지 ID 보정 후 콘텐츠 업데이트')
+
+            // 이미지 ID가 업데이트되었으므로 상태를 재설정하고 다시 시도
+            setTimeout(() => {
+              setIsSubmitting(false)
+              handleSubmit()
+            }, 100)
+            return
+          }
+        }
+      }
+
+      // 디버깅 정보
+      console.log('제출 콘텐츠 정보:', {
+        제목: title,
+        소제목: subtitle,
+        카테고리: category,
+        '콘텐츠 길이': content.length,
+        '이미지 수': actualImages.length,
+        '이미지 ID들': actualImages.map((img) =>
+          img.getAttribute('data-image-id')
+        ),
+      })
+
       // 매거진 게시 함수 호출
-      //const result = await postMagazine(title, subtitle, category, content)
+      console.log('매거진 등록 시도...')
+      const result = await postMagazine(title, subtitle, category, content)
+      console.log('매거진 등록 결과:', result)
 
       // 성공 시 로컬 스토리지 드래프트 삭제
       localStorage.removeItem(STORAGE_KEY)
@@ -344,10 +463,54 @@ const MagazineWrite: React.FC = () => {
       alert('매거진이 성공적으로 등록되었습니다. 검토 후 게시됩니다.')
 
       // 매거진 목록 페이지로 이동
-      navigate('/magazine')
+      navigate('/magazinelist')
     } catch (error) {
+      // API 호출 오류 처리
       console.error('매거진 등록 실패:', error)
-      alert('매거진 등록 중 오류가 발생했습니다. 다시 시도해주세요.')
+
+      if (error instanceof Error) {
+        const errorMessage = error.message || ''
+
+        // 오류 유형별 분류 및 사용자 친화적 메시지 제공
+        if (
+          errorMessage.includes('401') ||
+          errorMessage.includes('인증') ||
+          errorMessage.includes('로그인')
+        ) {
+          alert('로그인 세션이 만료되었습니다. 다시 로그인해주세요.')
+          navigate('/onboarding')
+        } else if (
+          errorMessage.includes('MAGAZINE_IMAGE_NOT_FOUND') ||
+          errorMessage.includes('해당 매거진 이미지를 찾을 수 없습니다')
+        ) {
+          alert(
+            '이미지 등록 처리 중 문제가 발생했습니다. 이미지를 모두 삭제하고 다시 추가해 주세요.'
+          )
+        } else if (errorMessage.includes('이미지 업로드 실패')) {
+          alert(
+            '이미지 업로드에 실패했습니다. 이미지 크기와 형식을 확인하고 다시 시도해주세요.'
+          )
+        } else if (
+          errorMessage.includes('최소 한 개 이상의 이미지가 필요합니다') ||
+          errorMessage.includes('유효한 이미지 블록이 없습니다')
+        ) {
+          alert(
+            '매거진에는 최소 한 개 이상의 이미지가 필요합니다. 이미지를 추가해주세요.'
+          )
+        } else if (
+          errorMessage.includes('유효한 이미지 데이터가 아닙니다') ||
+          errorMessage.includes('이미지 데이터 처리 중 오류')
+        ) {
+          alert('올바르지 않은 이미지 형식입니다. 이미지를 다시 삽입해주세요.')
+        } else {
+          // 기타 오류
+          alert(
+            `매거진 등록 중 오류가 발생했습니다. 다시 시도해주세요.\n${errorMessage.substring(0, 100)}`
+          )
+        }
+      } else {
+        alert('매거진 등록 중 오류가 발생했습니다. 다시 시도해주세요.')
+      }
     } finally {
       setIsSubmitting(false) // 제출 중 상태 해제
     }
@@ -361,6 +524,25 @@ const MagazineWrite: React.FC = () => {
     if (!files || files.length === 0) return
 
     const file = files[0]
+
+    // 이미지 파일 유효성 검사 추가
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드할 수 있습니다.')
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+      return
+    }
+
+    // 이미지 크기 제한 (10MB)
+    const maxSize = 10 * 1024 * 1024 // 10MB
+    if (file.size > maxSize) {
+      alert('이미지 크기는 10MB 이하여야 합니다.')
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+      return
+    }
 
     // MagazineImageHandler의 함수를 사용하여 이미지 삽입
     insertImageToQuill(file, quillRef, imageState, setImageState, fileInputRef)
