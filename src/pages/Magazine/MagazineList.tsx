@@ -41,7 +41,7 @@ import {
   sortDisplayMap,
   MagazineItem,
   MagazineApiResponse,
-} from './magazinedata'
+} from './magazineData'
 import { getTokenCookie } from '../../utils/fetchWithRefresh'
 
 const MagazineList: React.FC = () => {

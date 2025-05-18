@@ -1,3 +1,5 @@
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react'
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ReactQuill from 'react-quill'
@@ -28,7 +30,6 @@ import {
   emoticonButtonStyles,
   emoticonPickerOverlayStyles,
 } from './styles/EmoticonButtonStyles'
-import { css } from '@emotion/react'
 import { SmileIcon } from '../../components/icon/iconComponents'
 import { getTokenCookie } from '../../utils/fetchWithRefresh'
 
