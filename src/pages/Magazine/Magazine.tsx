@@ -24,8 +24,7 @@ import {
   AnimatedButtonWrapper,
 } from './styles/MagazineStyles'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
-import { categoryNames } from './magazinedata'
-
+import { categoryNames } from './magazineData'
 // API 응답 데이터 타입 정의
 interface MagazineContent {
   id: number
