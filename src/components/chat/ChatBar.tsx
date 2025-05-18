@@ -9,7 +9,7 @@ import { useToast } from '../toast/ToastProvider'
 import * as IconComponents from '../../components/icon/iconComponents'
 import EmoticonPicker from '../emoticon/EmoticonPicker'
 import { EmoticonType } from '../emoticon/Emoticon'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 interface ChatBarProps {
   onSendMessage: (message: string) => void
@@ -30,6 +30,10 @@ function ChatBar({
   const [showEmoticonPicker, setShowEmoticonPicker] = useState<boolean>(false)
   const { showToast } = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
+  const otherProfileImage = location.state?.profileImage
+  const otherUserName = location.state?.userName
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value)
   }
@@ -49,7 +53,12 @@ function ChatBar({
   }
 
   const handlePlusClick = () => {
-    navigate(`/chat/custom-form/make/${chatId}`)
+    navigate(`/chat/custom-form/make/${chatId}`, {
+      state: {
+        profileImage: otherProfileImage,
+        userName: otherUserName,
+      },
+    })
   }
 
   const handleEmojiClick = () => {
@@ -68,6 +77,7 @@ function ChatBar({
 
   const handleEmoticonShopClick = () => {
     // showToast('이모티콘샵으로 이동합니다', 'info')
+    navigate('/emoticons')
     setShowEmoticonPicker(false)
   }
 
@@ -109,6 +119,7 @@ function ChatBar({
                 type="text"
                 placeholder="메시지를 입력하세요"
                 value={message}
+                disabled={disabled}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
               />

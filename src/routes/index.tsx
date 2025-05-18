@@ -7,7 +7,6 @@ import Matching from '../pages/Matching'
 import HomePage from '../pages/Home/Home.tsx'
 import MyPage from '../pages/Mypage/Mypage.tsx'
 import Notification from '../pages/Home/NotificationPage.tsx'
-import Review from '../pages/Review/ReviewPage.tsx'
 import MagazineList from '../pages/Magazine/MagazineList.tsx'
 import MagazineWrite from '../pages/Magazine/MagazineWrite.tsx'
 import Magazine from '../pages/Magazine/Magazine.tsx'
@@ -35,27 +34,76 @@ import CustomFormView from '../pages/Chat/CustomFormView'
 import ChatHome from '../pages/Chat/ChatHome'
 import ChatRoom from '../pages/Chat/ChatRoom'
 import { useAuthStore } from '../stores/userStore'
-import { useEffect } from 'react'
-import { useNavigate, Navigate, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, Navigate, useParams, useLocation } from 'react-router-dom'
+import { useSocketMessage } from '../hooks/useSocketMessage'
+import CustomFormDone from '../pages/Chat/CustomFormDone'
+import ReviewPage from '../pages/Review/ReviewPage'
 
+// 경로별 컴포넌트 렌더링을 위한 헬퍼 함수
 const ChatRoomRoute = () => {
   const { id } = useParams()
   return <ChatRoom chatId={id} />
 }
 
 const CustomFormMakeRoute = () => {
-  const { id } = useParams()
-  return <CustomFormMake matchId={id} />
+  const { matchId } = useParams()
+  return <CustomFormMake matchId={matchId} />
+}
+
+const CustomFormDoneRoute = () => {
+  const { formId, matchId: matchIdFromParams } = useParams()
+  const location = useLocation()
+  const matchIdFromState = location.state?.matchingId
+  const matchId = matchIdFromParams || matchIdFromState
+  return <CustomFormDone formId={formId} matchId={matchId} />
 }
 
 const CustomFormViewRoute = () => {
-  const { id } = useParams()
-  return <CustomFormView matchId={id} />
+  const { formId, matchId: matchIdFromParams } = useParams()
+  const location = useLocation()
+  const matchIdFromState = location.state?.matchingId
+  const matchId = matchIdFromParams || matchIdFromState
+  return <CustomFormView formId={formId} matchId={matchId} />
 }
+
+const ReportRoute = () => {
+  const { reportedUserId, targetUserId, fromPage } = useParams()
+
+  return (
+    <Report
+      reportedUserId={reportedUserId}
+      targetUserId={targetUserId}
+      fromPage={fromPage}
+    />
+  )
+}
+
+const ReviewRoute = () => {
+  const { chatId } = useParams()
+  const location = useLocation()
+  const opponentName = location.state?.opponentName
+  return <ReviewPage chatId={chatId} opponentName={opponentName} />
+}
+
+// 전역 인증 여부 추적
+let socketInitialized = false
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, hydrated, setUser } = useAuthStore()
   const navigate = useNavigate()
+
+  // 웹소켓 연결 - 한 번만 초기화하도록 상태 관리
+  const { isConnected } = useSocketMessage()
+  const [initializing, setInitializing] = useState(!socketInitialized)
+
+  // 웹소켓 초기화 완료 추적
+  useEffect(() => {
+    if (isConnected && initializing) {
+      socketInitialized = true
+      setInitializing(false)
+    }
+  }, [isConnected, initializing])
 
   // hydration 후 user가 null이고 localStorage에 user가 있으면 복원 시도 (임시)
   useEffect(() => {
@@ -82,9 +130,11 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
     return null
   }
 
+  // 인증 확인
   if (!user) {
     return <Navigate to="/onboarding" replace />
   }
+
   return <>{children}</>
 }
 
@@ -210,7 +260,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/chat/custom-form/make/:id',
+    path: '/chat/custom-form/make/:matchId',
     element: (
       <RequireAuth>
         <CustomFormMakeRoute />
@@ -218,10 +268,18 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/chat/custom-form/view/:id',
+    path: '/chat/custom-form/view/:formId/:matchId',
     element: (
       <RequireAuth>
         <CustomFormViewRoute />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/chat/custom-form/done/:formId/:matchId',
+    element: (
+      <RequireAuth>
+        <CustomFormDoneRoute />
       </RequireAuth>
     ),
   },
@@ -274,10 +332,10 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/review',
+    path: '/review/:chatId',
     element: (
       <RequireAuth>
-        <Review />
+        <ReviewRoute />
       </RequireAuth>
     ),
   },
@@ -298,39 +356,55 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/report',
+    path: '/report/:reportedUserId/:targetUserId/:fromPage',
     element: (
       <RequireAuth>
-        <Report />
+        <ReportRoute />
       </RequireAuth>
     ),
   },
   {
     path: '/magazinelist',
-    element: <MagazineList />,
+    element: (
+      <RequireAuth>
+        <MagazineList />
+      </RequireAuth>
+    ),
   },
   {
     path: '/magazine/write',
-    element: <MagazineWrite />,
+    element: (
+      <RequireAuth>
+        <MagazineWrite />
+      </RequireAuth>
+    ),
   },
   {
     path: '/magazine',
-    element: <Magazine />,
+    element: (
+      <RequireAuth>
+        <Magazine />
+      </RequireAuth>
+    ),
   },
   {
     path: '/magazine/mylist',
-    element: <MyList />,
+    element: (
+      <RequireAuth>
+        <MyList />
+      </RequireAuth>
+    ),
   },
   {
     path: '*',
     element: <div>404 Not Found</div>,
   },
   {
-    path: '/report',
-    element: <Report />,
-  },
-  {
     path: '/notification',
-    element: <Notification />,
+    element: (
+      <RequireAuth>
+        <Notification />
+      </RequireAuth>
+    ),
   },
 ])

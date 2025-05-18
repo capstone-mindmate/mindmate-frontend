@@ -83,7 +83,7 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
   const categoryMap: Record<string, string> = {
     학업: 'ACADEMIC',
     진로: 'CAREER',
-    대인관계: 'RELATIONSHIP',
+    인간관계: 'RELATIONSHIP',
     건강: 'MENTAL_HEALTH',
     학교생활: 'CAMPUS_LIFE',
     자기계발: 'PERSONAL_GROWTH',

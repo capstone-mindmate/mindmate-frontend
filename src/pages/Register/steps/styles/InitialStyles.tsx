@@ -9,7 +9,7 @@ export const RegisterContainer = styled.div`
   flex-direction: column;
   position: relative;
 
-  ${media.mobileBig} {
+  ${media.tablet} {
     width: 100%;
   }
 `

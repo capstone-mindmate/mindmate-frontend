@@ -918,10 +918,6 @@ function App() {
               gap: '3rem',
             }}
           >
-            <AskInput
-              placeHolder="질문을 입력해주세요"
-              onCloseBtnClick={() => {}}
-            />
             <AnswerInput title="한 직업을 평생 할 수 있다고 생각하시나요?" />
           </div>
           <div className="initial">
