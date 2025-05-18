@@ -29,7 +29,7 @@ export const TopFixedContent = styled.div`
   width: 100%;
   max-width: 884px;
   position: fixed;
-  top: 57px;
+  top: 55px;
   right: 0;
   left: 0;
   margin: auto;

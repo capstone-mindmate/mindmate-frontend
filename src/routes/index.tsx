@@ -380,7 +380,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/magazine',
+    path: '/magazine/:id',
     element: (
       <RequireAuth>
         <Magazine />
