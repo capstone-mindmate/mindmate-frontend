@@ -262,6 +262,21 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
     setImageLoadedMap((prev) => ({ ...prev, [id]: true }))
   }
 
+  const getImageUrl = (path: string): string => {
+    if (!path) return '/default-profile-image.png'
+    return path.startsWith('/api') ? path : `/api${path}`
+  }
+
+  // 이미지 로딩 상태 초기화 함수
+  const resetImageLoadState = () => {
+    setImageLoadedMap({})
+  }
+
+  // chatItems가 변경될 때마다 이미지 로딩 상태 초기화
+  useEffect(() => {
+    resetImageLoadState()
+  }, [chatItems])
+
   return (
     <RootContainer>
       <TopBar
@@ -333,25 +348,29 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
           </div>
         ) : filteredChatItems.length > 0 ? (
           filteredChatItems.map((item, index) => {
-            const realImageUrl = 'https://mindmate.shop/api' + item.profileImage
-            const defaultProfileImageUrl = '/default-profile-image.png'
             const uniqueKey = `${item.id}-${item.profileImage}`
+            const imageUrl =
+              'https://mindmate.shop' + getImageUrl(item.profileImage)
+
             return (
               <div key={uniqueKey} style={{ position: 'relative' }}>
                 {!imageLoadedMap[item.id] && (
                   <img
-                    src={realImageUrl}
+                    src={imageUrl}
                     alt=""
                     style={{ display: 'none' }}
                     onLoad={() => handleImageLoad(item.id)}
-                    onError={() => handleImageLoad(item.id)}
+                    onError={(e) => {
+                      console.error('이미지 로드 실패:', imageUrl)
+                      handleImageLoad(item.id)
+                    }}
                   />
                 )}
                 <ChatItem
                   profileImage={
                     imageLoadedMap[item.id]
-                      ? realImageUrl
-                      : defaultProfileImageUrl
+                      ? imageUrl
+                      : '/default-profile-image.png'
                   }
                   userName={item.userName}
                   lastTime={item.lastTime}
@@ -365,7 +384,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
                   onClick={() => {
                     handleChatItemClick(
                       item.id,
-                      realImageUrl,
+                      imageUrl,
                       item.userName,
                       item.matchingId,
                       item.oppositeId
