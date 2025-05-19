@@ -262,21 +262,6 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
     setImageLoadedMap((prev) => ({ ...prev, [id]: true }))
   }
 
-  const getImageUrl = (path: string): string => {
-    if (!path) return '/default-profile-image.png'
-    return path.startsWith('/api') ? path : `/api${path}`
-  }
-
-  // 이미지 로딩 상태 초기화 함수
-  const resetImageLoadState = () => {
-    setImageLoadedMap({})
-  }
-
-  // chatItems가 변경될 때마다 이미지 로딩 상태 초기화
-  useEffect(() => {
-    resetImageLoadState()
-  }, [chatItems])
-
   return (
     <RootContainer>
       <TopBar
@@ -349,8 +334,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         ) : filteredChatItems.length > 0 ? (
           filteredChatItems.map((item, index) => {
             const uniqueKey = `${item.id}-${item.profileImage}`
-            const imageUrl =
-              'https://mindmate.shop' + getImageUrl(item.profileImage)
+            const imageUrl = 'https://mindmate.shop' + item.profileImage
 
             return (
               <div key={uniqueKey} style={{ position: 'relative' }}>
