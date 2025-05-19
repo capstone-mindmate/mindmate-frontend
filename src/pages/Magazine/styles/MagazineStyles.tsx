@@ -25,7 +25,9 @@ export const CoverImage = styled.div<{ featuredImage: string | null }>`
   height: 40vh;
   min-height: 300px;
   background-image: ${({ featuredImage }) =>
-    featuredImage ? `url(${featuredImage})` : 'url(/public/image.png)'};
+    featuredImage
+      ? `url(${featuredImage})`
+      : 'url(/default-profile-image.png)'};
   background-size: cover;
   background-position: center;
   position: relative;

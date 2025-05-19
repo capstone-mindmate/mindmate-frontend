@@ -6,7 +6,7 @@ export const frames: FrameData[] = [
     id: 1,
     title: '친구 사이에도 거리두기가 필요해',
     detail: '인간관계 때문에 고민중이라면 필독 👀',
-    imageSrc: 'public/image.png',
+    imageSrc: 'default-profile-image.png',
     currentPage: 1,
     totalPages: 5,
   },

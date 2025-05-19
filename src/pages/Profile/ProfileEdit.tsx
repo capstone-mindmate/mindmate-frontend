@@ -81,6 +81,12 @@ const ProfileEdit = ({}: ProfileEditProps) => {
     undefined
   )
   const [loading, setLoading] = useState(true)
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
+
+  const defaultProfileImageUrl =
+    'https://mindmate.shop/api/profileImages/default-profile-image.png'
+  const realProfileImageUrl = profileImagePreview
+  const profileKey = profileImagePreview || 'default'
 
   // 내 프로필 정보 불러오기
   useEffect(() => {
@@ -111,6 +117,10 @@ const ProfileEdit = ({}: ProfileEditProps) => {
     }
     fetchProfile()
   }, [])
+
+  useEffect(() => {
+    setIsImageLoaded(false)
+  }, [profileImagePreview])
 
   const handleNickNameChange = (value: string) => {
     setUserNickName(value)
@@ -204,9 +214,22 @@ const ProfileEdit = ({}: ProfileEditProps) => {
       />
       <MainContainer>
         <ProfileImageContainer>
+          {realProfileImageUrl && !isImageLoaded && (
+            <img
+              key={profileKey}
+              src={realProfileImageUrl}
+              alt=""
+              style={{ display: 'none' }}
+              onLoad={() => setIsImageLoaded(true)}
+              onError={() => setIsImageLoaded(true)}
+            />
+          )}
           <InitialProfileImageSetting
             onImageChange={handleImageChange}
-            initialImage={'https://mindmate.shop/api' + profileImageUrl}
+            initialImage={
+              isImageLoaded ? realProfileImageUrl : defaultProfileImageUrl
+            }
+            onImageLoad={() => setIsImageLoaded(true)}
           />
         </ProfileImageContainer>
 

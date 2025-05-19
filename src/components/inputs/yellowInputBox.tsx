@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react'
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
+import React, { useState, useRef, useEffect } from 'react'
 
 interface YellowInputBoxProps {
   activeState: boolean
@@ -28,6 +28,9 @@ const getTextareaStyle = (isTitle: boolean, height: number) => css`
   overflow-y: auto;
   font-family: inherit;
   box-sizing: border-box;
+  -webkit-scrollbar {
+    display: none;
+  }
 `
 
 const inputBoxStyle = {

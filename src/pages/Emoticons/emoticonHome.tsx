@@ -38,6 +38,12 @@ const EmoticonHome = () => {
   const [ownedEmoticons, setOwnedEmoticons] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const { user } = useAuthStore()
+  const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
+  const realProfileImageUrl = profile?.profileImage
+    ? 'https://mindmate.shop/api' + profile.profileImage
+    : ''
+  const defaultProfileImageUrl =
+    'https://mindmate.shop/api/profileImages/default-profile-image.png'
 
   const bottomSheetMenuItems = [
     {
@@ -172,10 +178,20 @@ const EmoticonHome = () => {
 
       <EmoticonsContainer>
         <ProfileContainer>
+          {realProfileImageUrl && !isProfileImageLoaded && (
+            <img
+              src={realProfileImageUrl}
+              alt=""
+              style={{ display: 'none' }}
+              onLoad={() => setIsProfileImageLoaded(true)}
+              onError={() => setIsProfileImageLoaded(true)}
+            />
+          )}
           <EmoticonProfile
             profileImage={
-              'https://mindmate.shop/api' + profile?.profileImage ||
-              'https://mindmate.shop/api/profileImages/default-profile-image.png'
+              isProfileImageLoaded
+                ? realProfileImageUrl
+                : defaultProfileImageUrl
             }
             name={profile?.nickname || '프로필이름'}
             heldCoins={pointBalance ?? 0}

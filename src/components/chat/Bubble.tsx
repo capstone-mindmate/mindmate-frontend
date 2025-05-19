@@ -76,7 +76,7 @@ const Bubble: React.FC<BubbleProps> = ({
             onError={(e) => {
               console.error('프로필 이미지 로드 실패:', profileImage)
               // 기본 이미지로 대체
-              e.currentTarget.src = '/public/image.png'
+              e.currentTarget.src = '/default-profile-image.png'
             }}
           />
         ) : (

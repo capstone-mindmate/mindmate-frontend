@@ -26,7 +26,7 @@ interface ChatItemType {
   userName: string
   lastTime: string
   category: string
-  userType: '리스너' | '스피커'
+  userType: '리스너' | '스피커' | '완료'
   subject: string
   message: string
   isRead: boolean
@@ -34,6 +34,7 @@ interface ChatItemType {
   isCompleted: boolean
   matchingId: number
   oppositeId: number
+  chatRoomStatus: string
 }
 
 const ChatHome = ({ matchId }: ChatHomeProps) => {
@@ -82,10 +83,10 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
       }
     })
     .filter((item) => {
-      if (activeFilter === '전체') return true
+      if (activeFilter === '전체') return item.userType !== '완료'
       if (activeFilter === '리스너') return item.userType === '리스너'
       if (activeFilter === '스피커') return item.userType === '스피커'
-      if (activeFilter === '완료') return item.isCompleted
+      if (activeFilter === '완료') return item.userType === '완료'
       return true
     })
 
@@ -171,19 +172,27 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
           userName: item.oppositeName ?? '본인',
           oppositeId: item.oppositeId,
           lastTime: item.lastMessageTime
-            ? new Date(item.lastMessageTime).toLocaleTimeString('ko-KR', {
+            ? new Date(
+                new Date(item.lastMessageTime).getTime() + 9 * 60 * 60 * 1000
+              ).toLocaleTimeString('ko-KR', {
                 hour: '2-digit',
                 minute: '2-digit',
               })
             : '',
           category: '', // 필요시 matchingTitle 등에서 추출
-          userType: item.userRole === 'SPEAKER' ? '스피커' : '리스너',
+          userType:
+            item.chatRoomStatus === 'CLOSED'
+              ? '완료'
+              : item.userRole === 'SPEAKER'
+                ? '스피커'
+                : '리스너',
           subject: item.matchingTitle ?? '',
           message: item.lastMessage ?? '',
           isRead: (item.unreadCount ?? 0) === 0,
           unreadCount: item.unreadCount ?? 0,
           isCompleted: item.chatRoomStatus === 'CLOSED',
           matchingId: item.matchingId ?? 0,
+          chatRoomStatus: item.chatRoomStatus ?? '',
         }))
         setChatItems(mapped)
         // 성공적으로 로드되면 시도 횟수 리셋
@@ -244,6 +253,18 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
       fetchChatRooms(tokenToUse)
     }
   }
+
+  const [imageLoadedMap, setImageLoadedMap] = useState<{
+    [id: string]: boolean
+  }>({})
+
+  const handleImageLoad = (id: string) => {
+    setImageLoadedMap((prev) => ({ ...prev, [id]: true }))
+  }
+
+  useEffect(() => {
+    setImageLoadedMap({})
+  }, [chatItems])
 
   return (
     <RootContainer>
@@ -315,31 +336,49 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
             </button>
           </div>
         ) : filteredChatItems.length > 0 ? (
-          filteredChatItems.map((item, index) => (
-            <ChatItem
-              key={item.id}
-              profileImage={'https://mindmate.shop/api' + item.profileImage}
-              userName={item.userName}
-              lastTime={item.lastTime}
-              category={item.category}
-              userType={item.userType}
-              subject={item.subject}
-              message={item.message}
-              isRead={item.isRead}
-              unreadCount={item.unreadCount}
-              borderBottom={index < filteredChatItems.length - 1}
-              onClick={() => {
-                console.log('matchingId:', item.matchingId)
-                handleChatItemClick(
-                  item.id,
-                  'https://mindmate.shop/api' + item.profileImage,
-                  item.userName,
-                  item.matchingId,
-                  item.oppositeId
-                )
-              }}
-            />
-          ))
+          filteredChatItems.map((item, index) => {
+            const realImageUrl = 'https://mindmate.shop/api' + item.profileImage
+            const defaultProfileImageUrl = '/default-profile-image.png'
+            const uniqueKey = `${item.id}-${item.profileImage}`
+            return (
+              <div key={uniqueKey} style={{ position: 'relative' }}>
+                {!imageLoadedMap[item.id] && (
+                  <img
+                    src={realImageUrl}
+                    alt=""
+                    style={{ display: 'none' }}
+                    onLoad={() => handleImageLoad(item.id)}
+                    onError={() => handleImageLoad(item.id)}
+                  />
+                )}
+                <ChatItem
+                  profileImage={
+                    imageLoadedMap[item.id]
+                      ? realImageUrl
+                      : defaultProfileImageUrl
+                  }
+                  userName={item.userName}
+                  lastTime={item.lastTime}
+                  category={item.category}
+                  userType={item.userType}
+                  subject={item.subject}
+                  message={item.message}
+                  isRead={item.isRead}
+                  unreadCount={item.unreadCount}
+                  borderBottom={index < filteredChatItems.length - 1}
+                  onClick={() => {
+                    handleChatItemClick(
+                      item.id,
+                      realImageUrl,
+                      item.userName,
+                      item.matchingId,
+                      item.oppositeId
+                    )
+                  }}
+                />
+              </div>
+            )
+          })
         ) : (
           <div
             style={{

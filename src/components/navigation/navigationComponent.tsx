@@ -77,8 +77,6 @@ const NavigationComponent: React.FC = () => {
 
   // 읽지 않은 메시지 수 상태
   const [unreadCount, setUnreadCount] = useState(0)
-  const [isFirstLoad, setIsFirstLoad] = useState(true) // 첫 로딩 상태
-  const previousUnreadCountRef = useRef<number>(0) // 이전 값 저장용 ref
 
   // 전체 읽지 않은 메시지 수 가져오기
   const { totalUnreadCount } = useMessageStore()
@@ -87,38 +85,9 @@ const NavigationComponent: React.FC = () => {
   const { stompClient, isConnected, fetchTotalUnreadCount } = useSocketMessage()
 
   // 안정화된 상태 업데이트 함수
-  const updateUnreadCount = useCallback(
-    (newCount: number) => {
-      setUnreadCount((prevCount) => {
-        // 첫 로딩 시 또는 확실한 증가가 있을 때만 업데이트
-        if (isFirstLoad && newCount > 0) {
-          setIsFirstLoad(false)
-          previousUnreadCountRef.current = newCount
-          return newCount
-        }
-
-        // 이전 값과 새 값 사이에 큰 차이(30% 이상)가 있을 때만 업데이트
-        // 또는 새 값이 0이 아니고 이전 값보다 크면 업데이트
-        if (
-          Math.abs(prevCount - newCount) / Math.max(prevCount, 1) > 0.3 ||
-          (newCount > 0 && newCount > prevCount)
-        ) {
-          previousUnreadCountRef.current = newCount
-          return newCount
-        }
-
-        // 새 값이 0이고 이전 값도 0이면 업데이트
-        if (newCount === 0 && prevCount === 0) {
-          previousUnreadCountRef.current = 0
-          return 0
-        }
-
-        // 그 외의 경우, 특히 새 값이 0이고 이전 값이 0이 아니면 이전 값 유지
-        return prevCount
-      })
-    },
-    [isFirstLoad]
-  )
+  const updateUnreadCount = useCallback((newCount: number) => {
+    setUnreadCount(newCount)
+  }, [])
 
   // 커스텀 이벤트를 통한 읽지 않은 메시지 수 업데이트
   useEffect(() => {
@@ -167,21 +136,12 @@ const NavigationComponent: React.FC = () => {
     fetchTotalUnreadCount(true)
   }, [stompClient, isConnected, fetchTotalUnreadCount])
 
-  // totalUnreadCount가 업데이트되면 동기화
+  // totalUnreadCount가 바뀔 때마다 무조건 updateUnreadCount 호출
   useEffect(() => {
-    // 최초 한 번 실행 시에만 콘솔 출력
-    // console.log('네비게이션: totalUnreadCount 업데이트됨', totalUnreadCount)
-
-    // 값이 0이 아닌 경우에만 업데이트 (초기값 또는 오류 방지)
-    if (totalUnreadCount !== undefined && totalUnreadCount > 0) {
-      // console.log('네비게이션: 읽지 않은 메시지 수 업데이트', totalUnreadCount)
+    if (typeof totalUnreadCount === 'number') {
       updateUnreadCount(totalUnreadCount)
-    } else if (totalUnreadCount === 0 && !isFirstLoad) {
-      // 첫 로딩이 아닐 때만 0으로 설정 (플리커링 방지)
-      // console.log('네비게이션: 읽지 않은 메시지 수 0으로 설정')
-      updateUnreadCount(0)
     }
-  }, [totalUnreadCount, updateUnreadCount, isFirstLoad])
+  }, [totalUnreadCount, updateUnreadCount])
 
   // 페이지 로드 시 한 번 강제 요청
   useEffect(() => {

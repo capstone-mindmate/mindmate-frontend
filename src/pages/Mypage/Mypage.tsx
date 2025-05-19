@@ -55,6 +55,7 @@ const MyPage = () => {
   const [reviewTags, setReviewTags] = useState<any[]>([])
   const [userReviews, setUserReviews] = useState<any[]>([])
   const [pointBalance, setPointBalance] = useState<number | null>(null)
+  const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -234,6 +235,17 @@ const MyPage = () => {
     fetchPointBalance()
   }, [userId, user])
 
+  useEffect(() => {
+    setIsProfileImageLoaded(false)
+  }, [userProfile])
+
+  const realProfileImageUrl = userProfile?.profileImage
+    ? `https://mindmate.shop/api${userProfile.profileImage}`
+    : ''
+  const defaultProfileImageUrl =
+    'https://mindmate.shop/api/profileImages/default-profile-image.png'
+  const profileKey = `${userProfile?.username || ''}-${userProfile?.profileImage || ''}`
+
   // TODO: 프로필 편집 버튼 클릭 핸들러
   const handleProfileEdit = () => {
     navigate('/profile/edit')
@@ -271,14 +283,24 @@ const MyPage = () => {
         <ComponentContainer>
           <ProfileEdit
             profileImage={
-              userProfile?.profileImage
-                ? `https://mindmate.shop/api${userProfile.profileImage}`
-                : 'https://mindmate.shop/api/profileImages/default-profile-image.png'
+              isProfileImageLoaded
+                ? realProfileImageUrl
+                : defaultProfileImageUrl
             }
             username={userProfile?.username}
             onEditClick={handleProfileEdit}
             isOwnProfile={isOwnProfile}
           />
+          {realProfileImageUrl && !isProfileImageLoaded && (
+            <img
+              key={profileKey}
+              src={realProfileImageUrl}
+              alt=""
+              style={{ display: 'none' }}
+              onLoad={() => setIsProfileImageLoaded(true)}
+              onError={() => setIsProfileImageLoaded(true)}
+            />
+          )}
           <InfoBoxContainer>
             <InfoBox
               averageScore={userStats?.averageScore}

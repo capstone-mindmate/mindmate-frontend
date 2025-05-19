@@ -162,25 +162,25 @@ function App() {
       id: 1,
       title: '친구 사이에도 거리두기가 필요해',
       detail: '인간관계 때문에 고민중이라면 읽어보세요 👀',
-      imageSrc: 'public/image.png',
+      imageSrc: 'default-profile-image.png',
     },
     {
       id: 2,
       title: '익명 대화 뜻밖의 현실조언',
       detail: '인간관계 때문에 고민중이라면 필독👀',
-      imageSrc: 'public/image.png',
+      imageSrc: 'default-profile-image.png',
     },
     {
       id: 3,
       title: '친구 사이에도 거리두기가 필요해',
       detail: '인간관계 때문에 고민중이라면 필독👀',
-      imageSrc: 'public/image.png',
+      imageSrc: 'default-profile-image.png',
     },
     {
       id: 4,
       title: '친구 사이에도 거리두기가 필요해',
       detail: '인간관계 때문에 고민중이라면 필독👀',
-      imageSrc: 'public/image.png',
+      imageSrc: 'default-profile-image.png',
     },
   ]
 
@@ -234,7 +234,7 @@ function App() {
               프로필 편집 컴포넌트
             </h2>
             <ProfileEdit
-              profileImage="/public/image.png"
+              profileImage="/default-profile-image.png"
               username="행복한 돌멩이"
               onEditClick={handleProfileEdit}
             />
@@ -277,7 +277,7 @@ function App() {
             <DetailReview
               reviews={[
                 {
-                  profileImage: '/public/image.png',
+                  profileImage: '/default-profile-image.png',
                   username: '건들면 짖는댕',
                   rating: 4.0,
                   date: '25.03.28',
@@ -358,7 +358,7 @@ function App() {
           <div css={bubbleContainerStyles}>
             <Bubble
               isMe={false}
-              profileImage="public/image.png"
+              profileImage="default-profile-image.png"
               timestamp="오후 3:42"
               showTime={true}
             >
@@ -367,7 +367,7 @@ function App() {
 
             <Bubble
               isMe={false}
-              profileImage="public/image.png"
+              profileImage="default-profile-image.png"
               timestamp="오후 3:42"
               showTime={false}
               isContinuous={true}
@@ -406,7 +406,7 @@ function App() {
           <div css={bubbleContainerStyles}>
             <Bubble
               isMe={false}
-              profileImage="public/image.png"
+              profileImage="default-profile-image.png"
               timestamp="오후 3:42"
               showTime={true}
             >
@@ -419,7 +419,7 @@ function App() {
 
             <Bubble
               isMe={false}
-              profileImage="public/image.png"
+              profileImage="default-profile-image.png"
               timestamp="오후 3:44"
               showTime={true}
             >
@@ -432,7 +432,7 @@ function App() {
 
             <Bubble
               isMe={false}
-              profileImage="public/image.png"
+              profileImage="default-profile-image.png"
               timestamp="오후 3:46"
               showTime={true}
             >
@@ -505,7 +505,7 @@ function App() {
             <div style={{ width: '280px', height: '380px' }}>
               <Frame
                 title="친구 사이에도 거리두기가 필요해"
-                imageSrc="public/image.png"
+                imageSrc="default-profile-image.png"
                 detail="인간관계 때문에 고민중이라면 필독 👀"
                 currentPage={2}
                 totalPages={25}
@@ -758,7 +758,7 @@ function App() {
                   <div style={{ width: '280px', height: '380px' }}>
                     <Frame
                       title="친구 사이에도 거리두기가 필요해"
-                      imageSrc="public/image.png"
+                      imageSrc="default-profile-image.png"
                       detail="인간관계 때문에 고민중이라면 필독 👀"
                       currentPage={2}
                       totalPages={25}

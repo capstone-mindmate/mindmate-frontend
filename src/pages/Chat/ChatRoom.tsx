@@ -151,7 +151,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     const baseMessage = {
       id: msg.id || msg.messageId || `msg-${Date.now()}`,
       isMe: msg.senderId === myUserId, // userId만 비교
-      timestamp: msg.timestamp || msg.createdAt || '',
+      timestamp: msg.createdAt || '',
       isRead: msg.isRead ?? false,
       senderId: msg.senderId, // 추가
     }
@@ -854,7 +854,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   function formatKoreanTime(timestamp: string) {
     if (!timestamp) return ''
     const date = new Date(timestamp)
-    let hours = date.getHours()
+    let hours = date.getHours() + 9
     const minutes = String(date.getMinutes()).padStart(2, '0')
     const isAM = hours < 12
     const period = isAM ? '오전' : '오후'
@@ -956,6 +956,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         { method: 'POST' }
       )
       setCloseModalType('REQUEST')
+      setRoomStatus('CLOSE_REQUEST')
       // 소켓으로 상대방에게 종료 요청 알림 (userId 포함)
       stompClient?.publish &&
         stompClient.publish({
@@ -974,6 +975,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       // 내 userId와 다를 때만 상대방 화면에서만 모달 표시
       if (data.userId && data.userId !== myUserId) {
         setCloseModalType('RECEIVE')
+        setRoomStatus('CLOSE_REQUEST')
       }
     } catch {
       // fallback: userId 정보 없으면 무시
@@ -1579,31 +1581,26 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           chatId={matchingIdFromNav}
         />
       </ChatBarWrapper>
-      {(closeModalType === 'REQUEST' || roomStatus === 'CLOSE_REQUEST') &&
-        ((closeRequestRoleType === 'LISTENER' && listener) ||
-          (closeRequestRoleType === 'SPEAKER' && !listener)) && (
-          <ModalComponent
-            modalType="채팅종료신청"
-            isOpen={true}
-            onClose={() => setCloseModalType('NONE')}
-            buttonText="확인"
-            buttonClick={() => setCloseModalType('NONE')}
-          />
-        )}
-
-      {(closeModalType === 'RECEIVE' || roomStatus === 'CLOSE_REQUEST') &&
-        ((closeRequestRoleType === 'LISTENER' && !listener) ||
-          (closeRequestRoleType === 'SPEAKER' && listener)) && (
-          <ModalComponent
-            modalType="채팅종료수락"
-            isOpen={true}
-            onClose={() => setCloseModalType('NONE')}
-            onAccept={handleCloseAccept}
-            onReject={handleCloseReject}
-            buttonText=""
-            buttonClick={() => {}}
-          />
-        )}
+      {closeModalType === 'REQUEST' && (
+        <ModalComponent
+          modalType="채팅종료신청"
+          isOpen={true}
+          onClose={() => setCloseModalType('NONE')}
+          buttonText="확인"
+          buttonClick={() => setCloseModalType('NONE')}
+        />
+      )}
+      {closeModalType === 'RECEIVE' && (
+        <ModalComponent
+          modalType="채팅종료수락"
+          isOpen={true}
+          onClose={() => setCloseModalType('NONE')}
+          onAccept={handleCloseAccept}
+          onReject={handleCloseReject}
+          buttonText=""
+          buttonClick={() => {}}
+        />
+      )}
     </RootContainer>
   )
 }

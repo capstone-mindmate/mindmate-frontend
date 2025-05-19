@@ -123,22 +123,13 @@ export const useSocketMessage = () => {
 
   // 주기적으로 REST API에서 읽지 않은 메시지 수를 가져오는 함수
   const startUnreadCountPolling = useCallback((token: string) => {
-    // 기존 타이머가 있으면 정리
-    if (unreadCountTimerRef.current) {
-      clearInterval(unreadCountTimerRef.current)
-    }
-
-    // 1분마다 백업으로 REST API 호출 (소켓 실패 시에만)
+    if (unreadCountTimerRef.current) return // 이미 타이머 있으면 중복 생성 방지
     unreadCountTimerRef.current = setInterval(() => {
-      // 소켓으로부터 메시지를 받지 못한 경우에만 REST API 사용
       if (!hasReceivedUnreadCountRef.current) {
-        // console.log('소켓 응답 없음, REST API로 읽지 않은 메시지 수 백업 요청')
-        fetchTotalUnreadCount(token, true) // 강제 API 호출 플래그 전달
+        fetchTotalUnreadCount(token, true)
       }
-
-      // 다음 간격을 위해 플래그 리셋
       hasReceivedUnreadCountRef.current = false
-    }, 60000) // 1분으로 늘림
+    }, 60000)
   }, [])
 
   useEffect(() => {
@@ -355,29 +346,10 @@ export const useSocketMessage = () => {
     // API 제한: 마지막 요청 시간과 현재 시간을 비교
     const currentTime = Date.now()
 
-    // 전역 API 제한 검사 - 모든 컴포넌트에 적용
-    if (
-      !forceUpdate &&
-      currentTime - lastApiRequestTime < API_REQUEST_THROTTLE
-    ) {
-      // console.log(
-      //   `API 제한: 마지막 요청 후 ${API_REQUEST_THROTTLE / 1000}초 내에 재요청 방지`
-      // )
+    // 최소 간격(10초) 내에는 무조건 막기 (forceUpdate여도)
+    if (currentTime - lastApiRequestTime < API_REQUEST_THROTTLE) {
       return
     }
-
-    // 컴포넌트 수준의 제한도 확인
-    if (
-      !forceUpdate &&
-      currentTime - lastRequestTimeRef.current < API_REQUEST_THROTTLE
-    ) {
-      // console.log(
-      //   `컴포넌트 제한: 마지막 요청 후 ${API_REQUEST_THROTTLE / 1000}초 내에 재요청 방지`
-      // )
-      return
-    }
-
-    // 두 타임스탬프 모두 업데이트
     lastApiRequestTime = currentTime
     lastRequestTimeRef.current = currentTime
 

@@ -20,6 +20,9 @@ export const ChatContainer = styled.div`
   box-sizing: border-box;
   overflow: scroll;
   scroll-behavior: smooth;
+  -webkit-scrollbar {
+    display: none;
+  }
 
   ${media.tablet} {
     width: 100%;

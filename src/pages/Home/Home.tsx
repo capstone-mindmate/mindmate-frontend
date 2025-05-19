@@ -174,7 +174,7 @@ const HomePage = () => {
         : `https://mindmate.shop/api${imageContent.imageUrl}`
     }
 
-    return '/public/image.png' // 기본 이미지 경로
+    return '/default-profile-image.png' // 기본 이미지 경로
   }
 
   return (

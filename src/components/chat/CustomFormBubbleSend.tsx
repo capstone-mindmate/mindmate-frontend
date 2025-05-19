@@ -114,7 +114,7 @@ const Bubble = ({
                 onClick={handleButtonClick}
                 css={CustomFormBubbleSendStyles.button}
               >
-                답변하기
+                {isMe ? '답변보기' : '답변하기'}
               </button>
             </div>
           </div>

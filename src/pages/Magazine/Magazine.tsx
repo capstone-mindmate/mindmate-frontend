@@ -298,7 +298,7 @@ const Magazine: React.FC = () => {
       setFeaturedImage(imageUrl)
     } else {
       // 기본 이미지 경로
-      setFeaturedImage('/public/image.png')
+      setFeaturedImage('/default-profile-image.png')
     }
   }
 
