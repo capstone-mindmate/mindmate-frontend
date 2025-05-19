@@ -334,7 +334,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         ) : filteredChatItems.length > 0 ? (
           filteredChatItems.map((item, index) => {
             const uniqueKey = `${item.id}-${item.profileImage}`
-            const imageUrl = 'https://mindmate.shop' + item.profileImage
+            const imageUrl = 'https://mindmate.shop/api' + item.profileImage
 
             return (
               <div key={uniqueKey} style={{ position: 'relative' }}>

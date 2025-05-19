@@ -34,15 +34,19 @@ export default defineConfig({
   ],
   server: {
     host: true,
+    proxy: {
+      '/api': {
+        target: 'https://mindmate.shop',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/tests/setup.ts'],
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-  },
-  server: {
-    // host: '0.0.0.0',
   },
   optimizeDeps: {
     esbuildOptions: {
