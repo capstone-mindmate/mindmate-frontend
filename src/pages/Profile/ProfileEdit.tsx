@@ -86,7 +86,6 @@ const ProfileEdit = ({}: ProfileEditProps) => {
   const defaultProfileImageUrl =
     'https://mindmate.shop/api/profileImages/default-profile-image.png'
   const realProfileImageUrl = profileImagePreview
-  const profileKey = profileImagePreview || 'default'
 
   // 내 프로필 정보 불러오기
   useEffect(() => {
@@ -120,7 +119,7 @@ const ProfileEdit = ({}: ProfileEditProps) => {
 
   useEffect(() => {
     setIsImageLoaded(false)
-  }, [profileImagePreview])
+  }, [realProfileImageUrl])
 
   const handleNickNameChange = (value: string) => {
     setUserNickName(value)
@@ -216,7 +215,6 @@ const ProfileEdit = ({}: ProfileEditProps) => {
         <ProfileImageContainer>
           {realProfileImageUrl && !isImageLoaded && (
             <img
-              key={profileKey}
               src={realProfileImageUrl}
               alt=""
               style={{ display: 'none' }}

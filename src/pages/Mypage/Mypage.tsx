@@ -57,6 +57,16 @@ const MyPage = () => {
   const [pointBalance, setPointBalance] = useState<number | null>(null)
   const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
 
+  const realProfileImageUrl = userProfile?.profileImage
+    ? `https://mindmate.shop/api${userProfile.profileImage}`
+    : ''
+  const defaultProfileImageUrl =
+    'https://mindmate.shop/api/profileImages/default-profile-image.png'
+
+  useEffect(() => {
+    setIsProfileImageLoaded(false)
+  }, [realProfileImageUrl])
+
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true)
@@ -235,17 +245,6 @@ const MyPage = () => {
     fetchPointBalance()
   }, [userId, user])
 
-  useEffect(() => {
-    setIsProfileImageLoaded(false)
-  }, [userProfile])
-
-  const realProfileImageUrl = userProfile?.profileImage
-    ? `https://mindmate.shop/api${userProfile.profileImage}`
-    : ''
-  const defaultProfileImageUrl =
-    'https://mindmate.shop/api/profileImages/default-profile-image.png'
-  const profileKey = `${userProfile?.username || ''}-${userProfile?.profileImage || ''}`
-
   // TODO: 프로필 편집 버튼 클릭 핸들러
   const handleProfileEdit = () => {
     navigate('/profile/edit')
@@ -293,7 +292,6 @@ const MyPage = () => {
           />
           {realProfileImageUrl && !isProfileImageLoaded && (
             <img
-              key={profileKey}
               src={realProfileImageUrl}
               alt=""
               style={{ display: 'none' }}

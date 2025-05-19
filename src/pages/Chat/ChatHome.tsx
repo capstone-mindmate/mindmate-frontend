@@ -262,10 +262,6 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
     setImageLoadedMap((prev) => ({ ...prev, [id]: true }))
   }
 
-  useEffect(() => {
-    setImageLoadedMap({})
-  }, [chatItems])
-
   return (
     <RootContainer>
       <TopBar
