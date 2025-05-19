@@ -34,13 +34,6 @@ export default defineConfig({
   ],
   server: {
     host: true,
-    proxy: {
-      '/api': {
-        target: 'http://mindmate-backend:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
   },
   test: {
     globals: true,
