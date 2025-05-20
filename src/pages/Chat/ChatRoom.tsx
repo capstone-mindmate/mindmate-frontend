@@ -323,7 +323,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       }
 
       const res = await fetchWithRefresh(
-        `https://localhost/api/chat/rooms/${chatId}/messages`,
+        `https://mindmate.shop/api/chat/rooms/${chatId}/messages`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -1175,7 +1175,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                       // 채팅방의 모든 폼 데이터 조회
                       if (chatId) {
                         const response = await fetchWithRefresh(
-                          `https://localhost/api/custom-forms/chat-room/${chatId}`,
+                          `https://mindmate.shop/api/custom-forms/chat-room/${chatId}`,
                           {
                             method: 'GET',
                             headers: { 'Content-Type': 'application/json' },
