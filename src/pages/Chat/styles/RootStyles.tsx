@@ -23,6 +23,7 @@ export const ChatContainer = styled.div`
   -webkit-scrollbar {
     display: none;
   }
+  scrollbar-width: none;
 
   ${media.tablet} {
     width: 100%;
