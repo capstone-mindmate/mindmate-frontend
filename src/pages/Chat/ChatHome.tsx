@@ -248,7 +248,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
   return (
     <RootContainer>
       <TopBar
-        leftContent={<LogoText>채팅</LogoText>}
+        leftContent={<LogoText>채팅하기</LogoText>}
         showBorder={false}
         isFixed={true}
       />
@@ -279,12 +279,12 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         />
       </CategoryFilterContainer>
 
-      <ChatContainer>
+      <ChatContainer style={{ paddingTop: '56px' }}>
         {isLoading ? (
           <div
             style={{
               textAlign: 'center',
-              padding: '40px 20px',
+              padding: '96px 20px',
               color: '#888',
             }}
           >
@@ -294,7 +294,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
           <div
             style={{
               textAlign: 'center',
-              padding: '40px 20px',
+              padding: '96px 20px',
               color: '#e74c3c',
             }}
           >
@@ -344,7 +344,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
           <div
             style={{
               textAlign: 'center',
-              padding: '40px 20px',
+              padding: '96px 20px',
               color: '#888',
             }}
           >

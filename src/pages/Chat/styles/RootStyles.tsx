@@ -16,7 +16,7 @@ export const ChatContainer = styled.div`
   width: 884px;
   height: 100%;
   position: relative;
-  padding: 57px 24px 80px 24px;
+  padding: 0px 24px 80px 24px;
   box-sizing: border-box;
   overflow: scroll;
   scroll-behavior: smooth;
@@ -29,16 +29,8 @@ export const ChatContainer = styled.div`
 export const LogoText = styled.span`
   font-family: 'pretendard';
   font-size: 20px;
-  font-weight: 640;
+  font-weight: 600;
   color: #392111;
-
-  @media (max-width: 480px) {
-    font-size: 18px;
-  }
-
-  @media (min-width: 1024px) {
-    font-size: 22px;
-  }
 `
 
 export const CustomFormContainer = styled.div`

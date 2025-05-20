@@ -41,9 +41,9 @@ export const TopBarContainer = styled.div<{
 
 // 페이지 제목 스타일 (body2_re)
 export const TopBarTitle = styled.h1`
-  font-size: 14px;
-  font-weight: 400;
-  color: #000000;
+  font-size: 20px;
+  font-weight: 600;
+  color: #392111;
   margin: 0;
   flex-grow: 1;
   text-align: center;
@@ -108,8 +108,8 @@ export const TopBarLeftContent = styled.div`
   align-items: center;
 
   /* 텍스트일 경우 스타일 */
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
   color: #392111;
 `
 

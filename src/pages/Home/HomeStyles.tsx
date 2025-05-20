@@ -38,8 +38,8 @@ export const CategoryTitle = styled.p`
 export const HomeCategoryContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 17px 24px 0 24px;
+  gap: 15px;
+  margin: 17px 24px;
 `
 
 // 섹션 구분선이 있는 컨테이너
