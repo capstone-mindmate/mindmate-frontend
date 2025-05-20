@@ -1,4 +1,3 @@
-import { createBrowserRouter } from 'react-router-dom'
 import Register from '../pages/Register'
 import Devtools from '../pages/Devtools'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
@@ -35,7 +34,13 @@ import ChatHome from '../pages/Chat/ChatHome'
 import ChatRoom from '../pages/Chat/ChatRoom'
 import { useAuthStore } from '../stores/userStore'
 import { useEffect, useState } from 'react'
-import { useNavigate, Navigate, useParams, useLocation } from 'react-router-dom'
+import {
+  useNavigate,
+  Navigate,
+  useParams,
+  useLocation,
+  createBrowserRouter,
+} from 'react-router-dom'
 import { useSocketMessage } from '../hooks/useSocketMessage'
 import CustomFormDone from '../pages/Chat/CustomFormDone'
 import ReviewPage from '../pages/Review/ReviewPage'
@@ -65,6 +70,16 @@ const CustomFormViewRoute = () => {
   const matchIdFromState = location.state?.matchingId
   const matchId = matchIdFromParams || matchIdFromState
   return <CustomFormView formId={formId} matchId={matchId} />
+}
+
+const NotFound = () => {
+  const location = useLocation()
+
+  if (location.pathname.startsWith('/api')) {
+    return null
+  }
+
+  return <div>404 Not Found</div>
 }
 
 const ReportRoute = () => {
@@ -141,7 +156,7 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <OnboardingPage />,
+    element: <Navigate to="/home" replace />,
   },
   {
     path: '/register',
@@ -397,7 +412,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <div>404 Not Found</div>,
+    element: <NotFound />,
   },
   {
     path: '/notification',
