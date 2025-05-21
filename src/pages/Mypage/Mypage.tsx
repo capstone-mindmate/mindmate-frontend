@@ -71,7 +71,7 @@ const MyPage = () => {
     const fetchProfile = async () => {
       setLoading(true)
       try {
-        let profileRes, profileData
+        let profileRes, profileData, reveiwListRes
         if (!userId || (user && String(user.id) === String(userId))) {
           // 내 프로필
           setIsOwnProfile(true)
@@ -121,9 +121,20 @@ const MyPage = () => {
               }))
             )
           }
+
+          reveiwListRes = await fetchWithRefresh(
+            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          )
+
+          const reveiwListData = await reveiwListRes.json()
+
           // 상세 리뷰 (응답의 reviews 배열 활용)
           setUserReviews(
-            (profileData.reviews || []).map((r: any) => ({
+            (reveiwListData.content || []).map((r: any) => ({
               profileImage:
                 'https://mindmate.shop/api' + r.reviewerProfileImage,
               username: r.reviewerNickname,
