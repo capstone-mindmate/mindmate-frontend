@@ -421,7 +421,7 @@ export const useSocketMessage = () => {
         }, retryTime)
       } else {
         // console.error(
-        //   '전체 읽지 않은 메시지 수 요청 실패: https 상태 코드',
+        //   '전체 읽지 않은 메시지 수 요청 실패: HTTP 상태 코드',
         //   response.status
         // )
       }

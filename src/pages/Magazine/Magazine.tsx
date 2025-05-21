@@ -291,7 +291,7 @@ const Magazine: React.FC = () => {
 
     if (imageContent && imageContent.imageUrl) {
       // 이미지 URL이 상대 경로인 경우 기본 URL 추가
-      const imageUrl = imageContent.imageUrl.startsWith('https')
+      const imageUrl = imageContent.imageUrl.startsWith('http')
         ? imageContent.imageUrl
         : `https://mindmate.shop/api${imageContent.imageUrl}`
 
@@ -316,7 +316,7 @@ const Magazine: React.FC = () => {
             if (!content.imageUrl) return ''
 
             // 이미지 URL이 상대 경로인 경우 기본 URL 추가
-            const imageUrl = content.imageUrl.startsWith('https')
+            const imageUrl = content.imageUrl.startsWith('http')
               ? content.imageUrl
               : `https://mindmate.shop/api${content.imageUrl}`
 
@@ -326,7 +326,7 @@ const Magazine: React.FC = () => {
             if (!content.emoticonUrl) return ''
 
             // 이모티콘 URL이 상대 경로인 경우 기본 URL 추가
-            const emoticonUrl = content.emoticonUrl.startsWith('https')
+            const emoticonUrl = content.emoticonUrl.startsWith('http')
               ? content.emoticonUrl
               : `https://mindmate.shop/api${content.emoticonUrl}`
 
@@ -432,7 +432,7 @@ const Magazine: React.FC = () => {
   }
 
   // 프로필 이미지 URL 처리
-  const profileImageUrl = magazine.authorImageUrl.startsWith('https')
+  const profileImageUrl = magazine.authorImageUrl.startsWith('http')
     ? magazine.authorImageUrl
     : `https://mindmate.shop/api${magazine.authorImageUrl}`
 
@@ -478,7 +478,7 @@ const Magazine: React.FC = () => {
               height="24"
               viewBox="0 0 24 24"
               fill="none"
-              xmlns="https://www.w3.org/2000/svg"
+              xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 d="M9 18L15 12L9 6"
