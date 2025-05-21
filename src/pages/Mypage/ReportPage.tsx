@@ -124,13 +124,16 @@ const ReportPage = ({
         targetId: targetUserId,
       }
       try {
-        const res = await fetchWithRefresh('http://localhost/api/reports', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(body),
-        })
+        const res = await fetchWithRefresh(
+          'https://mindmate.shop/api/reports',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+          }
+        )
         if (!res.ok) {
           throw new Error('신고 제출 실패')
         }
