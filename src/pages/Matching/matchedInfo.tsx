@@ -338,6 +338,10 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
     }
   }
 
+  const handleBackClick = () => {
+    navigate('/matching')
+  }
+
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category)
   }
@@ -496,7 +500,12 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
 
   return (
     <RootContainer>
-      <TopBar title="매칭방 목록" showBackButton actionText="" />
+      <TopBar
+        title="매칭방 목록"
+        showBackButton
+        onBackClick={handleBackClick}
+        actionText=""
+      />
       <MatchingContainer>
         <TopFixedContent fixedType="matched">
           <CategoryContainer>
