@@ -1,4 +1,4 @@
-import { SettingIcon } from '../../components/icon/iconComponents'
+import { SettingIcon, KebabIcon } from '../../components/icon/iconComponents'
 import InfoBox from '../../components/mypage/InfoBox'
 import MatchingGraph from '../../components/mypage/MatchingGraph'
 import ProfileEdit from '../../components/mypage/ProfileEdit'
@@ -6,6 +6,7 @@ import NavigationComponent from '../../components/navigation/navigationComponent
 import DetailReview from '../../components/review/DetailReview'
 import TagReview from '../../components/review/TagReview'
 import TopBar from '../../components/topbar/Topbar'
+import BottomSheet from '../../components/bottomSheet/BottomSheet'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   ContentContainer,
@@ -56,12 +57,13 @@ const MyPage = () => {
   const [userReviews, setUserReviews] = useState<any[]>([])
   const [pointBalance, setPointBalance] = useState<number | null>(null)
   const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
 
   const realProfileImageUrl = userProfile?.profileImage
-    ? `https://mindmate.shop/api${userProfile.profileImage}`
+    ? `http://localhost/api${userProfile.profileImage}`
     : ''
   const defaultProfileImageUrl =
-    'https://mindmate.shop/api/profileImages/default-profile-image.png'
+    'http://localhost/api/profileImages/default-profile-image.png'
 
   useEffect(() => {
     setIsProfileImageLoaded(false)
@@ -77,7 +79,7 @@ const MyPage = () => {
           setIsOwnProfile(true)
           if (user?.id) {
             profileRes = await fetchWithRefresh(
-              `https://mindmate.shop/api/profiles`,
+              `http://localhost/api/profiles`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -99,6 +101,7 @@ const MyPage = () => {
             averageScore: profileData.averageRating,
             coins: profileData.points,
             matchCount: profileData.totalCounselingCount,
+            avgResponseTime: profileData.avgResponseTime,
           })
           // categoryData를 한글로 변환
           const convertedCategoryData = Object.entries(
@@ -123,7 +126,7 @@ const MyPage = () => {
           }
 
           reveiwListRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
+            `http://localhost/api/reviews/profile/${profileData.id}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -135,8 +138,7 @@ const MyPage = () => {
           // 상세 리뷰 (응답의 reviews 배열 활용)
           setUserReviews(
             (reveiwListData.content || []).map((r: any) => ({
-              profileImage:
-                'https://mindmate.shop/api' + r.reviewerProfileImage,
+              profileImage: 'http://localhost/api' + r.reviewerProfileImage,
               username: r.reviewerNickname,
               rating: r.rating,
               date: r.createdAt
@@ -159,7 +161,7 @@ const MyPage = () => {
             return
           }
           profileRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/profiles/users/${userId}`,
+            `http://localhost/api/profiles/users/${userId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -178,6 +180,7 @@ const MyPage = () => {
             averageScore: profileData.averageRating,
             coins: profileData.points,
             matchCount: profileData.totalCounselingCount,
+            avgResponseTime: profileData.avgResponseTime,
           })
           // categoryData를 한글로 변환
           const convertedCategoryData = Object.entries(
@@ -203,7 +206,7 @@ const MyPage = () => {
           }
           // 상세 리뷰
           const reviewRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
+            `http://localhost/api/reviews/profile/${profileData.id}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -238,7 +241,7 @@ const MyPage = () => {
     const fetchPointBalance = async () => {
       try {
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/points/balance',
+          'http://localhost/api/points/balance',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -256,14 +259,16 @@ const MyPage = () => {
     fetchPointBalance()
   }, [userId, user])
 
-  // TODO: 프로필 편집 버튼 클릭 핸들러
   const handleProfileEdit = () => {
     navigate('/profile/edit')
   }
 
-  // TODO: 설정 버튼 클릭 핸들러
   const handleSettingClick = () => {
     navigate('/profile/setting')
+  }
+
+  const handleKebabClick = () => {
+    setIsBottomSheetOpen(true)
   }
 
   // 리뷰 전체보기 클릭 핸들러 - 상세 리뷰 페이지로 이동
@@ -279,17 +284,37 @@ const MyPage = () => {
     <MypageContainer>
       <ContentContainer>
         <TopBar
-          leftContent={<LogoText>마이페이지</LogoText>}
+          leftContent={
+            <LogoText>{isOwnProfile ? '마이페이지' : '프로필'}</LogoText>
+          }
           rightContent={
-            isOwnProfile && (
+            isOwnProfile ? (
               <button onClick={handleSettingClick}>
                 <SettingIcon color="#392111" />
+              </button>
+            ) : (
+              <button onClick={handleKebabClick}>
+                <KebabIcon />
               </button>
             )
           }
           showBorder={false}
           isFixed={true}
         />
+        {!isOwnProfile && (
+          <BottomSheet
+            isOpen={isBottomSheetOpen}
+            onClose={() => setIsBottomSheetOpen(false)}
+            menuItems={[
+              {
+                text: '신고',
+                onClick: () => {
+                  navigate(`/report/${user?.id}/${userId}/PROFILE`)
+                },
+              },
+            ]}
+          />
+        )}
         <ComponentContainer>
           <ProfileEdit
             profileImage={
@@ -313,8 +338,17 @@ const MyPage = () => {
           <InfoBoxContainer>
             <InfoBox
               averageScore={userStats?.averageScore}
-              coins={pointBalance !== null ? pointBalance : userStats?.coins}
+              coins={
+                isOwnProfile
+                  ? pointBalance !== null
+                    ? pointBalance
+                    : userStats?.coins
+                  : undefined
+              }
               matchCount={userStats?.matchCount}
+              avgResponseTime={
+                !isOwnProfile ? userStats?.avgResponseTime : undefined
+              }
             />
           </InfoBoxContainer>
           <MatchingGraphContainer>

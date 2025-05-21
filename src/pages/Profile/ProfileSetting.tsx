@@ -27,7 +27,7 @@ const ProfileSetting = ({}: ProfileSettingProps) => {
   // 로그아웃 API 연동
   const handleLogout = async () => {
     try {
-      await fetchWithRefresh('https://mindmate.shop/api/auth/logout', {
+      await fetchWithRefresh('http://localhost/api/auth/logout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
