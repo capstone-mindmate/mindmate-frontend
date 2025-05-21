@@ -48,7 +48,7 @@ export const postMagazine = async (
       try {
         console.log(`이미지 업로드 시작: ${imagesToUpload.length}개`)
         // 이미지 업로드 API 엔드포인트
-        const apiUrl = 'httpss://mindmate.shop/api/magazines/image'
+        const apiUrl = 'https://mindmate.shop/api/magazines/image'
         const formData = new FormData()
 
         // 이미지 파일 추가 - 'files' 키로 파일 추가
@@ -184,7 +184,7 @@ export const postMagazine = async (
     )
 
     // 5. 매거진 게시 API 호출
-    const response = await fetch('httpss://mindmate.shop/api/magazines', {
+    const response = await fetch('https://mindmate.shop/api/magazines', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

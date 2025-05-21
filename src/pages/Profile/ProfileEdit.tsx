@@ -84,7 +84,7 @@ const ProfileEdit = ({}: ProfileEditProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false)
 
   const defaultProfileImageUrl =
-    'httpss://mindmate.shop/api/profileImages/default-profile-image.png'
+    'https://mindmate.shop/api/profileImages/default-profile-image.png'
   const realProfileImageUrl = profileImagePreview
 
   // 내 프로필 정보 불러오기
@@ -93,7 +93,7 @@ const ProfileEdit = ({}: ProfileEditProps) => {
       setLoading(true)
       try {
         const res = await fetchWithRefresh(
-          'httpss://mindmate.shop/api/profiles',
+          'https://mindmate.shop/api/profiles',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -104,7 +104,7 @@ const ProfileEdit = ({}: ProfileEditProps) => {
         setSelectedDepartment(data.department || '')
         setSelectedYear(data.entranceTime ? String(data.entranceTime) : '')
         setProfileImagePreview(
-          'httpss://mindmate.shop/api' + data.profileImage || undefined
+          'https://mindmate.shop/api' + data.profileImage || undefined
         )
         setProfileImageUrl(data.profileImage || undefined)
         setProfileImageId(data.profileImageId)
@@ -145,14 +145,14 @@ const ProfileEdit = ({}: ProfileEditProps) => {
     if (profileImageFile) {
       try {
         // 1. 현재 프로필 이미지 id 조회
-        // const currentImgRes = await fetchWithRefresh('httpss://mindmate.shop/api/profiles/image/current', {
+        // const currentImgRes = await fetchWithRefresh('https://mindmate.shop/api/profiles/image/current', {
         //   method: 'GET',
         //   headers: { 'Content-Type': 'application/json' },
         // })
         // const currentImgData = await currentImgRes.json()
         // if (currentImgRes.ok && currentImgData.id) {
         //   // 2. 기존 이미지 삭제
-        //   await fetchWithRefresh(`httpss://mindmate.shop/api/profiles/image/${currentImgData.id}`, {
+        //   await fetchWithRefresh(`https://mindmate.shop/api/profiles/image/${currentImgData.id}`, {
         //     method: 'DELETE',
         //     headers: { 'Content-Type': 'application/json' },
         //   })
@@ -161,7 +161,7 @@ const ProfileEdit = ({}: ProfileEditProps) => {
         const formData = new FormData()
         formData.append('file', profileImageFile)
         const imageRes = await fetchWithRefresh(
-          'httpss://mindmate.shop/api/profiles/image',
+          'https://mindmate.shop/api/profiles/image',
           {
             method: 'POST',
             body: formData,
@@ -188,7 +188,7 @@ const ProfileEdit = ({}: ProfileEditProps) => {
     if (newProfileImageId !== undefined) {
       payload.profileImageId = newProfileImageId
     }
-    const res = await fetchWithRefresh('httpss://mindmate.shop/api/profiles', {
+    const res = await fetchWithRefresh('https://mindmate.shop/api/profiles', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

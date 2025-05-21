@@ -145,7 +145,7 @@ const Magazine: React.FC = () => {
 
       // fetchWithRefresh 사용하여 활동 정보 전송 API 호출
       const response = await fetchWithRefresh(
-        `httpss://mindmate.shop/api/magazines/${id}/engagement`,
+        `https://mindmate.shop/api/magazines/${id}/engagement`,
         {
           method: 'POST',
           headers: {
@@ -181,7 +181,7 @@ const Magazine: React.FC = () => {
 
         // fetchWithRefresh 사용하여 매거진 데이터 가져오기
         const response = await fetchWithRefresh(
-          `httpss://mindmate.shop/api/magazines/${id}`
+          `https://mindmate.shop/api/magazines/${id}`
         )
 
         if (!response.ok) {
@@ -293,7 +293,7 @@ const Magazine: React.FC = () => {
       // 이미지 URL이 상대 경로인 경우 기본 URL 추가
       const imageUrl = imageContent.imageUrl.startsWith('https')
         ? imageContent.imageUrl
-        : `httpss://mindmate.shop/api${imageContent.imageUrl}`
+        : `https://mindmate.shop/api${imageContent.imageUrl}`
 
       setFeaturedImage(imageUrl)
     } else {
@@ -318,7 +318,7 @@ const Magazine: React.FC = () => {
             // 이미지 URL이 상대 경로인 경우 기본 URL 추가
             const imageUrl = content.imageUrl.startsWith('https')
               ? content.imageUrl
-              : `httpss://mindmate.shop/api${content.imageUrl}`
+              : `https://mindmate.shop/api${content.imageUrl}`
 
             // 이미지 로드 후 스크롤 위치 갱신을 위해 클래스 추가
             return `<img src="${imageUrl}" class="magazine-content-image" alt="콘텐츠 이미지" onload="setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 100)" />`
@@ -328,7 +328,7 @@ const Magazine: React.FC = () => {
             // 이모티콘 URL이 상대 경로인 경우 기본 URL 추가
             const emoticonUrl = content.emoticonUrl.startsWith('https')
               ? content.emoticonUrl
-              : `httpss://mindmate.shop/api${content.emoticonUrl}`
+              : `https://mindmate.shop/api${content.emoticonUrl}`
 
             return `<img src="${emoticonUrl}" alt="${content.emoticonName || '이모티콘'}" class="magazine-emoticon" />`
           default:
@@ -379,7 +379,7 @@ const Magazine: React.FC = () => {
     try {
       // fetchWithRefresh 사용하여 좋아요 API 호출
       const response = await fetchWithRefresh(
-        `httpss://mindmate.shop/api/magazines/${magazine.id}/like`,
+        `https://mindmate.shop/api/magazines/${magazine.id}/like`,
         {
           method: 'POST',
           headers: {
@@ -434,7 +434,7 @@ const Magazine: React.FC = () => {
   // 프로필 이미지 URL 처리
   const profileImageUrl = magazine.authorImageUrl.startsWith('https')
     ? magazine.authorImageUrl
-    : `httpss://mindmate.shop/api${magazine.authorImageUrl}`
+    : `https://mindmate.shop/api${magazine.authorImageUrl}`
 
   return (
     <MagazineDetailContainer>

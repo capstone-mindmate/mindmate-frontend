@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { fetchWithRefresh } from '../utils/fetchWithRefresh'
 
 async function fetchMe() {
-  const res = await fetchWithRefresh(`httpss://mindmate.shop/api/profiles`, {
+  const res = await fetchWithRefresh(`https://mindmate.shop/api/profiles`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

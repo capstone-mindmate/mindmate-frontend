@@ -115,7 +115,7 @@ function OnboardingContent() {
 
       // 2. 회원가입 시도 (credentials: 'include')
       const registerRes = await fetch(
-        'httpss://mindmate.shop/api/auth/register',
+        'https://mindmate.shop/api/auth/register',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -130,7 +130,7 @@ function OnboardingContent() {
       ).then((res) => res.json())
 
       // 3. 로그인 시도 (credentials: 'include')
-      const loginRes = await fetch('httpss://mindmate.shop/api/auth/login', {
+      const loginRes = await fetch('https://mindmate.shop/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -156,7 +156,7 @@ function OnboardingContent() {
               setTokenCookie(data.refreshToken, 'refreshToken')
 
               const res = await fetchWithRefresh(
-                `httpss://mindmate.shop/api/profiles`,
+                `https://mindmate.shop/api/profiles`,
                 {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },
@@ -175,7 +175,7 @@ function OnboardingContent() {
               setTokenCookie(data.refreshToken, 'refreshToken')
 
               const res = await fetchWithRefresh(
-                `httpss://mindmate.shop/api/profiles`,
+                `https://mindmate.shop/api/profiles`,
                 {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },

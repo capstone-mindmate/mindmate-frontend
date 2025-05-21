@@ -40,7 +40,7 @@ export async function fetchWithRefresh(input: RequestInfo, init?: RequestInit) {
 
   if (res.status === 401) {
     const refreshToken = getTokenCookie('refreshToken')
-    const refreshRes = await fetch('httpss://mindmate.shop/api/auth/refresh', {
+    const refreshRes = await fetch('https://mindmate.shop/api/auth/refresh', {
       method: 'POST',
       headers: {
         ...(refreshToken ? { Authorization: `Bearer ${refreshToken}` } : {}),

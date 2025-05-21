@@ -90,7 +90,7 @@ const ReviewPage = ({
     if (selectedRating > 0 && selectedReviews.length > 0) {
       try {
         const res = await fetchWithRefresh(
-          'httpss://mindmate.shop/api/reviews',
+          'https://mindmate.shop/api/reviews',
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
