@@ -102,7 +102,7 @@ const MyList: React.FC = () => {
 
           if (smallestIdImage && smallestIdImage.imageUrl) {
             // 이미지 URL이 상대 경로인 경우 기본 URL 추가
-            thumbnailUrl = smallestIdImage.imageUrl.startsWith('https')
+            thumbnailUrl = smallestIdImage.imageUrl.startsWith('http')
               ? smallestIdImage.imageUrl
               : `https://mindmate.shop/api${smallestIdImage.imageUrl}`
           }

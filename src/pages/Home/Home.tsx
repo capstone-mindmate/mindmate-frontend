@@ -169,7 +169,7 @@ const HomePage = () => {
     )
 
     if (imageContent && imageContent.imageUrl) {
-      return imageContent.imageUrl.startsWith('https')
+      return imageContent.imageUrl.startsWith('http')
         ? imageContent.imageUrl
         : `https://mindmate.shop/api${imageContent.imageUrl}`
     }

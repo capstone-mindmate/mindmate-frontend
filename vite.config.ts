@@ -48,19 +48,20 @@ export default defineConfig({
     setupFiles: ['./src/tests/setup.ts'],
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
   },
-  define: {
-    global: 'window', // sockjs-client에서 global 참조 오류 해결
-  },
+
   optimizeDeps: {
     esbuildOptions: {
-      // Node.js 글로벌 polyfill
       plugins: [
         NodeGlobalsPolyfillPlugin({
-          global: true,
           process: true,
-          buffer: true,
         }),
       ],
+      define: {
+        global: 'globalThis',
+      },
     },
+  },
+  define: {
+    global: 'globalThis',
   },
 })

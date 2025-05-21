@@ -27,7 +27,7 @@ const getSelectStyle = (
   transition: border-color 0.2s ease;
   color: ${hasValue ? '#150c06' : '#A3A3A3'};
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='14' height='8' viewBox='0 0 14 8' fill='none' xmlns='https://www.w3.org/2000/svg'%3e%3cpath d='M1 1L7 7L13 1' stroke='%23150C06' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='14' height='8' viewBox='0 0 14 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M1 1L7 7L13 1' stroke='%23150C06' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 12px center;
   cursor: pointer;
