@@ -1377,7 +1377,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                     } else {
                       // API 응답 실패 시 채팅방 ID로 폼 데이터 조회
                       console.error(
-                        '폼 데이터 확인 실패: https 상태 코드',
+                        '폼 데이터 확인 실패: HTTP 상태 코드',
                         response.status
                       )
                       const found = await findAndUpdateFormData()
