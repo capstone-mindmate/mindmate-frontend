@@ -37,7 +37,7 @@ const isValidImageUrl = (url: string): boolean => {
     url &&
     url.trim() !== '' &&
     (url.startsWith('http://') ||
-      url.startsWith('https://') ||
+      url.startsWith('http://') ||
       url.startsWith('/'))
   )
 }

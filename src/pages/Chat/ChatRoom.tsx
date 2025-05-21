@@ -1301,7 +1301,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                   try {
                     const response = await fetchWithRefresh(
-                      `https:/localhost/api/custom-forms/${formId}`,
+                      `https://mindmate.shop/api/custom-forms/${formId}`,
                       {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },

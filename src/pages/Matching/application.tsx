@@ -159,7 +159,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
         title="매칭 신청 정보"
         showBackButton
         actionText=""
-        onBackClick={() => navigate('/matching')}
+        onBackClick={() => navigate('/matching/matched')}
       />
       <MatchingContainer>
         <ApplicationList pageType="matched">

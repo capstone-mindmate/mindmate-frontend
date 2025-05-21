@@ -105,7 +105,7 @@ function OnboardingContent() {
     onSuccess: async (tokenResponse) => {
       // 1. 구글 유저 정보 가져오기 (여기는 credentials 필요 없음)
       const googleUserInfo = await fetch(
-        'https://www.googleapis.com/oauth2/v3/userinfo',
+        'http://www.googleapis.com/oauth2/v3/userinfo',
         {
           headers: {
             Authorization: `Bearer ${tokenResponse.access_token}`,
@@ -392,7 +392,7 @@ function OnboardingContent() {
                 type="button"
               >
                 <img
-                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  src="http://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                   alt="Google"
                   css={iconStyle}
                 />

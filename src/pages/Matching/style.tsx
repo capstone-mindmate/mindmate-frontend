@@ -71,6 +71,7 @@ export const CategoryContainer = styled.div`
   flex-wrap: no-wrap;
   flex-direction: row;
   overflow-x: scroll;
+  scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
   }

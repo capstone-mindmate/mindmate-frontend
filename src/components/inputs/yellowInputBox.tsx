@@ -31,6 +31,7 @@ const getTextareaStyle = (isTitle: boolean, height: number) => css`
   -webkit-scrollbar {
     display: none;
   }
+  scrollbar-width: none;
 `
 
 const inputBoxStyle = {
