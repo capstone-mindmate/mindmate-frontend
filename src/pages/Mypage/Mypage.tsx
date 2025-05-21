@@ -58,10 +58,10 @@ const MyPage = () => {
   const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
 
   const realProfileImageUrl = userProfile?.profileImage
-    ? `https://mindmate.shop/api${userProfile.profileImage}`
+    ? `httpss://mindmate.shop/api${userProfile.profileImage}`
     : ''
   const defaultProfileImageUrl =
-    'https://mindmate.shop/api/profileImages/default-profile-image.png'
+    'httpss://mindmate.shop/api/profileImages/default-profile-image.png'
 
   useEffect(() => {
     setIsProfileImageLoaded(false)
@@ -77,7 +77,7 @@ const MyPage = () => {
           setIsOwnProfile(true)
           if (user?.id) {
             profileRes = await fetchWithRefresh(
-              `https://mindmate.shop/api/profiles`,
+              `httpss://mindmate.shop/api/profiles`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -123,7 +123,7 @@ const MyPage = () => {
           }
 
           reveiwListRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
+            `httpss://mindmate.shop/api/reviews/profile/${profileData.id}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -136,7 +136,7 @@ const MyPage = () => {
           setUserReviews(
             (reveiwListData.content || []).map((r: any) => ({
               profileImage:
-                'https://mindmate.shop/api' + r.reviewerProfileImage,
+                'httpss://mindmate.shop/api' + r.reviewerProfileImage,
               username: r.reviewerNickname,
               rating: r.rating,
               date: r.createdAt
@@ -159,7 +159,7 @@ const MyPage = () => {
             return
           }
           profileRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/profiles/users/${userId}`,
+            `httpss://mindmate.shop/api/profiles/users/${userId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -203,7 +203,7 @@ const MyPage = () => {
           }
           // 상세 리뷰
           const reviewRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
+            `httpss://mindmate.shop/api/reviews/profile/${profileData.id}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -238,7 +238,7 @@ const MyPage = () => {
     const fetchPointBalance = async () => {
       try {
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/points/balance',
+          'httpss://mindmate.shop/api/points/balance',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },

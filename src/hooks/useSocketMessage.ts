@@ -41,7 +41,7 @@ const initializeConnection = (token: string): Promise<Client | null> => {
       console.log('웹소켓 연결 초기화 시작...')
 
       // 소켓 연결
-      const socket = new SockJS('https://mindmate.shop/api/ws')
+      const socket = new SockJS('httpss://mindmate.shop/api/ws')
       const stompClient = new Client({
         webSocketFactory: () => socket,
         connectHeaders: {
@@ -356,7 +356,7 @@ export const useSocketMessage = () => {
     try {
       // console.log('전체 읽지 않은 메시지 수 REST API 요청')
       const response = await fetch(
-        'https://mindmate.shop/api/chat/unread/total',
+        'httpss://mindmate.shop/api/chat/unread/total',
         {
           method: 'GET',
           headers: {
@@ -421,7 +421,7 @@ export const useSocketMessage = () => {
         }, retryTime)
       } else {
         // console.error(
-        //   '전체 읽지 않은 메시지 수 요청 실패: HTTP 상태 코드',
+        //   '전체 읽지 않은 메시지 수 요청 실패: https 상태 코드',
         //   response.status
         // )
       }

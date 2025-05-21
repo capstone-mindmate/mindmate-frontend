@@ -4,13 +4,13 @@ test.describe('Onboarding 페이지', () => {
   // 각 테스트 전에 실행되는 설정
   test.beforeEach(async ({ page }) => {
     // Onboarding 페이지로 이동
-    await page.goto('https://mindmate.shop:5173/onboarding')
+    await page.goto('httpss://mindmate.shop:5173/onboarding')
     await page.waitForLoadState('networkidle')
   })
 
   test('페이지가 올바르게 로드된다', async ({ page }) => {
     // 페이지가 로드되었는지 확인
-    await expect(page).toHaveURL('https://mindmate.shop:5173/onboarding')
+    await expect(page).toHaveURL('httpss://mindmate.shop:5173/onboarding')
   })
 
   test('슬라이드 이미지와 텍스트가 표시된다', async ({ page }) => {

@@ -804,7 +804,7 @@ function App() {
             style={{ width: '375px', margin: '30px 0' }}
           >
             <CardNewsComponent
-              imgUrl="http://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
+              imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
               title="슬기로운 방학생활 넘어가나 넘어가나 넘어가나 넘어가나 넘어가나"
               organization="인권센터 학생상담소"
               date="2025-01-16"

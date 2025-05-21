@@ -40,7 +40,7 @@ function EmoticonPicker({
       setError(null)
       try {
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/available',
+          'httpss://mindmate.shop/api/emoticons/available',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },

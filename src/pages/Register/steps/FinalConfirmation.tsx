@@ -45,7 +45,7 @@ const CheckIcon = ({
         height="10"
         viewBox="0 0 14 10"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+        xmlns="https://www.w3.org/2000/svg"
       >
         <path
           d="M1 5L5 9L13 1"
@@ -160,7 +160,7 @@ const FinalConfirmation = ({
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+                xmlns="https://www.w3.org/2000/svg"
               >
                 <path
                   d="M9 18L15 12L9 6"

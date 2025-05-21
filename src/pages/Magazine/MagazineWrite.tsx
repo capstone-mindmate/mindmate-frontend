@@ -126,7 +126,7 @@ const MagazineWrite: React.FC = () => {
       return
     }
 
-    fetch('https://mindmate.shop/api/profiles', {
+    fetch('httpss://mindmate.shop/api/profiles', {
       headers: { Authorization: `Bearer ${accessToken}` },
       credentials: 'include',
     })

@@ -50,8 +50,8 @@ const MyList: React.FC = () => {
       // API 엔드포인트 선택 (선택된 카테고리에 따라)
       const endpoint =
         selectedCategory === '관심 목록'
-          ? 'https://mindmate.shop/api/magazines/liked'
-          : 'https://mindmate.shop/api/magazines/my'
+          ? 'httpss://mindmate.shop/api/magazines/liked'
+          : 'httpss://mindmate.shop/api/magazines/my'
 
       // 쿼리 파라미터 생성
       const params = new URLSearchParams()
@@ -102,9 +102,9 @@ const MyList: React.FC = () => {
 
           if (smallestIdImage && smallestIdImage.imageUrl) {
             // 이미지 URL이 상대 경로인 경우 기본 URL 추가
-            thumbnailUrl = smallestIdImage.imageUrl.startsWith('http')
+            thumbnailUrl = smallestIdImage.imageUrl.startsWith('https')
               ? smallestIdImage.imageUrl
-              : `https://mindmate.shop/api${smallestIdImage.imageUrl}`
+              : `httpss://mindmate.shop/api${smallestIdImage.imageUrl}`
           }
         }
 

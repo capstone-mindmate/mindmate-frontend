@@ -89,11 +89,14 @@ const Register = () => {
   // 프로필 생성 mutation
   const profileMutation = useMutation({
     mutationFn: async (profileData: any) => {
-      const res = await fetchWithRefresh('https://mindmate.shop/api/profiles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profileData),
-      })
+      const res = await fetchWithRefresh(
+        'httpss://mindmate.shop/api/profiles',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profileData),
+        }
+      )
       const data = await res.json()
       if (!res.ok) throw new Error('프로필 생성 실패')
       return data
@@ -101,10 +104,13 @@ const Register = () => {
     onSuccess: async (data) => {
       localStorage.setItem('userId', data.id)
 
-      const res = await fetchWithRefresh(`https://mindmate.shop/api/profiles`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      })
+      const res = await fetchWithRefresh(
+        `httpss://mindmate.shop/api/profiles`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
       const ProfileData = await res.json()
       if (!res.ok) throw new Error(await res.json())
 
@@ -146,7 +152,7 @@ const Register = () => {
         const formData = new FormData()
         formData.append('file', imageFile)
         const imageRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/profiles/image',
+          'httpss://mindmate.shop/api/profiles/image',
           {
             method: 'POST',
             body: formData,

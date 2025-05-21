@@ -141,7 +141,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
       }
 
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/chat/rooms',
+        'httpss://mindmate.shop/api/chat/rooms',
         {
           method: 'GET',
           headers: {
@@ -334,7 +334,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         ) : filteredChatItems.length > 0 ? (
           filteredChatItems.map((item, index) => {
             const uniqueKey = `${item.id}-${item.profileImage}`
-            const imageUrl = 'https://mindmate.shop/api' + item.profileImage
+            const imageUrl = 'httpss://mindmate.shop/api' + item.profileImage
 
             return (
               <div key={uniqueKey} style={{ position: 'relative' }}>

@@ -22,22 +22,22 @@ const defaultLinks: SupportLink[] = [
   {
     id: '1',
     imageUrl: '/support/career_center.png',
-    linkUrl: 'http://job.ajou.ac.kr/',
+    linkUrl: 'https://job.ajou.ac.kr/',
   },
   {
     id: '2',
     imageUrl: '/support/counseling_center.png',
-    linkUrl: 'http://ascc.ajou.ac.kr/ascc/index.do',
+    linkUrl: 'https://ascc.ajou.ac.kr/ascc/index.do',
   },
   {
     id: '3',
     imageUrl: 'public/support/innovation_center.png',
-    linkUrl: 'http://ajou.ac.kr/ace/index.do',
+    linkUrl: 'https://ajou.ac.kr/ace/index.do',
   },
   {
     id: '4',
     imageUrl: 'public/support/global_center.png',
-    linkUrl: 'http://cll.ajou.ac.kr/cll/index.do',
+    linkUrl: 'https://cll.ajou.ac.kr/cll/index.do',
   },
 ]
 

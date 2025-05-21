@@ -105,7 +105,7 @@ function OnboardingContent() {
     onSuccess: async (tokenResponse) => {
       // 1. 구글 유저 정보 가져오기 (여기는 credentials 필요 없음)
       const googleUserInfo = await fetch(
-        'http://www.googleapis.com/oauth2/v3/userinfo',
+        'https://www.googleapis.com/oauth2/v3/userinfo',
         {
           headers: {
             Authorization: `Bearer ${tokenResponse.access_token}`,
@@ -115,7 +115,7 @@ function OnboardingContent() {
 
       // 2. 회원가입 시도 (credentials: 'include')
       const registerRes = await fetch(
-        'https://mindmate.shop/api/auth/register',
+        'httpss://mindmate.shop/api/auth/register',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -130,7 +130,7 @@ function OnboardingContent() {
       ).then((res) => res.json())
 
       // 3. 로그인 시도 (credentials: 'include')
-      const loginRes = await fetch('https://mindmate.shop/api/auth/login', {
+      const loginRes = await fetch('httpss://mindmate.shop/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -156,7 +156,7 @@ function OnboardingContent() {
               setTokenCookie(data.refreshToken, 'refreshToken')
 
               const res = await fetchWithRefresh(
-                `https://mindmate.shop/api/profiles`,
+                `httpss://mindmate.shop/api/profiles`,
                 {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },
@@ -175,7 +175,7 @@ function OnboardingContent() {
               setTokenCookie(data.refreshToken, 'refreshToken')
 
               const res = await fetchWithRefresh(
-                `https://mindmate.shop/api/profiles`,
+                `httpss://mindmate.shop/api/profiles`,
                 {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },
@@ -392,7 +392,7 @@ function OnboardingContent() {
                 type="button"
               >
                 <img
-                  src="http://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                   alt="Google"
                   css={iconStyle}
                 />

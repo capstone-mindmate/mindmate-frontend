@@ -73,7 +73,7 @@ const HomePage = () => {
         const accessToken = getTokenCookie('accessToken')
 
         // API URL
-        const apiUrl = `https://mindmate.shop/api/magazines/popular?limit=5`
+        const apiUrl = `httpss://mindmate.shop/api/magazines/popular?limit=5`
 
         // API 호출
         const response = await fetch(apiUrl, {
@@ -169,9 +169,9 @@ const HomePage = () => {
     )
 
     if (imageContent && imageContent.imageUrl) {
-      return imageContent.imageUrl.startsWith('http')
+      return imageContent.imageUrl.startsWith('https')
         ? imageContent.imageUrl
-        : `https://mindmate.shop/api${imageContent.imageUrl}`
+        : `httpss://mindmate.shop/api${imageContent.imageUrl}`
     }
 
     return '/default-profile-image.png' // 기본 이미지 경로
@@ -317,12 +317,12 @@ const HomePage = () => {
               <ClickableCard
                 onClick={() =>
                   handleCardNewsClick(
-                    'http://github.com/capstone-mindmate/mindmate-frontend'
+                    'https://github.com/capstone-mindmate/mindmate-frontend'
                   )
                 }
               >
                 <CardNewsComponent
-                  imgUrl="http://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
+                  imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
                   title="슬기로운 방학생활"
                   organization="인권센터 학생상담소"
                   date="2025-01-16"
@@ -331,12 +331,12 @@ const HomePage = () => {
               <ClickableCard
                 onClick={() =>
                   handleCardNewsClick(
-                    'http://github.com/capstone-mindmate/mindmate-frontend'
+                    'https://github.com/capstone-mindmate/mindmate-frontend'
                   )
                 }
               >
                 <CardNewsComponent
-                  imgUrl="http://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
+                  imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
                   title="나의 솔로해방 일지"
                   organization="인권센터 학생상담소"
                   date="2025-01-15"
@@ -345,12 +345,12 @@ const HomePage = () => {
               <ClickableCard
                 onClick={() =>
                   handleCardNewsClick(
-                    'http://github.com/capstone-mindmate/mindmate-frontend'
+                    'https://github.com/capstone-mindmate/mindmate-frontend'
                   )
                 }
               >
                 <CardNewsComponent
-                  imgUrl="http://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
+                  imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
                   title="스트레스 관리 방법"
                   organization="인권센터 학생상담소"
                   date="2025-01-10"

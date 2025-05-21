@@ -31,7 +31,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({
       {!isImageLoaded && (
         <ProfileImage
           src={
-            'https://mindmate.shop/api/profileImages/default-profile-image.png'
+            'httpss://mindmate.shop/api/profileImages/default-profile-image.png'
           }
           alt="기본 프로필 이미지"
           style={{ position: 'absolute' }}

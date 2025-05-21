@@ -51,7 +51,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
       setIsLoading(true)
       try {
         const res = await fetchWithRefresh(
-          `https://mindmate.shop/api/matchings/${matchedRoom.id}/waiting-users?page=0&size=20`,
+          `httpss://mindmate.shop/api/matchings/${matchedRoom.id}/waiting-users?page=0&size=20`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -99,7 +99,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
 
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/matchings/${matchedRoom.id}/${selectedApplication.id}/acceptance`,
+        `httpss://mindmate.shop/api/matchings/${matchedRoom.id}/${selectedApplication.id}/acceptance`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -132,7 +132,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
         isOpen={isModalOpen}
         userProfileProps={{
           profileImage:
-            'https://mindmate.shop/api' +
+            'httpss://mindmate.shop/api' +
             selectedApplication.waitingUserProfileImage,
           name: selectedApplication.waitingUserNickname,
           department: selectedApplication.waitingUserDepartment,
@@ -170,7 +170,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
               <ApplicationInfo
                 key={application.id}
                 profileImage={
-                  'https://mindmate.shop/api' +
+                  'httpss://mindmate.shop/api' +
                   application.waitingUserProfileImage
                 }
                 name={application.waitingUserNickname}

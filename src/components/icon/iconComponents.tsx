@@ -40,7 +40,7 @@ export const AlarmIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -69,7 +69,7 @@ export const BackIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
       onClick={onClick}
     >
@@ -97,7 +97,7 @@ export const CheckIconBig: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <g clipPath="url(#clip0_169_4136)">
@@ -138,7 +138,7 @@ export const CheckIconSmall: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -166,7 +166,7 @@ export const ErrorIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -194,7 +194,7 @@ export const ImageIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -222,7 +222,7 @@ export const InfoIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -256,7 +256,7 @@ export const KebabIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -304,7 +304,7 @@ export const ListIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -338,7 +338,7 @@ export const PlusIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -366,7 +366,7 @@ export const SearchIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -394,7 +394,7 @@ export const SendIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -422,7 +422,7 @@ export const SettingIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -457,7 +457,7 @@ export const SmileIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <circle cx="12" cy="12" r="9" stroke={color} strokeWidth={strokeWidth} />
@@ -488,7 +488,7 @@ export const StarIcon: React.FC<IconProps & { filled?: boolean }> = ({
       height={height}
       viewBox="0 0 24 24"
       fill={filled ? color : 'none'}
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -516,7 +516,7 @@ export const TextIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -544,7 +544,7 @@ export const UploadIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -572,7 +572,7 @@ export const WarningIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -600,7 +600,7 @@ export const AttachmentIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -628,7 +628,7 @@ export const CameraIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -672,7 +672,7 @@ export const ChatAlertIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
     >
       <circle cx="12.5" cy="11.5" r="9.5" fill="#FB4F50" />
     </svg>
@@ -696,7 +696,7 @@ export const ChatBoxIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -724,7 +724,7 @@ export const ChatBubbleIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -751,7 +751,7 @@ export const CoinIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -776,7 +776,7 @@ export const HomeIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -804,7 +804,7 @@ export const MessageIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -832,7 +832,7 @@ export const NormalPlusIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -861,7 +861,7 @@ export const CloseIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <path
@@ -889,7 +889,7 @@ export const UserIcon: React.FC<IconProps> = ({
       height={height}
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       css={iconStyle}
     >
       <circle

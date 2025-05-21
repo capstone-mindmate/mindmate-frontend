@@ -40,10 +40,10 @@ const EmoticonHome = () => {
   const { user } = useAuthStore()
   const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
   const realProfileImageUrl = profile?.profileImage
-    ? 'https://mindmate.shop/api' + profile.profileImage
+    ? 'httpss://mindmate.shop/api' + profile.profileImage
     : ''
   const defaultProfileImageUrl =
-    'https://mindmate.shop/api/profileImages/default-profile-image.png'
+    'httpss://mindmate.shop/api/profileImages/default-profile-image.png'
 
   const bottomSheetMenuItems = [
     {
@@ -81,7 +81,7 @@ const EmoticonHome = () => {
       try {
         // 프로필 정보
         let profileRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/profiles',
+          'httpss://mindmate.shop/api/profiles',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -92,7 +92,7 @@ const EmoticonHome = () => {
 
         // 포인트 잔액
         let pointRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/points/balance',
+          'httpss://mindmate.shop/api/points/balance',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -104,7 +104,7 @@ const EmoticonHome = () => {
 
         // 상점 이모티콘
         let shopRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/shop',
+          'httpss://mindmate.shop/api/emoticons/shop',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -115,7 +115,7 @@ const EmoticonHome = () => {
 
         // 내 이모티콘
         let myRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/my',
+          'httpss://mindmate.shop/api/emoticons/my',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },

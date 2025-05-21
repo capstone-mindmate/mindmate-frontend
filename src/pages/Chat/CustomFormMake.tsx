@@ -91,7 +91,7 @@ const CustomFormMake = ({ matchId }: CustomFormMakeProps) => {
 
       // 웹소켓 연결이 안되었을 경우 REST API 호출로 대체
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/custom-forms',
+        'httpss://mindmate.shop/api/custom-forms',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

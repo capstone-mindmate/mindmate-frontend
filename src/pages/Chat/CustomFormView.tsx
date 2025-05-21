@@ -42,7 +42,7 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
     const fetchFormData = async () => {
       try {
         const res = await fetchWithRefresh(
-          `https://mindmate.shop/api/custom-forms/${formId}`
+          `httpss://mindmate.shop/api/custom-forms/${formId}`
         )
         if (!res.ok) {
           throw new Error('설문지 정보를 불러오지 못했습니다.')
@@ -120,7 +120,7 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
 
       // 웹소켓 연결이 안되었을 경우 REST API 호출로 대체
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/custom-forms/${formId}/respond`,
+        `httpss://mindmate.shop/api/custom-forms/${formId}/respond`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -163,7 +163,7 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
   const sendSystemMessageREST = async (roomId: string | number) => {
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/messages`,
+        `httpss://mindmate.shop/api/chat/messages`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
