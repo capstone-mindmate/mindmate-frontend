@@ -22,10 +22,9 @@ const NickNameAndProfile = ({
 }: NickNameAndProfileProps) => {
   const [isEnabled, setIsEnabled] = useState(false)
   const [userNickName, setUserNickName] = useState(initialData.nickname || '')
-  const [profileImage, setProfileImage] = useState<File | null>(null)
-  useEffect(() => {
-    setIsEnabled(userNickName !== '')
-  }, [])
+  const [profileImageFile, setProfileImageFile] = useState<File | undefined>(
+    undefined
+  )
 
   useEffect(() => {
     setIsEnabled(userNickName !== '')
@@ -35,18 +34,17 @@ const NickNameAndProfile = ({
     setUserNickName(value)
   }
 
+  // File 선택 시 File 객체만 상태에 저장
   const handleImageChange = (file: File) => {
-    setProfileImage(file)
+    setProfileImageFile(file)
   }
 
   const handleNextStep = () => {
     if (isEnabled) {
       const updatedData: any = { nickname: userNickName }
-
-      if (profileImage) {
-        updatedData.profileImage = profileImage
+      if (profileImageFile) {
+        updatedData.profileImage = profileImageFile
       }
-
       goToNextStep(updatedData)
     }
   }
@@ -64,7 +62,9 @@ const NickNameAndProfile = ({
       <RegisterInputContainer>
         <InitialProfileImageSetting
           onImageChange={handleImageChange}
-          initialImage={initialData.profileImageUrl}
+          initialImage={
+            profileImageFile ? URL.createObjectURL(profileImageFile) : undefined
+          }
         />
         <TitleInputBox
           placeholder="닉네임을 입력해주세요"

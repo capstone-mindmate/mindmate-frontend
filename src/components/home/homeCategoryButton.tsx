@@ -4,6 +4,7 @@ import { css } from '@emotion/react'
 interface HomeCategoryButtonProps {
   buttonText: string
   emoji: string
+  onClick?: () => void
 }
 
 const containerStyle = css`
@@ -58,8 +59,16 @@ const emojiStyle = css`
   margin-right: 12px;
 `
 
-const HomeCategoryButton = ({ buttonText, emoji }: HomeCategoryButtonProps) => {
-  const handleClick = () => {}
+const HomeCategoryButton = ({
+  buttonText,
+  emoji,
+  onClick,
+}: HomeCategoryButtonProps) => {
+  const handleClick = () => {
+    if (onClick) {
+      onClick()
+    }
+  }
 
   return (
     <div className="container" css={containerStyle}>

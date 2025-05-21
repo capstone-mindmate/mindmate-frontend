@@ -4,7 +4,7 @@ export const PickerContainer = styled.div`
   width: 100%;
   background-color: #fff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 0px 10px 15px 10px;
+  padding: 0px 0px 15px 0px;
   z-index: 1000;
   box-sizing: border-box;
   max-width: 100%;

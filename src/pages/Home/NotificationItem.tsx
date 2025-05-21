@@ -9,7 +9,7 @@ import {
   NotificationTitle,
   NotificationDescription,
   NotificationTime,
-} from './NotificationStyles'
+} from './NotificationStyles.tsx'
 
 interface NotificationItemProps {
   type: 'match' | 'comment'

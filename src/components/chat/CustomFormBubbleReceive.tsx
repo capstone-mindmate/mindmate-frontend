@@ -19,6 +19,8 @@ interface BubbleProps {
   isLastMessage?: boolean
   isRead?: boolean
   isContinuous?: boolean
+  isCustomFormMake?: boolean
+  onClick?: () => void
 }
 
 const CustomFormBubbleSendStyles = {
@@ -68,9 +70,20 @@ const Bubble = ({
   isLastMessage = false,
   isRead = false,
   isContinuous = false,
+  isCustomFormMake = false,
+  onClick,
 }: BubbleProps) => {
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // 이벤트 버블링 방지
+    if (onClick) onClick()
+  }
+
   return (
-    <BubbleWrapper isMe={isMe} isContinuous={isContinuous}>
+    <BubbleWrapper
+      isMe={isMe}
+      isContinuous={isContinuous}
+      isCustomFormMake={true}
+    >
       {!isMe &&
         (profileImage && !isContinuous ? (
           <ProfileImage src={profileImage} alt="프로필" />
@@ -78,7 +91,7 @@ const Bubble = ({
           <ProfileContainer />
         ))}
       <MessageContainer isMe={isMe}>
-        <BubbleContainer isMe={isMe}>
+        <BubbleContainer isMe={isMe} isCustomFormMake={true}>
           <div
             className="custom-form-bubble-send"
             css={CustomFormBubbleSendStyles.container}
@@ -91,7 +104,7 @@ const Bubble = ({
               css={CustomFormBubbleSendStyles.buttonBox}
             >
               <button
-                onClick={() => {}}
+                onClick={handleButtonClick}
                 css={CustomFormBubbleSendStyles.button}
               >
                 확인하기

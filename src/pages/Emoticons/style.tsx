@@ -27,7 +27,7 @@ export const ProfileContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-top: 70px;
+  margin-top: 20px;
 `
 
 export const PurchaseAbleEmoticonContainer = styled.div`

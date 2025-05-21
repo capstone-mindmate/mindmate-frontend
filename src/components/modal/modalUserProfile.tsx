@@ -8,6 +8,7 @@ interface ModalUserProfileProps {
   makeDate?: string
   onBackClick?: () => void
   showDetails?: boolean
+  onClick?: () => void
 }
 
 const profileStyles = {
@@ -111,9 +112,15 @@ export const ModalMatchingUserProfile = ({
   name,
   department,
   makeDate,
+  onClick,
 }: ModalUserProfileProps) => {
   return (
-    <div className="container" css={profileStyles.container}>
+    <div
+      className="container"
+      css={profileStyles.container}
+      onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : undefined }}
+    >
       <div className="profile-image" css={profileStyles.profileImageWrapper}>
         <img src={profileImage} css={profileStyles.profileImageStyle} />
       </div>

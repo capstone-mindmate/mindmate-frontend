@@ -3,6 +3,7 @@ import styled from '@emotion/styled'
 interface BubbleContainerProps {
   isMe: boolean
   isEmoticon?: boolean
+  isCustomFormMake?: boolean
 }
 
 export const BubbleContainer = styled.div<BubbleContainerProps>`
@@ -18,7 +19,13 @@ export const BubbleContainer = styled.div<BubbleContainerProps>`
   line-height: 1.2;
   color: #000000;
   background-color: ${(props) =>
-    props.isEmoticon ? 'none' : props.isMe ? '#FEECC4' : '#E8E8E8'};
+    props.isCustomFormMake
+      ? '#FEECC4'
+      : props.isEmoticon
+        ? 'none'
+        : props.isMe
+          ? '#FEECC4'
+          : '#E8E8E8'};
   position: relative;
   word-break: break-word;
 `
@@ -27,11 +34,14 @@ export const BubbleWrapper = styled.div<{
   isMe: boolean
   isContinuous?: boolean
   isEmoticon?: boolean
+  isLastMessage?: boolean
+  isCustomFormMake?: boolean
 }>`
   display: flex;
   width: 100%;
   justify-content: ${(props) => (props.isMe ? 'flex-end' : 'flex-start')};
   margin: ${(props) => {
+    if (props.isLastMessage) return '10px 0px 100px 0px'
     if (props.isContinuous) {
       // 이모티콘이면서 연속된 메시지인 경우 위쪽 마진 줄이기
       return props.isEmoticon ? '0px 0px 10px 0px' : '0px 0px 10px 0px'

@@ -135,7 +135,7 @@ const slideFarRightToFarther = keyframes`
 // 프레임 래퍼 (슬라이드 애니메이션용)
 export const FrameWrapper = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   position: relative;
   height: 330px;
@@ -150,6 +150,8 @@ export const FrameWrapper = styled.div`
     backface-visibility: hidden;
     perspective: 1000px;
     transform-style: preserve-3d;
+    width: 280px; /* 모든 프레임에 동일한 너비 적용 */
+    height: 230px; /* 모든 프레임에 동일한 높이 적용 */
 
     &.far-prev {
       transform: translateX(-160%) scale(0);

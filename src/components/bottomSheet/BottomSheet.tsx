@@ -63,7 +63,7 @@ const BottomSheet = ({
       right: 0;
       bottom: 0;
       background-color: #00000055;
-      z-index: 1000;
+      z-index: 1001;
       display: flex;
       align-items: flex-end;
       justify-content: center;

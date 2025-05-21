@@ -6,6 +6,7 @@ import { CameraIcon } from '../../components/icon/iconComponents'
 interface InitialProfileImageSettingProps {
   onImageChange?: (file: File) => void
   initialImage?: string
+  onImageLoad?: () => void
 }
 
 const styles = {
@@ -89,6 +90,7 @@ const DefaultProfileIcon = () => (
 const InitialProfileImageSetting = ({
   onImageChange,
   initialImage,
+  onImageLoad,
 }: InitialProfileImageSettingProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(
     initialImage || null
@@ -128,6 +130,8 @@ const InitialProfileImageSetting = ({
             src={imagePreview}
             alt="프로필 이미지"
             css={styles.profileImage}
+            onLoad={onImageLoad}
+            onError={onImageLoad}
           />
         ) : (
           <div css={styles.defaultProfile}>

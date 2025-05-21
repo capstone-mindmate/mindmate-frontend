@@ -4,16 +4,8 @@ import styled from '@emotion/styled'
 export const LogoText = styled.span`
   font-family: 'pretendard';
   font-size: 20px;
-  font-weight: 640;
+  font-weight: 600;
   color: #392111;
-
-  @media (max-width: 480px) {
-    font-size: 18px;
-  }
-
-  @media (min-width: 1024px) {
-    font-size: 22px;
-  }
 `
 
 // 마이페이지 컨테이너

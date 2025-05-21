@@ -165,7 +165,9 @@ const ChatTest: React.FC = () => {
                 isLastMessage={isLastMessage}
                 isRead={message.isRead}
                 isContinuous={isContinuous}
-                profileImage={message.isMe ? undefined : '/public/image.png'}
+                profileImage={
+                  message.isMe ? undefined : '/default-profile-image.png'
+                }
               >
                 <EmoticonWrapper>
                   <EmoticonComponent
@@ -187,7 +189,9 @@ const ChatTest: React.FC = () => {
                 isLastMessage={isLastMessage}
                 isRead={message.isRead}
                 isContinuous={isContinuous}
-                profileImage={message.isMe ? undefined : '/public/image.png'}
+                profileImage={
+                  message.isMe ? undefined : '/default-profile-image.png'
+                }
               >
                 {message.content}
               </Bubble>

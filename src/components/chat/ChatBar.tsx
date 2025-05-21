@@ -9,16 +9,30 @@ import { useToast } from '../toast/ToastProvider'
 import * as IconComponents from '../../components/icon/iconComponents'
 import EmoticonPicker from '../emoticon/EmoticonPicker'
 import { EmoticonType } from '../emoticon/Emoticon'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 interface ChatBarProps {
-  onSendMessage?: (message: string) => void
+  onSendMessage: (message: string) => void
   onSendEmoticon?: (emoticonType: EmoticonType) => void
+  onTyping?: (isTyping: boolean) => void
+  disabled?: boolean
+  chatId?: string | undefined
 }
 
-function ChatBar({ onSendMessage, onSendEmoticon }: ChatBarProps) {
+function ChatBar({
+  onSendMessage,
+  onSendEmoticon,
+  onTyping,
+  disabled,
+  chatId,
+}: ChatBarProps) {
   const [message, setMessage] = useState<string>('')
   const [showEmoticonPicker, setShowEmoticonPicker] = useState<boolean>(false)
   const { showToast } = useToast()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const otherProfileImage = location.state?.profileImage
+  const otherUserName = location.state?.userName
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value)
@@ -28,18 +42,23 @@ function ChatBar({ onSendMessage, onSendEmoticon }: ChatBarProps) {
     if (message.trim() && onSendMessage) {
       onSendMessage(message)
       setMessage('')
-      showToast('메시지가 전송되었습니다', 'success')
+      // showToast('메시지가 전송되었습니다', 'success')
     }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && message.trim() && onSendMessage) {
+    if (e.key === 'Enter' && message.trim()) {
       handleSendMessage()
     }
   }
 
   const handlePlusClick = () => {
-    showToast('커스텀폼 버튼이 클릭되었습니다', 'info')
+    navigate(`/chat/custom-form/make/${chatId}`, {
+      state: {
+        profileImage: otherProfileImage,
+        userName: otherUserName,
+      },
+    })
   }
 
   const handleEmojiClick = () => {
@@ -49,15 +68,16 @@ function ChatBar({ onSendMessage, onSendEmoticon }: ChatBarProps) {
   const handleSelectEmoticon = (type: EmoticonType) => {
     if (onSendEmoticon) {
       onSendEmoticon(type)
-      showToast(`${type} 이모티콘을 보냈습니다`, 'success')
+      // showToast(`${type} 이모티콘을 보냈습니다`, 'success')
     } else {
-      showToast(`이모티콘을 선택했습니다: ${type}`, 'info')
+      // showToast(`이모티콘을 선택했습니다: ${type}`, 'info')
     }
     setShowEmoticonPicker(false)
   }
 
   const handleEmoticonShopClick = () => {
-    showToast('이모티콘샵으로 이동합니다', 'info')
+    // showToast('이모티콘샵으로 이동합니다', 'info')
+    navigate('/emoticons')
     setShowEmoticonPicker(false)
   }
 
@@ -99,6 +119,7 @@ function ChatBar({ onSendMessage, onSendEmoticon }: ChatBarProps) {
                 type="text"
                 placeholder="메시지를 입력하세요"
                 value={message}
+                disabled={disabled}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
               />

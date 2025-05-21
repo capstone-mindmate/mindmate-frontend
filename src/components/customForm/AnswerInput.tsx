@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 interface AskInputProps {
   title: string
+  onAnswerChange?: (value: string) => void
 }
 
 const askInputStyles = {
@@ -45,13 +46,16 @@ const askInputStyles = {
   `,
 }
 
-const AskInput = ({ title }: AskInputProps) => {
+const AskInput = ({ title, onAnswerChange }: AskInputProps) => {
   const [inputValue, setInputValue] = useState('')
 
   const hasValue = inputValue.length > 0
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
+    if (onAnswerChange) {
+      onAnswerChange(e.target.value)
+    }
   }
 
   return (

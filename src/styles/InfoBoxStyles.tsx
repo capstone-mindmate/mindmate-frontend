@@ -53,7 +53,7 @@ export const ScoreValue = styled.div`
 // 별 아이콘 래퍼 - 점수 왼쪽에 위치
 export const StarIconWrapper = styled.div`
   position: absolute;
-  right: calc(50% + 15px);
+  right: calc(50% + 20px);
   display: flex;
   align-items: center;
 `

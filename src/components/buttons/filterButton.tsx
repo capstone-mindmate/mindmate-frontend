@@ -1,10 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface FilterButtonProps {
   buttonText: string
   onActiveChange?: (isActive: boolean) => void
+  isActive?: boolean
 }
 
 const buttonStyle = (isActive: boolean) => css`
@@ -28,12 +29,26 @@ const buttonStyle = (isActive: boolean) => css`
 const FilterButton: React.FC<FilterButtonProps> = ({
   buttonText,
   onActiveChange,
+  isActive: externalIsActive,
 }) => {
-  const [isActive, setIsActive] = useState(false)
+  const [internalIsActive, setInternalIsActive] = useState(false)
+
+  const isActive =
+    externalIsActive !== undefined ? externalIsActive : internalIsActive
+
+  useEffect(() => {
+    if (externalIsActive !== undefined) {
+      setInternalIsActive(externalIsActive)
+    }
+  }, [externalIsActive])
 
   const handleClick = () => {
     const newActiveState = !isActive
-    setIsActive(newActiveState)
+
+    if (externalIsActive === undefined) {
+      setInternalIsActive(newActiveState)
+    }
+
     onActiveChange?.(newActiveState)
   }
 

@@ -4,73 +4,84 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import TopBar from '../../components/topbar/Topbar'
 import ApplicationInfo from '../../components/matching/applicationInfo'
 import ModalComponent from '../../components/modal/modalComponent'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 import { css } from '@emotion/react'
 
 import { RootContainer, MatchingContainer, ApplicationList } from './style'
-
-// 더미 신청자 데이터
-const dummyApplicationsData = [
-  {
-    id: 1,
-    profileImage: '/public/image.png',
-    name: '열정가득 대학생',
-    department: '소프트웨어학과',
-    makeDate: '2023-04-26',
-    message:
-      '안녕하세요! 해당 주제에 대해 관심이 많아 신청합니다. 함께 이야기 나누고 싶습니다.',
-    isAccepted: false,
-  },
-  {
-    id: 2,
-    profileImage: '/public/image.png',
-    name: '알고리즘 좋아요',
-    department: '컴퓨터공학과',
-    makeDate: '2023-04-25',
-    message:
-      '저도 같은 고민을 하고 있어서 함께 이야기 나누고 싶어요. 최근에 관련 분야 인턴을 했었는데 도움이 될 것 같습니다!',
-    isAccepted: false,
-  },
-  {
-    id: 3,
-    profileImage: '/public/image.png',
-    name: '미래의 개발자',
-    department: '정보통신학과',
-    makeDate: '2023-04-25',
-    message:
-      '해당 주제에 대해 의견을 나누고 싶습니다. 비슷한 경험이 있어서 서로 도움이 될 것 같아요.',
-    isAccepted: false,
-  },
-  {
-    id: 4,
-    profileImage: '/public/image.png',
-    name: '취업준비생',
-    department: '소프트웨어학과',
-    makeDate: '2023-04-24',
-    message:
-      '같은 고민을 하고 있어서 신청합니다. 함께 이야기하면 좋은 해결책을 찾을 수 있을 것 같아요!',
-    isAccepted: false,
-  },
-]
+import { useToast } from '../../components/toast/ToastProvider'
 
 interface MatchedApplicationProps {}
+
+// API로부터 받아온 신청자 정보 타입
+interface WaitingUser {
+  id: number
+  waitingUserId: number
+  waitingUserNickname: string
+  waitingUserDepartment: string
+  waitingUserEntranceTime: number
+  waitingUserGraduation: boolean
+  waitingUserCounselingCount: number
+  waitingUserProfileImage: string
+  message: string
+  status: string
+  createdAt: string
+}
 
 const MatchedApplication = ({}: MatchedApplicationProps) => {
   const location = useLocation()
   const navigate = useNavigate()
   const { item } = location.state || {}
-  const [applications, setApplications] = useState(dummyApplicationsData)
+  const [applications, setApplications] = useState<WaitingUser[]>([])
   const [matchedRoom, setMatchedRoom] = useState(item || null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedApplication, setSelectedApplication] = useState<
-    (typeof dummyApplicationsData)[0] | null
-  >(null)
+  const [selectedApplication, setSelectedApplication] =
+    useState<WaitingUser | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const { showToast } = useToast()
 
   useEffect(() => {
-    // API 호출 로직 추가하기
+    // 매칭 신청자 목록 조회 API 호출
+    const fetchWaitingUsers = async () => {
+      if (!matchedRoom || !matchedRoom.id) {
+        // 매칭방 정보가 없으면 더미 데이터 사용
+        return
+      }
+
+      setIsLoading(true)
+      try {
+        const res = await fetchWithRefresh(
+          `https://mindmate.shop/api/matchings/${matchedRoom.id}/waiting-users?page=0&size=20`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+
+        if (!res.ok) {
+          const errorData = await res.json()
+          throw new Error(
+            errorData.message || '매칭 신청자 목록을 불러오지 못했습니다.'
+          )
+        }
+
+        const data = await res.json()
+        if (Array.isArray(data.content)) {
+          setApplications(data.content)
+        } else {
+          setApplications([])
+        }
+      } catch (error: any) {
+        showToast(error.message, 'error')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchWaitingUsers()
   }, [matchedRoom])
 
-  const handleOpenModal = (application: (typeof dummyApplicationsData)[0]) => {
+  const handleOpenModal = (application: WaitingUser) => {
     setSelectedApplication(application)
     setIsModalOpen(true)
   }
@@ -79,14 +90,34 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
     setIsModalOpen(false)
   }
 
-  const handleMatchApplicationClick = (
-    application: (typeof dummyApplicationsData)[0]
-  ) => {
+  const handleMatchApplicationClick = (application: WaitingUser) => {
     handleOpenModal(application)
   }
 
-  const handleMatchingRequest = () => {
-    // 여기서 매칭 신청 콜하기
+  const handleMatchingRequest = async () => {
+    if (!selectedApplication || !matchedRoom) return
+
+    try {
+      const res = await fetchWithRefresh(
+        `https://mindmate.shop/api/matchings/${matchedRoom.id}/${selectedApplication.id}/acceptance`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message || '매칭 수락에 실패했습니다.')
+      }
+
+      // 성공 시 모달 닫기 및 리스트 새로고침
+      handleCloseModal()
+
+      navigate('/matching')
+    } catch (error: any) {
+      showToast(error.message, 'error')
+    }
   }
 
   const renderModal = () => {
@@ -100,18 +131,23 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
         onClose={handleCloseModal}
         isOpen={isModalOpen}
         userProfileProps={{
-          profileImage: selectedApplication.profileImage,
-          name: selectedApplication.name,
-          department: selectedApplication.department,
-          makeDate: selectedApplication.makeDate,
+          profileImage:
+            'https://mindmate.shop/api' +
+            selectedApplication.waitingUserProfileImage,
+          name: selectedApplication.waitingUserNickname,
+          department: selectedApplication.waitingUserDepartment,
+          makeDate: new Date(
+            selectedApplication.createdAt
+          ).toLocaleDateString(),
+          userId: selectedApplication.waitingUserId,
         }}
         matchingInfoProps={{
-          title: 'asdf',
-          description: 'asdf',
+          title: matchedRoom?.title || '',
+          description: matchedRoom?.description || '',
         }}
         messageProps={{
           onMessageChange: () => {},
-          messageValue: 'asdf',
+          messageValue: selectedApplication.message,
         }}
       />
     )
@@ -119,24 +155,34 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
 
   return (
     <RootContainer>
-      <TopBar title="매칭 신청 정보" showBackButton actionText="" />
+      <TopBar
+        title="매칭 신청 정보"
+        showBackButton
+        actionText=""
+        onBackClick={() => navigate('/matching/matched')}
+      />
       <MatchingContainer>
         <ApplicationList pageType="matched">
-          {applications.length > 0 ? (
+          {isLoading ? (
+            <div>로딩 중...</div>
+          ) : applications.length > 0 ? (
             applications.map((application, index) => (
               <ApplicationInfo
                 key={application.id}
-                profileImage={application.profileImage}
-                name={application.name}
-                department={application.department}
-                makeDate={application.makeDate}
+                profileImage={
+                  'https://mindmate.shop/api' +
+                  application.waitingUserProfileImage
+                }
+                name={application.waitingUserNickname}
+                department={application.waitingUserDepartment}
+                makeDate={new Date(application.createdAt).toLocaleDateString()}
                 onClick={() => handleMatchApplicationClick(application)}
                 message={application.message}
                 borderSet={index < applications.length - 1}
               />
             ))
           ) : (
-            <div></div>
+            <div>신청자가 없습니다.</div>
           )}
         </ApplicationList>
       </MatchingContainer>

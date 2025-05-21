@@ -4,7 +4,7 @@ export const TagReviewContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 30px;
 `
 
 export const TagReviewTitle = styled.h2`
