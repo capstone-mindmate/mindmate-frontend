@@ -37,7 +37,7 @@ const selectStyles = {
       padding 0.3s ease;
 
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='12' height='6' viewBox='0 0 14 8' fill='none' xmlns='https://www.w3.org/2000/svg'%3e%3cpath d='M1 1L7 7L13 1' stroke='%23150C06' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='12' height='6' viewBox='0 0 14 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M1 1L7 7L13 1' stroke='%23150C06' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 12px center; /* 화살표 위치 조정 */
     background-size: 14px;
