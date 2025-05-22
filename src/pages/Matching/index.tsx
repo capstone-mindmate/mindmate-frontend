@@ -441,7 +441,7 @@ const Matching = () => {
         )
         if (!res.ok) {
           const errorData = await res.json()
-          throw new Error(errorData.message || '매칭 신청에 실패했습니다.')
+          throw new Error(errorData.message || res.statusText)
         }
         showToast('매칭 신청이 완료되었습니다!', 'success')
         setIsModalOpen(false)
