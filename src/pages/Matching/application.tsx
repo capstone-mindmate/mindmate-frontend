@@ -182,7 +182,9 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
               />
             ))
           ) : (
-            <div>신청자가 없습니다.</div>
+            <div style={{ padding: '20px', textAlign: 'left', color: '#888' }}>
+              신청자가 없습니다.
+            </div>
           )}
         </ApplicationList>
       </MatchingContainer>

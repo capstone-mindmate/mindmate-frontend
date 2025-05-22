@@ -201,18 +201,22 @@ const MyPage = () => {
               }))
             )
           }
-          // 상세 리뷰
-          const reviewRes = await fetchWithRefresh(
+
+          reveiwListRes = await fetchWithRefresh(
             `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
             }
           )
-          const reviewData = await reviewRes.json()
+
+          const reveiwListData = await reveiwListRes.json()
+
+          // 상세 리뷰 (응답의 reviews 배열 활용)
           setUserReviews(
-            (reviewData.content || []).map((r: any) => ({
-              profileImage: r.reviewerProfileImage,
+            (reveiwListData.content || []).map((r: any) => ({
+              profileImage:
+                'https://mindmate.shop/api' + r.reviewerProfileImage,
               username: r.reviewerNickname,
               rating: r.rating,
               date: r.createdAt

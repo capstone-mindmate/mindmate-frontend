@@ -47,6 +47,7 @@ interface MatchItemType {
   makeDate?: string
   userId: number
   creatorId?: number
+  anonymous?: boolean
 }
 
 const departmentOptions = [
@@ -184,6 +185,7 @@ const Matching = () => {
           userId: item.userId ?? item.creatorId,
           category: categoryMap[item.category?.trim()] || item.category,
         }))
+        console.log(mapped)
         setMatchItems((prev) => (append ? [...prev, ...mapped] : mapped))
         setHasMore(!data.last)
       } else {
@@ -380,6 +382,7 @@ const Matching = () => {
         description: data.description ?? '',
         creatorRole: data.creatorRole ?? '',
         category: data.category ?? '',
+        anonymous: data.anonymous ?? false,
         matchType: data.creatorRole === 'SPEAKER' ? '스피커' : '리스너',
         borderSet: false,
         username: data.creatorNickname ?? '',
@@ -545,10 +548,10 @@ const Matching = () => {
     const handleProfileClick = () => {
       // userId 우선, 없으면 creatorId 사용
       const userId = selectedItem?.userId ?? selectedItem?.creatorId
-      if (userId) {
+      if (userId && !selectedItem?.anonymous) {
         navigate(`/mypage/${userId}`)
       } else {
-        alert('상대방 프로필 정보를 찾을 수 없습니다.')
+        showToast('상대방 프로필 정보를 찾을 수 없습니다.', 'error')
       }
     }
     return (
@@ -704,7 +707,7 @@ const Matching = () => {
                 department={item.department ?? ''}
                 title={item.title ?? ''}
                 description={item.description ?? ''}
-                matchType={item.matchType ?? ''}
+                matchType={item.creatorRole ?? ''}
                 category={item.category ?? ''}
                 borderSet={index < matchItems.length - 1}
                 onClick={() => handleMatchItemClick(item)}

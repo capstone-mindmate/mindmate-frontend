@@ -122,6 +122,7 @@ interface MatchingDetail {
   creatorDepartment: string
   creatorCounselingCount: number
   creatorAvgRating: number
+  waitingUserId: number
 }
 
 // 프로필 상세 정보 인터페이스
@@ -240,10 +241,14 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
                   message: item.applicationMessage || '',
                   username: detail.creatorNickname, // 필요시 추가 정보
                   profileImage:
-                    'https://mindmate.shop/api' + detail.creatorProfileImage, // 필요시 추가 정보
+                    'https://mindmate.shop/api' +
+                    (detail.creatorProfileImage
+                      ? detail.creatorProfileImage
+                      : '/profileImages/default-profile-image.png'), // 필요시 추가 정보
                   makeDate: formatDate(detail.createdAt), // 필요시 추가 정보
                   borderSet: true, // 필요시 추가 정보
                   applicationStatus: detail.status, // 필요시 추가 정보
+                  waitingUserId: item.waitingUserId, // 필요시 추가 정보
                 }
               } catch {
                 // 상세 조회 실패 시 기본 정보만 사용
@@ -338,10 +343,6 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
     }
   }
 
-  const handleBackClick = () => {
-    navigate('/matching')
-  }
-
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category)
   }
@@ -355,6 +356,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
   }
 
   const handleOpenModal = (application: (typeof appliedMatchingRooms)[0]) => {
+    console.log(application)
     setSelectedApplication(application)
     setIsModalOpen(true)
   }
@@ -372,7 +374,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
     try {
       // waitingUserId를 사용하여 매칭 신청 취소 API 호출
       // API 스웨거 문서에 따르면 /matchings/waiting-users/{waitingUserId} DELETE 메서드 사용
-      const waitingUserId = selectedApplication.id
+      const waitingUserId = selectedApplication.waitingUserId
 
       const res = await fetchWithRefresh(
         `https://mindmate.shop/api/matchings/waiting-users/${waitingUserId}`,
@@ -382,7 +384,10 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
         }
       )
 
-      if (!res.ok) throw new Error('매칭 취소에 실패했습니다.')
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message || res.statusText)
+      }
 
       showToast('매칭 신청이 취소되었습니다.', 'success')
       setIsModalOpen(false)
@@ -391,14 +396,13 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
 
       // 목록 다시 불러오기
       fetchMatchingRooms()
-    } catch (e) {
-      if (e instanceof Error) {
-        showToast(e.message, 'error')
-      } else {
-        showToast('매칭 취소 중 오류가 발생했습니다.', 'error')
-      }
+    } catch (e: any) {
+      showToast(e.message, 'error')
     } finally {
       setIsLoading(false)
+      setIsModalOpen(false)
+      setMatchingDetail(null)
+      setCreatorProfile(null)
     }
   }
 
@@ -503,8 +507,8 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
       <TopBar
         title="매칭방 목록"
         showBackButton
-        onBackClick={handleBackClick}
         actionText=""
+        onBackClick={() => navigate('/matching')}
       />
       <MatchingContainer>
         <TopFixedContent fixedType="matched">
