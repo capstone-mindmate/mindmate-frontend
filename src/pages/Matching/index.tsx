@@ -163,9 +163,9 @@ const Matching = () => {
       params.append('category', categoryEngMap[selectedCategory])
     if (selectedDepartment) params.append('department', selectedDepartment)
     if (isListenerActive && !isSpeakerActive)
-      params.append('requiredRole', 'LISTENER')
-    if (!isListenerActive && isSpeakerActive)
       params.append('requiredRole', 'SPEAKER')
+    if (!isListenerActive && isSpeakerActive)
+      params.append('requiredRole', 'LISTENER')
     if (searchQuery.trim() !== '') params.append('keyword', searchQuery.trim())
     // 검색어가 있으면 /search, 없으면 /matchings
     const endpoint =
@@ -241,11 +241,11 @@ const Matching = () => {
 
     if (isListenerActive && !isSpeakerActive) {
       filtered = filtered.filter(
-        (item: MatchItemType) => item.matchType === '리스너'
+        (item: MatchItemType) => item.creatorRole === 'LISTENER'
       )
     } else if (!isListenerActive && isSpeakerActive) {
       filtered = filtered.filter(
-        (item: MatchItemType) => item.matchType === '스피커'
+        (item: MatchItemType) => item.creatorRole === 'SPEAKER'
       )
     }
 
