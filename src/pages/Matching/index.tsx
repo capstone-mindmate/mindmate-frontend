@@ -448,7 +448,7 @@ const Matching = () => {
         setMessageToSend('')
       } catch (e: any) {
         setIsModalOpen(false)
-        showToast(e.message, 'error')
+        showToast(e, 'error')
       }
     }
   }
