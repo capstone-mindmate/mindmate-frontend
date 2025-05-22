@@ -153,7 +153,11 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
           }),
         }
       )
-      if (!res.ok) throw new Error(res.statusText)
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message || res.statusText)
+      }
       showToast('매칭방이 성공적으로 생성되었습니다!', 'success')
       navigate('/matching')
       // TODO: 성공 시 이동 처리 (예: 홈/매칭방 목록 등)
