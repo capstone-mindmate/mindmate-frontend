@@ -83,15 +83,16 @@ const NotFound = () => {
 }
 
 const ReportRoute = () => {
-  const { reportedUserId, targetUserId, fromPage } = useParams()
+  return <Report />
+}
 
-  return (
-    <Report
-      reportedUserId={reportedUserId}
-      targetUserId={targetUserId}
-      fromPage={fromPage}
-    />
-  )
+const ChatReportRoute = () => {
+  return <Report />
+}
+
+// 프로필 신고를 위한 새로운 Route 컴포넌트 추가
+const ProfileReportRoute = () => {
+  return <Report />
 }
 
 const ReviewRoute = () => {
@@ -375,6 +376,22 @@ export const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <ReportRoute />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/chat/:chatId/report/:reportedUserId/:targetUserId',
+    element: (
+      <RequireAuth>
+        <ChatReportRoute />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/profile/:profileId/report/:reportedUserId/:targetUserId',
+    element: (
+      <RequireAuth>
+        <ProfileReportRoute />
       </RequireAuth>
     ),
   },

@@ -36,7 +36,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'https://mindmate.shop',
+        target: 'http://localhost',
         changeOrigin: true,
         secure: false,
       },

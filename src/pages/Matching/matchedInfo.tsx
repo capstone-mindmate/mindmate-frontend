@@ -169,7 +169,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
       const fetchMyCreatedRooms = async () => {
         try {
           const res = await fetchWithRefresh(
-            'https://mindmate.shop/api/matchings/creator?page=0&size=20',
+            'http://localhost/api/matchings/creator?page=0&size=20',
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -206,7 +206,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
       const fetchAppliedRooms = async () => {
         try {
           const res = await fetchWithRefresh(
-            'https://mindmate.shop/api/matchings/applications?page=0&size=20',
+            'http://localhost/api/matchings/applications?page=0&size=20',
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -220,7 +220,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
             const fetchDetails = async (item: any) => {
               try {
                 const detailRes = await fetchWithRefresh(
-                  `https://mindmate.shop/api/matchings/${item.matching.id}`,
+                  `http://localhost/api/matchings/${item.matching.id}`,
                   {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
@@ -241,7 +241,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
                   message: item.applicationMessage || '',
                   username: detail.creatorNickname, // 필요시 추가 정보
                   profileImage:
-                    'https://mindmate.shop/api' +
+                    'http://localhost/api' +
                     (detail.creatorProfileImage
                       ? detail.creatorProfileImage
                       : '/profileImages/default-profile-image.png'), // 필요시 추가 정보
@@ -289,7 +289,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
   //   setIsDetailLoading(true)
   //   try {
   //     const res = await fetchWithRefresh(
-  //       `https://mindmate.shop/api/matchings/${matchingId}`,
+  //       `http://localhost/api/matchings/${matchingId}`,
   //       {
   //         method: 'GET',
   //         headers: { 'Content-Type': 'application/json' },
@@ -323,7 +323,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
   const fetchCreatorProfile = async (userId: number) => {
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/profiles/users/${userId}`,
+        `http://localhost/api/profiles/users/${userId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -377,7 +377,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
       const waitingUserId = selectedApplication.waitingUserId
 
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/matchings/waiting-users/${waitingUserId}`,
+        `http://localhost/api/matchings/waiting-users/${waitingUserId}`,
         {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
@@ -458,8 +458,8 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
           isOpen={isModalOpen}
           userProfileProps={{
             profileImage:
-              'https://mindmate.shop/api' + creatorProfile.profileImage ||
-              'https://mindmate.shop/api/profileImages/default-profile-image.png',
+              'http://localhost/api' + creatorProfile.profileImage ||
+              'http://localhost/api/profileImages/default-profile-image.png',
             name: creatorProfile.nickname,
             department: creatorProfile.department,
             makeDate: formatDate(matchingDetail.createdAt),

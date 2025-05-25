@@ -73,7 +73,7 @@ const HomePage = () => {
         const accessToken = getTokenCookie('accessToken')
 
         // API URL
-        const apiUrl = `https://mindmate.shop/api/magazines/popular?limit=5`
+        const apiUrl = `http://localhost/api/magazines/popular?limit=5`
 
         // API 호출
         const response = await fetch(apiUrl, {
@@ -171,7 +171,7 @@ const HomePage = () => {
     if (imageContent && imageContent.imageUrl) {
       return imageContent.imageUrl.startsWith('http')
         ? imageContent.imageUrl
-        : `https://mindmate.shop/api${imageContent.imageUrl}`
+        : `http://localhost/api${imageContent.imageUrl}`
     }
 
     return '/default-profile-image.png' // 기본 이미지 경로

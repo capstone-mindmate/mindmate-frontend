@@ -323,7 +323,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       }
 
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/messages`,
+        `http://localhost/api/chat/rooms/${chatId}/messages`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -394,7 +394,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const fetchEmoticons = async () => {
     try {
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/emoticons/available',
+        'http://localhost/api/emoticons/available',
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -469,7 +469,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
         try {
           const response = await fetchWithRefresh(
-            `https://mindmate.shop/api/custom-forms/chat-room/${chatId}`,
+            `http://localhost/api/custom-forms/chat-room/${chatId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -566,7 +566,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       const loadSingleFormData = async () => {
         try {
           const response = await fetchWithRefresh(
-            `https://mindmate.shop/api/custom-forms/${formId}`,
+            `http://localhost/api/custom-forms/${formId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -737,7 +737,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   // REST API를 사용한 읽음 처리 대체 함수
   // const markAsReadFallback = async () => {
   //   try {
-  //     await fetchWithRefresh(`https://mindmate.shop/api/chat/rooms/${chatId}/read`, {
+  //     await fetchWithRefresh(`http://localhost/api/chat/rooms/${chatId}/read`, {
   //       method: 'POST',
   //       headers: { 'Content-Type': 'application/json' },
   //     })
@@ -815,14 +815,11 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   // REST API를 사용한 메시지 전송 대체 함수
   const sendMessageFallback = async (content: string) => {
     try {
-      const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/messages`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roomId: chatId, content, type: 'TEXT' }),
-        }
-      )
+      const res = await fetchWithRefresh(`http://localhost/api/chat/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomId: chatId, content, type: 'TEXT' }),
+      })
 
       if (res.ok) {
         const data = await res.json()
@@ -938,7 +935,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     }
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/messages/before/${oldestId}?size=30`,
+        `http://localhost/api/chat/rooms/${chatId}/messages/before/${oldestId}?size=30`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -979,7 +976,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const handleCloseRequest = async () => {
     try {
       await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/close`,
+        `http://localhost/api/chat/rooms/${chatId}/close`,
         { method: 'POST' }
       )
       setCloseModalType('REQUEST')
@@ -1012,7 +1009,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   // 종료 수락
   const handleCloseAccept = async () => {
     await fetchWithRefresh(
-      `https://mindmate.shop/api/chat/rooms/${chatId}/close/accept`,
+      `http://localhost/api/chat/rooms/${chatId}/close/accept`,
       { method: 'POST' }
     )
     setCloseModalType('NONE')
@@ -1025,7 +1022,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   // 종료 거절
   const handleCloseReject = async () => {
     await fetchWithRefresh(
-      `https://mindmate.shop/api/chat/rooms/${chatId}/close/reject`,
+      `http://localhost/api/chat/rooms/${chatId}/close/reject`,
       { method: 'POST' }
     )
     setCloseModalType('NONE')
@@ -1084,7 +1081,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           {
             text: '신고',
             onClick: () => {
-              navigate(`/report/${myUserId}/${otherUserId}/MATCHING`)
+              navigate(`/chat/${chatId}/report/${myUserId}/${otherUserId}`)
             },
           },
           { text: '종료 요청', onClick: handleCloseRequest },
@@ -1206,7 +1203,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                       // 채팅방의 모든 폼 데이터 조회
                       if (chatId) {
                         const response = await fetchWithRefresh(
-                          `https://mindmate.shop/api/custom-forms/chat-room/${chatId}`,
+                          `http://localhost/api/custom-forms/chat-room/${chatId}`,
                           {
                             method: 'GET',
                             headers: { 'Content-Type': 'application/json' },
@@ -1330,7 +1327,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                   try {
                     const response = await fetchWithRefresh(
-                      `https://mindmate.shop/api/custom-forms/${formId}`,
+                      `http://localhost/api/custom-forms/${formId}`,
                       {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },
