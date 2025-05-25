@@ -347,9 +347,36 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       )
       loadAttemptRef.current = 0
       setErrorMessage(null)
-      setRoomStatus(data.roomStatus)
-      setCloseRequestRoleType(data.closeRequestRole)
-      setListener(data.listener)
+
+      // API 응답에서 받은 값들을 상태에 설정
+      const apiRoomStatus = data.roomStatus
+      const apiCloseRequestRoleType = data.closeRequestRole
+      const apiListener = data.listener
+
+      setRoomStatus(apiRoomStatus)
+      setCloseRequestRoleType(apiCloseRequestRoleType)
+      setListener(apiListener)
+
+      // API 응답 값을 직접 사용하여 조건문 실행
+      if (apiRoomStatus === 'CLOSE_REQUEST') {
+        if (apiCloseRequestRoleType === 'LISTENER' && apiListener === true) {
+          // 요청 모달
+          setCloseModalType('REQUEST')
+        }
+        if (apiCloseRequestRoleType === 'LISTENER' && apiListener === false) {
+          // 수락 모달
+          setCloseModalType('RECEIVE')
+        }
+
+        if (apiCloseRequestRoleType === 'SPEAKER' && apiListener === true) {
+          // 수락 모달
+          setCloseModalType('RECEIVE')
+        }
+        if (apiCloseRequestRoleType === 'SPEAKER' && apiListener === false) {
+          // 요청 모달
+          setCloseModalType('REQUEST')
+        }
+      }
     } catch (e) {
       const error = e as Error
       console.error('메시지 조회 실패:', error)
@@ -1061,7 +1088,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
             },
           },
           { text: '종료 요청', onClick: handleCloseRequest },
-          { text: '채팅 제거', onClick: () => {} },
+          ...(roomStatus === 'CLOSED'
+            ? [{ text: '채팅 제거', onClick: () => {} }]
+            : []),
         ]}
       />
       <ChatContainer ref={chatContainerRef}>
