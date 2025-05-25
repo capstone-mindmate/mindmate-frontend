@@ -1,4 +1,3 @@
-import { createBrowserRouter } from 'react-router-dom'
 import Register from '../pages/Register'
 import Devtools from '../pages/Devtools'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
@@ -7,7 +6,10 @@ import Matching from '../pages/Matching'
 import HomePage from '../pages/Home/Home.tsx'
 import MyPage from '../pages/Mypage/Mypage.tsx'
 import Notification from '../pages/Home/NotificationPage.tsx'
-import Review from '../pages/Review/ReviewPage.tsx'
+import MagazineList from '../pages/Magazine/MagazineList.tsx'
+import MagazineWrite from '../pages/Magazine/MagazineWrite.tsx'
+import Magazine from '../pages/Magazine/Magazine.tsx'
+import MyList from '../pages/Magazine/MyList.tsx'
 
 import DetailReviewPage from '../pages/Mypage/DetailReviewPage.tsx'
 import Report from '../pages/Mypage/ReportPage.tsx'
@@ -25,8 +27,137 @@ import ProfileEdit from '../pages/Profile/ProfileEdit.tsx'
 import ChatTest from '../pages/ChatTest/ChatTest'
 import TermsOfUse from '../pages/Register/steps/TermsOfUse'
 import WithdrawMindMate from '../pages/Profile/WithdrawMindMate'
+import CustomFormMake from '../pages/Chat/CustomFormMake'
+import CustomFormView from '../pages/Chat/CustomFormView'
+
+import ChatHome from '../pages/Chat/ChatHome'
+import ChatRoom from '../pages/Chat/ChatRoom'
+import { useAuthStore } from '../stores/userStore'
+import { useEffect, useState } from 'react'
+import {
+  useNavigate,
+  Navigate,
+  useParams,
+  useLocation,
+  createBrowserRouter,
+} from 'react-router-dom'
+import { useSocketMessage } from '../hooks/useSocketMessage'
+import CustomFormDone from '../pages/Chat/CustomFormDone'
+import ReviewPage from '../pages/Review/ReviewPage'
+
+// 경로별 컴포넌트 렌더링을 위한 헬퍼 함수
+const ChatRoomRoute = () => {
+  const { id } = useParams()
+  return <ChatRoom chatId={id} />
+}
+
+const CustomFormMakeRoute = () => {
+  const { matchId } = useParams()
+  return <CustomFormMake matchId={matchId} />
+}
+
+const CustomFormDoneRoute = () => {
+  const { formId, matchId: matchIdFromParams } = useParams()
+  const location = useLocation()
+  const matchIdFromState = location.state?.matchingId
+  const matchId = matchIdFromParams || matchIdFromState
+  return <CustomFormDone formId={formId} matchId={matchId} />
+}
+
+const CustomFormViewRoute = () => {
+  const { formId, matchId: matchIdFromParams } = useParams()
+  const location = useLocation()
+  const matchIdFromState = location.state?.matchingId
+  const matchId = matchIdFromParams || matchIdFromState
+  return <CustomFormView formId={formId} matchId={matchId} />
+}
+
+const NotFound = () => {
+  const location = useLocation()
+
+  if (location.pathname.startsWith('/api')) {
+    return null
+  }
+
+  return <div>404 Not Found</div>
+}
+
+const ReportRoute = () => {
+  const { reportedUserId, targetUserId, fromPage } = useParams()
+
+  return (
+    <Report
+      reportedUserId={reportedUserId}
+      targetUserId={targetUserId}
+      fromPage={fromPage}
+    />
+  )
+}
+
+const ReviewRoute = () => {
+  const { chatId } = useParams()
+  const location = useLocation()
+  const opponentName = location.state?.opponentName
+  return <ReviewPage chatId={chatId} opponentName={opponentName} />
+}
+
+// 전역 인증 여부 추적
+let socketInitialized = false
+
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { user, hydrated, setUser } = useAuthStore()
+  const navigate = useNavigate()
+
+  // 웹소켓 연결 - 한 번만 초기화하도록 상태 관리
+  const { isConnected } = useSocketMessage()
+  const [initializing, setInitializing] = useState(!socketInitialized)
+
+  // 웹소켓 초기화 완료 추적
+  useEffect(() => {
+    if (isConnected && initializing) {
+      socketInitialized = true
+      setInitializing(false)
+    }
+  }, [isConnected, initializing])
+
+  // hydration 후 user가 null이고 localStorage에 user가 있으면 복원 시도 (임시)
+  useEffect(() => {
+    if (hydrated && !user) {
+      const raw = localStorage.getItem('auth-store')
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw)
+          if (parsed.state?.user) {
+            setUser(parsed.state.user)
+          } else {
+            navigate('/onboarding', { replace: true })
+          }
+        } catch (e) {
+          navigate('/onboarding', { replace: true })
+        }
+      } else {
+        navigate('/onboarding', { replace: true })
+      }
+    }
+  }, [hydrated, user, navigate, setUser])
+
+  if (!hydrated) {
+    return null
+  }
+
+  // 인증 확인
+  if (!user) {
+    return <Navigate to="/onboarding" replace />
+  }
+
+  return <>{children}</>
+}
 
 export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Navigate to="/home" replace />,
+  },
   {
     path: '/register',
     element: <Register />,
@@ -44,91 +175,251 @@ export const router = createBrowserRouter([
     element: <TermsOfUse />,
   },
   {
-    path: '/withdraw',
-    element: <WithdrawMindMate />,
-  },
-  {
-    path: '/devdev',
-    element: <Devtools />,
-  },
-  {
     path: '/onboarding',
     element: <OnboardingPage />,
   },
   {
+    path: '/withdraw',
+    element: (
+      <RequireAuth>
+        <WithdrawMindMate />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/devdev',
+    element: (
+      <RequireAuth>
+        <Devtools />
+      </RequireAuth>
+    ),
+  },
+  {
     path: '/matching',
-    element: <Matching />,
+    element: (
+      <RequireAuth>
+        <Matching />
+      </RequireAuth>
+    ),
   },
   {
     path: '/home',
-    element: <HomePage />,
+    element: (
+      <RequireAuth>
+        <HomePage />
+      </RequireAuth>
+    ),
   },
   {
     path: '/mypage',
-    element: <MyPage />,
+    element: (
+      <RequireAuth>
+        <MyPage />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/mypage/:userId',
+    element: (
+      <RequireAuth>
+        <MyPage />
+      </RequireAuth>
+    ),
   },
   {
     path: '/detailreview',
-    element: <DetailReviewPage />,
+    element: (
+      <RequireAuth>
+        <DetailReviewPage />
+      </RequireAuth>
+    ),
   },
   {
     path: '/matching/register',
-    element: <RegisterChatRoom />,
+    element: (
+      <RequireAuth>
+        <RegisterChatRoom />
+      </RequireAuth>
+    ),
   },
   {
     path: '/matching/matched',
-    element: <MatchedInfo />,
+    element: (
+      <RequireAuth>
+        <MatchedInfo />
+      </RequireAuth>
+    ),
   },
   {
     path: '/matching/application',
-    element: <MatchedApplication />,
+    element: (
+      <RequireAuth>
+        <MatchedApplication />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/chat',
+    element: (
+      <RequireAuth>
+        <ChatHome />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/chat/:id',
+    element: (
+      <RequireAuth>
+        <ChatRoomRoute />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/chat/custom-form/make/:matchId',
+    element: (
+      <RequireAuth>
+        <CustomFormMakeRoute />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/chat/custom-form/view/:formId/:matchId',
+    element: (
+      <RequireAuth>
+        <CustomFormViewRoute />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/chat/custom-form/done/:formId/:matchId',
+    element: (
+      <RequireAuth>
+        <CustomFormDoneRoute />
+      </RequireAuth>
+    ),
   },
   {
     path: '/emoticons',
-    element: <EmoticonHome />,
+    element: (
+      <RequireAuth>
+        <EmoticonHome />
+      </RequireAuth>
+    ),
   },
   {
     path: '/coin',
-    element: <PointPurchase />,
+    element: (
+      <RequireAuth>
+        <PointPurchase />
+      </RequireAuth>
+    ),
   },
   {
     path: '/coin/history',
-    element: <PointHistory />,
+    element: (
+      <RequireAuth>
+        <PointHistory />
+      </RequireAuth>
+    ),
   },
   {
     path: '/coin/success',
-    element: <PurchaseSuccess />,
+    element: (
+      <RequireAuth>
+        <PurchaseSuccess />
+      </RequireAuth>
+    ),
   },
   {
     path: '/coin/fail',
-    element: <PurchaseFail />,
+    element: (
+      <RequireAuth>
+        <PurchaseFail />
+      </RequireAuth>
+    ),
   },
   {
     path: '/chat-test',
-    element: <ChatTest />,
+    element: (
+      <RequireAuth>
+        <ChatTest />
+      </RequireAuth>
+    ),
   },
   {
-    path: '/review',
-    element: <Review />,
+    path: '/review/:chatId',
+    element: (
+      <RequireAuth>
+        <ReviewRoute />
+      </RequireAuth>
+    ),
   },
   {
     path: '/profile/setting',
-    element: <ProfileSetting />,
+    element: (
+      <RequireAuth>
+        <ProfileSetting />
+      </RequireAuth>
+    ),
   },
   {
     path: '/profile/edit',
-    element: <ProfileEdit />,
+    element: (
+      <RequireAuth>
+        <ProfileEdit />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/report/:reportedUserId/:targetUserId/:fromPage',
+    element: (
+      <RequireAuth>
+        <ReportRoute />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/magazinelist',
+    element: (
+      <RequireAuth>
+        <MagazineList />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/magazine/write',
+    element: (
+      <RequireAuth>
+        <MagazineWrite />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/magazine/:id',
+    element: (
+      <RequireAuth>
+        <Magazine />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/magazine/mylist',
+    element: (
+      <RequireAuth>
+        <MyList />
+      </RequireAuth>
+    ),
   },
   {
     path: '*',
-    element: <div>404 Not Found</div>,
-  },
-  {
-    path: '/report',
-    element: <Report />,
+    element: <NotFound />,
   },
   {
     path: '/notification',
-    element: <Notification />,
+    element: (
+      <RequireAuth>
+        <Notification />
+      </RequireAuth>
+    ),
   },
 ])

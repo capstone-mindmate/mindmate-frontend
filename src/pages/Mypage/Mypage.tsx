@@ -1,4 +1,4 @@
-import { SettingIcon } from '../../components/icon/iconComponents'
+import { SettingIcon, KebabIcon } from '../../components/icon/iconComponents'
 import InfoBox from '../../components/mypage/InfoBox'
 import MatchingGraph from '../../components/mypage/MatchingGraph'
 import ProfileEdit from '../../components/mypage/ProfileEdit'
@@ -6,7 +6,8 @@ import NavigationComponent from '../../components/navigation/navigationComponent
 import DetailReview from '../../components/review/DetailReview'
 import TagReview from '../../components/review/TagReview'
 import TopBar from '../../components/topbar/Topbar'
-import { useNavigate } from 'react-router-dom'
+import BottomSheet from '../../components/bottomSheet/BottomSheet'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   ContentContainer,
   MypageContainer,
@@ -15,31 +16,260 @@ import {
   InfoBoxContainer,
   MatchingGraphContainer,
 } from './MypageStyles'
+import { useAuthStore } from '../../stores/userStore'
+import { useEffect, useState } from 'react'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+
+const categoryMap: Record<string, string> = {
+  ACADEMIC: '학업',
+  CAREER: '진로',
+  RELATIONSHIP: '인간관계',
+  MENTAL_HEALTH: '건강',
+  CAMPUS_LIFE: '학교생활',
+  PERSONAL_GROWTH: '자기계발',
+  FINANCIAL: '경제',
+  EMPLOYMENT: '취업',
+  OTHER: '기타',
+}
+
+const categoryEngMap: Record<string, string> = {
+  학업: 'ACADEMIC',
+  진로: 'CAREER',
+  인간관계: 'RELATIONSHIP',
+  건강: 'MENTAL_HEALTH',
+  학교생활: 'CAMPUS_LIFE',
+  자기계발: 'PERSONAL_GROWTH',
+  경제: 'FINANCIAL',
+  취업: 'EMPLOYMENT',
+  기타: 'OTHER',
+}
 
 const MyPage = () => {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
+  const { userId } = useParams<{ userId?: string }>()
+  const [isOwnProfile, setIsOwnProfile] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [userProfile, setUserProfile] = useState<any>(null)
+  const [userStats, setUserStats] = useState<any>(null)
+  const [categoryData, setCategoryData] = useState<any>(null)
+  const [reviewTags, setReviewTags] = useState<any[]>([])
+  const [userReviews, setUserReviews] = useState<any[]>([])
+  const [pointBalance, setPointBalance] = useState<number | null>(null)
+  const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
 
-  // TODO: API 또는 상태 관리 라이브러리에서 사용자 정보를 가져오는 로직 추가
-  // const { userProfile, userStats, userReviews } = useUserData() 같은 형태로 구현
+  const realProfileImageUrl = userProfile?.profileImage
+    ? `https://mindmate.shop/api${userProfile.profileImage}`
+    : ''
+  const defaultProfileImageUrl =
+    'https://mindmate.shop/api/profileImages/default-profile-image.png'
 
-  // TODO: 현재 로그인한 사용자의 ID와 보고 있는 프로필의 사용자 ID를 비교하는 로직
-  // 실제 구현 시에는 아래와 같은 형태가 될 수 있음
-  // const { currentUserId } = useAuth() // 현재 로그인한 사용자 ID
-  // const { id: profileUserId } = useParams() // URL에서 가져온 프로필 사용자 ID
-  // const isOwnProfile = currentUserId === profileUserId
+  useEffect(() => {
+    setIsProfileImageLoaded(false)
+  }, [realProfileImageUrl])
 
-  // 임시로 하드코딩된 값 (실제 구현 시 위 로직으로 대체)
-  const isOwnProfile = false // TODO: 실제 인증 상태에 따라 변경되어야 함
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true)
+      try {
+        let profileRes, profileData, reveiwListRes
+        if (!userId || (user && String(user.id) === String(userId))) {
+          // 내 프로필
+          setIsOwnProfile(true)
+          if (user?.id) {
+            profileRes = await fetchWithRefresh(
+              `https://mindmate.shop/api/profiles`,
+              {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+              }
+            )
+          } else {
+            throw new Error('로그인 정보가 없습니다.')
+          }
+          profileData = await profileRes.json()
+          setUserProfile({
+            profileImage: profileData.profileImage,
+            username: profileData.nickname || '닉네임 없음',
+            department: profileData.department || '',
+            entranceTime: profileData.entranceTime
+              ? String(profileData.entranceTime)
+              : '',
+          })
+          setUserStats({
+            averageScore: profileData.averageRating,
+            coins: profileData.points,
+            matchCount: profileData.totalCounselingCount,
+            avgResponseTime: profileData.avgResponseTime,
+          })
+          // categoryData를 한글로 변환
+          const convertedCategoryData = Object.entries(
+            profileData.categoryCounts || {}
+          ).reduce(
+            (acc, [key, value]) => ({
+              ...acc,
+              [categoryMap[key] || key]: value,
+            }),
+            {}
+          )
+          setCategoryData(convertedCategoryData)
+          // 리뷰 태그(임시: 태그 카운트)
+          if (profileData.tagCounts) {
+            setReviewTags(
+              Object.entries(profileData.tagCounts).map(([text, count]) => ({
+                icon: '',
+                text,
+                count,
+              }))
+            )
+          }
 
-  // TODO: 프로필 편집 버튼 클릭 핸들러
+          reveiwListRes = await fetchWithRefresh(
+            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          )
+
+          const reveiwListData = await reveiwListRes.json()
+
+          // 상세 리뷰 (응답의 reviews 배열 활용)
+          setUserReviews(
+            (reveiwListData.content || []).map((r: any) => ({
+              profileImage:
+                'https://mindmate.shop/api' + r.reviewerProfileImage,
+              username: r.reviewerNickname,
+              rating: r.rating,
+              date: r.createdAt
+                ? r.createdAt.slice(2, 10).replace(/-/g, '.')
+                : '',
+              content: r.comment,
+            }))
+          )
+        } else {
+          // 타인 프로필 (상대방 userId)
+          setIsOwnProfile(false)
+          if (!userId) {
+            alert('상대방 userId가 없습니다.')
+            setUserProfile(null)
+            setUserStats(null)
+            setCategoryData(null)
+            setReviewTags([])
+            setUserReviews([])
+            setLoading(false)
+            return
+          }
+          profileRes = await fetchWithRefresh(
+            `https://mindmate.shop/api/profiles/users/${userId}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          )
+          profileData = await profileRes.json()
+          setUserProfile({
+            profileImage: profileData.profileImage,
+            username: profileData.nickname,
+            department: profileData.department || '',
+            entranceTime: profileData.entranceTime
+              ? String(profileData.entranceTime)
+              : '',
+          })
+          setUserStats({
+            averageScore: profileData.averageRating,
+            coins: profileData.points,
+            matchCount: profileData.totalCounselingCount,
+            avgResponseTime: profileData.avgResponseTime,
+          })
+          // categoryData를 한글로 변환
+          const convertedCategoryData = Object.entries(
+            profileData.categoryCounts || {}
+          ).reduce(
+            (acc, [key, value]) => ({
+              ...acc,
+              [categoryMap[key] || key]: value,
+            }),
+            {}
+          )
+          setCategoryData(convertedCategoryData)
+          // 리뷰 태그, 상세 리뷰 등 추가 API 호출
+          // 리뷰 태그(임시: 태그 카운트)
+          if (profileData.tagCounts) {
+            setReviewTags(
+              Object.entries(profileData.tagCounts).map(([text, count]) => ({
+                icon: '',
+                text,
+                count,
+              }))
+            )
+          }
+          // 상세 리뷰
+          const reviewRes = await fetchWithRefresh(
+            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          )
+          const reviewData = await reviewRes.json()
+          setUserReviews(
+            (reviewData.content || []).map((r: any) => ({
+              profileImage: r.reviewerProfileImage,
+              username: r.reviewerNickname,
+              rating: r.rating,
+              date: r.createdAt
+                ? r.createdAt.slice(2, 10).replace(/-/g, '.')
+                : '',
+              content: r.comment,
+            }))
+          )
+        }
+      } catch (e) {
+        setUserProfile(null)
+        setUserStats(null)
+        setCategoryData(null)
+        setReviewTags([])
+        setUserReviews([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
+
+    // 포인트 잔액 별도 조회
+    const fetchPointBalance = async () => {
+      try {
+        const res = await fetchWithRefresh(
+          'https://mindmate.shop/api/points/balance',
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          }
+        )
+        if (res.ok) {
+          const balance = await res.json()
+          setPointBalance(balance)
+        }
+      } catch (e) {
+        setPointBalance(null)
+      }
+    }
+    fetchPointBalance()
+  }, [userId, user])
+
   const handleProfileEdit = () => {
     navigate('/profile/edit')
-    // TODO: 프로필 편집 페이지로 이동하는 로직 추가
   }
 
-  // TODO: 설정 버튼 클릭 핸들러
   const handleSettingClick = () => {
     navigate('/profile/setting')
+  }
+
+  const handleKebabClick = () => {
+    setIsBottomSheetOpen(true)
   }
 
   // 리뷰 전체보기 클릭 핸들러 - 상세 리뷰 페이지로 이동
@@ -47,95 +277,105 @@ const MyPage = () => {
     navigate('/detailreview')
   }
 
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  // TagReview 테스트 데이터
-  const reviewTags = [
-    { icon: '⚡', text: '응답이 빨라요', count: 12 },
-    { icon: '🤝', text: '신뢰할 수 있는 대화였어요', count: 9 },
-    { icon: '❤️', text: '공감을 잘해줘요', count: 8 },
-    { icon: '☕', text: '편안한 분위기에서 이야기할 수 있었어요', count: 6 },
-    { icon: '🎯', text: '솔직하고 현실적인 조언을 해줘요', count: 3 },
-    { icon: '💡', text: '새로운 관점을 제시해줘요', count: 1 },
-  ]
-
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  const userProfile = {
-    profileImage: '/public/image.png',
-    username: '행복한 돌멩이',
+  if (loading) {
+    return <div></div>
   }
-
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  const userStats = {
-    averageScore: 4.6,
-    coins: 500,
-    matchCount: 3,
-  }
-
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  const categoryData = {
-    진로: 3,
-    취업: 7,
-    학업: 1,
-    인간관계: 6,
-    경제: 4,
-    기타: 1,
-  }
-
-  // TODO: API에서 가져온 데이터로 대체해야 함
-  const userReviews = [
-    {
-      profileImage: '/public/image.png',
-      username: '건들면 짖는댕',
-      rating: 4.0,
-      date: '25.03.28',
-      content: '응답이 엄청 빨랐어요! 대화 재밌었어요 ㅎ ㅎ',
-    },
-    {
-      profileImage: '/public/image copy.png',
-      username: '말하고 싶어라',
-      rating: 3.5,
-      date: '25.03.28',
-      content: '공감 천재세요',
-    },
-  ]
 
   return (
     <MypageContainer>
       <ContentContainer>
         <TopBar
-          leftContent={<LogoText>마이페이지</LogoText>}
+          leftContent={
+            <LogoText>{isOwnProfile ? '마이페이지' : '프로필'}</LogoText>
+          }
           rightContent={
-            isOwnProfile && ( // 본인 프로필일 경우에만 설정 버튼 표시
+            isOwnProfile ? (
               <button onClick={handleSettingClick}>
                 <SettingIcon color="#392111" />
+              </button>
+            ) : (
+              <button onClick={handleKebabClick}>
+                <KebabIcon />
               </button>
             )
           }
           showBorder={false}
           isFixed={true}
         />
+        {!isOwnProfile && (
+          <BottomSheet
+            isOpen={isBottomSheetOpen}
+            onClose={() => setIsBottomSheetOpen(false)}
+            menuItems={[
+              {
+                text: '신고',
+                onClick: () => {
+                  navigate(`/report/${user?.id}/${userId}/PROFILE`)
+                },
+              },
+            ]}
+          />
+        )}
         <ComponentContainer>
           <ProfileEdit
-            profileImage={userProfile.profileImage}
-            username={userProfile.username}
+            profileImage={
+              isProfileImageLoaded
+                ? realProfileImageUrl
+                : defaultProfileImageUrl
+            }
+            username={userProfile?.username}
             onEditClick={handleProfileEdit}
-            isOwnProfile={isOwnProfile} // 본인 프로필 여부 전달
+            isOwnProfile={isOwnProfile}
           />
+          {realProfileImageUrl && !isProfileImageLoaded && (
+            <img
+              src={realProfileImageUrl}
+              alt=""
+              style={{ display: 'none' }}
+              onLoad={() => setIsProfileImageLoaded(true)}
+              onError={() => setIsProfileImageLoaded(true)}
+            />
+          )}
           <InfoBoxContainer>
             <InfoBox
-              averageScore={userStats.averageScore}
-              coins={userStats.coins}
-              matchCount={userStats.matchCount}
+              averageScore={userStats?.averageScore}
+              coins={
+                isOwnProfile
+                  ? pointBalance !== null
+                    ? pointBalance
+                    : userStats?.coins
+                  : undefined
+              }
+              matchCount={userStats?.matchCount}
+              avgResponseTime={
+                !isOwnProfile ? userStats?.avgResponseTime : undefined
+              }
             />
           </InfoBoxContainer>
           <MatchingGraphContainer>
-            <MatchingGraph categoryData={categoryData} />
+            <MatchingGraph categoryData={categoryData || {}} />
           </MatchingGraphContainer>
           <TagReview tags={reviewTags} />
-          <DetailReview
-            reviews={userReviews}
-            onViewAllClick={handleViewAllReviewsClick}
-          />
+          {userReviews.length === 0 ? (
+            <div
+              style={{
+                background: 'whitesmoke',
+                borderRadius: 12,
+                padding: '32px 0',
+                textAlign: 'center',
+                color: '#aaa',
+                fontSize: 14,
+                margin: '16px 0',
+              }}
+            >
+              아직 받은 평가가 없어요 : (
+            </div>
+          ) : (
+            <DetailReview
+              reviews={userReviews}
+              onViewAllClick={handleViewAllReviewsClick}
+            />
+          )}
         </ComponentContainer>
       </ContentContainer>
       <NavigationComponent />

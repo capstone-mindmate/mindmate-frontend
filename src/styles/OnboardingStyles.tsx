@@ -1,72 +1,61 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
+import { media } from './breakpoints'
 
-// 반응형 디자인을 위한 브레이크포인트 정의
-const breakpoints = {
-  mobile: '375px',
-  tablet: '479px',
-  desktop: '767px',
-}
+export const RootContainer = css`
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`
 
-// 미디어 쿼리 헬퍼 함수
-const media = {
-  mobile: (styles: string) => `
-    @media (max-width: ${breakpoints.mobile}) {
-      ${styles}
-    }
-  `,
-  tablet: (styles: string) => `
-    @media (max-width: ${breakpoints.tablet}) {
-      ${styles}
-    }
-  `,
-  desktop: (styles: string) => `
-    @media (max-width: ${breakpoints.desktop}) {
-      ${styles}
-    }
-  `,
-}
+export const OnboardingContainer = css`
+  width: 884px;
+  height: 100%;
+  box-sizing: border-box;
+
+  ${media.tablet} {
+    width: 100%;
+  }
+`
 
 // 페이지 컨테이너
 export const pageContainerStyle = css`
-  min-height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background-color: white;
-  padding: 0;
+  padding: 0 24px;
   box-sizing: border-box;
-  overflow: hidden;
-`
-
-export const headerStyle = css`
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 20px;
+  position: relative;
 `
 
 export const contentContainerStyle = css`
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 44px);
-  flex: 1;
+  align-items: center;
+  height: 100%;
+  margin-top: 40px;
+  position: relative;
+  overflow: hidden;
 `
 
 // 슬라이더 스타일
 export const containerStyle = css`
   position: relative;
   width: 100%;
-  flex: 1;
-  overflow: hidden;
 `
 
 export const sliderWrapperStyle = css`
   position: relative;
   width: 100%;
-  height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  position: relative;
+  height: auto;
 `
 
 // 추가된 슬라이드 컨텐츠 스타일 함수
@@ -77,8 +66,6 @@ export const slideContentStyle = (
   isDragging: boolean
 ) => css`
   width: 100%;
-  height: 100%;
-  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -95,22 +82,21 @@ export const slideContentStyle = (
 `
 
 export const textContainerStyle = css`
-  padding: 20px 20px 20px 20px;
+  // padding: 20px 20px 20px 20px;
   text-align: left;
   width: 100%;
   margin-top: 0px;
-  margin-left: 24px;
   box-sizing: border-box;
 
-  ${media.tablet(`
-    padding: 16px;
-    margin-top: 30px;
-  `)}
+  ${media.tablet} {
+    // padding: 16px;
+    // margin-top: 30px;
+  }
 
-  ${media.mobile(`
-    padding: 12px;
-    margin-top: 20px;
-  `)}
+  ${media.mobileBig} {
+    // padding: 12px;
+    // margin-top: 20px;
+  }
 `
 
 //텍스트 페이드 효과
@@ -131,15 +117,15 @@ export const head2BoldStyle = css`
   overflow-wrap: break-word; // 긴 단어 줄바꿈
   word-wrap: break-word; // 긴 단어 줄바꿈
 
-  ${media.tablet(`
+  ${media.tablet} {
     font-size: 22px;
     margin-bottom: 6px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     font-size: 20px;
     margin-bottom: 4px;
-  `)}
+  }
 `
 
 export const body2ReStyle = css`
@@ -151,13 +137,13 @@ export const body2ReStyle = css`
   overflow-wrap: break-word; // 긴 단어 줄바꿈
   word-wrap: break-word; // 긴 단어 줄바꿈
 
-  ${media.tablet(`
+  ${media.tablet} {
     font-size: 13px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     font-size: 12px;
-  `)}
+  }
 `
 
 // 이모티콘
@@ -166,17 +152,17 @@ export const emoticonContainerStyle = css`
   justify-content: center;
   align-items: center;
   width: 100%;
-  flex: 1;
+
   padding: 20px 0;
   position: relative;
 
-  ${media.tablet(`
+  ${media.tablet} {
     padding: 16px 0;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     padding: 12px 0;
-  `)}
+  }
 `
 
 // 추가된 이모티콘 슬라이드 스타일
@@ -200,15 +186,15 @@ export const progressBarContainerStyle = css`
   margin-bottom: 20px;
   margin-top: 20px;
 
-  ${media.tablet(`
+  ${media.tablet} {
     margin-bottom: 16px;
     margin-top: 16px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     margin-bottom: 12px;
     margin-top: 12px;
-  `)}
+  }
 `
 
 export const progressBarDotsContainerStyle = css`
@@ -216,9 +202,9 @@ export const progressBarDotsContainerStyle = css`
   gap: 8px;
   justify-content: center;
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     gap: 6px;
-  `)}
+  }
 `
 
 export const progressDotStyle = (isActive: boolean) => css`
@@ -230,33 +216,35 @@ export const progressDotStyle = (isActive: boolean) => css`
   border: none;
   cursor: pointer;
 
-  ${media.tablet(`
+  ${media.tablet} {
     width: ${isActive ? '30px' : '7px'};
     height: 10px;
     border-radius: 7px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     width: ${isActive ? '25px' : '6px'};
     height: 8px;
     border-radius: 6px;
-  `)}
+  }
 `
 
 // 버튼 스타일
 export const buttonContainerStyle = css`
-  padding: 0 0 40px;
-  width: 90%;
-  margin: 0 24px;
+  // padding: 0 0 70px;
+  width: 100%;
+  // margin: 0 24px;
   justify-content: center;
-  ${media.tablet(`
-    padding: 0 0 32px;
-    margin: 0 24px;
-  `)}
+  position: absolute;
+  bottom: 50px;
+  ${media.tablet} {
+    // padding: 0 0 70px;
+    // margin: 0 24px;
+  }
 
-  ${media.mobile(`
-    padding: 0 0 24px;
-  `)}
+  ${media.mobileBig} {
+    // padding: 0 0 100px;
+  }
 `
 
 export const googleButtonStyle = css`
@@ -272,15 +260,15 @@ export const googleButtonStyle = css`
   font-size: 14px;
   color: #333;
 
-  ${media.tablet(`
+  ${media.tablet} {
     height: 40px;
     font-size: 13px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     height: 36px;
     font-size: 12px;
-  `)}
+  }
 `
 
 export const iconStyle = css`
@@ -288,13 +276,13 @@ export const iconStyle = css`
   width: 18px;
   height: 18px;
 
-  ${media.tablet(`
+  ${media.tablet} {
     width: 16px;
     height: 16px;
-  `)}
+  }
 
-  ${media.mobile(`
+  ${media.mobileBig} {
     width: 14px;
     height: 14px;
-  `)}
+  }
 `

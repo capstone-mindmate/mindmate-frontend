@@ -1,5 +1,5 @@
-import React from 'react'
 /** @jsxImportSource @emotion/react */
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { css } from '@emotion/react'
 import { Link, useLocation } from 'react-router-dom'
 import {
@@ -23,9 +23,12 @@ interface NavItem {
 
 const navigationStyle = {
   root: css`
-    width: 478px;
+    width: 884px;
     position: fixed;
+    left: 0;
+    right: 0;
     bottom: 0;
+    margin: 0 auto;
     ${media.tablet} {
       width: 100%;
     }
@@ -71,14 +74,88 @@ const navigationStyle = {
 
 const NavigationComponent: React.FC = () => {
   const location = useLocation()
-  const unreadCount = useMessageStore((state) => state.unreadCount)
 
-  // 소켓 연결
-  useSocketMessage()
+  // 읽지 않은 메시지 수 상태
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  // 전체 읽지 않은 메시지 수 가져오기
+  const { totalUnreadCount } = useMessageStore()
+
+  // 소켓 연결 - 초기화된 소켓 클라이언트 가져오기
+  const { stompClient, isConnected, fetchTotalUnreadCount } = useSocketMessage()
+
+  // 안정화된 상태 업데이트 함수
+  const updateUnreadCount = useCallback((newCount: number) => {
+    setUnreadCount(newCount)
+  }, [])
+
+  // 커스텀 이벤트를 통한 읽지 않은 메시지 수 업데이트
+  useEffect(() => {
+    const handleUnreadCountUpdate = (e: CustomEvent) => {
+      const { count } = e.detail as { count: number }
+      // console.log('네비게이션: 이벤트로 읽지 않은 메시지 수 업데이트', count)
+      updateUnreadCount(count)
+    }
+
+    // 이벤트 리스너 등록
+    window.addEventListener(
+      'unread-count-updated',
+      handleUnreadCountUpdate as EventListener
+    )
+
+    return () => {
+      window.removeEventListener(
+        'unread-count-updated',
+        handleUnreadCountUpdate as EventListener
+      )
+    }
+  }, [updateUnreadCount])
+
+  // 경로 변경 시 읽지 않은 메시지 수 갱신 - 추가 확인 로직 적용
+  useEffect(() => {
+    // 페이지 이동이 실제로 다른 경로로 이동한 경우에만 요청
+    const currentPath = location.pathname
+
+    // 채팅 관련 페이지에서 나갈 때만 요청 (채팅 페이지에서는 별도로 처리)
+    const isChatPage = currentPath.includes('/chat')
+    const wasChatPage = location.pathname.includes('/chat')
+
+    if (!isChatPage && wasChatPage && isConnected) {
+      // console.log('네비게이션: 채팅 페이지에서 나감, 읽지 않은 메시지 수 요청')
+      fetchTotalUnreadCount(true) // 강제 업데이트
+    }
+  }, [location.pathname, isConnected, fetchTotalUnreadCount])
+
+  // 초기 로드 및 소켓 연결 시 구독 - 한 번만 실행되도록 의존성 배열 최적화
+  useEffect(() => {
+    if (!stompClient || !isConnected) return
+
+    // console.log('네비게이션: 소켓 연결됨, 초기 읽지 않은 메시지 수 요청')
+    // 최초 한 번만 요청하도록 스톰프 클라이언트와 연결 상태를 의존성으로 설정
+    // 강제 업데이트 옵션 추가
+    fetchTotalUnreadCount(true)
+  }, [stompClient, isConnected, fetchTotalUnreadCount])
+
+  // totalUnreadCount가 바뀔 때마다 무조건 updateUnreadCount 호출
+  useEffect(() => {
+    if (typeof totalUnreadCount === 'number') {
+      updateUnreadCount(totalUnreadCount)
+    }
+  }, [totalUnreadCount, updateUnreadCount])
+
+  // 페이지 로드 시 한 번 강제 요청
+  useEffect(() => {
+    if (isConnected) {
+      // console.log(
+      //   '네비게이션: 컴포넌트 마운트 시 읽지 않은 메시지 수 강제 요청'
+      // )
+      fetchTotalUnreadCount(true)
+    }
+  }, [isConnected, fetchTotalUnreadCount])
 
   const navItems: NavItem[] = [
     {
-      path: '/',
+      path: '/home',
       icon: (color) => <HomeIcon color={color} />,
       label: '홈',
     },
@@ -88,7 +165,7 @@ const NavigationComponent: React.FC = () => {
       label: '매칭',
     },
     {
-      path: '/나중에 정하기',
+      path: '/chat',
       icon: (color) => (
         <div
           css={css`
@@ -96,12 +173,12 @@ const NavigationComponent: React.FC = () => {
           `}
         >
           <ChatBubbleIcon color={color} />
-          {unreadCount > 0 || ( // 소켓 연결되면 &&(and)로 바꾸기
+          {unreadCount > 0 && (
             <div css={navigationStyle.alertContainer}>
               <ChatAlertIcon
                 width={24}
                 height={24}
-                alertCount={12} //  alertCount={unreadCount} 소켓 연결되면 이걸로
+                alertCount={unreadCount}
                 fontSize={12}
               />
             </div>
@@ -113,7 +190,7 @@ const NavigationComponent: React.FC = () => {
       alertCount: unreadCount,
     },
     {
-      path: '/나중에 정하기',
+      path: '/mypage',
       icon: (color) => <UserIcon color={color} />,
       label: '마이페이지',
     },

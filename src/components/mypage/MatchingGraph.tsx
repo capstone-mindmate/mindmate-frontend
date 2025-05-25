@@ -54,7 +54,7 @@ const MatchingGraph: React.FC<MatchingGraphProps> = ({ categoryData }) => {
 
   // 설명 텍스트
   const descriptionText = isAllZero
-    ? '서둘러 대화를 나눠보세요!'
+    ? '대화를 나눠보세요!'
     : `✸ ${topCategoriesText} 카테고리를 가장 많이 이용했어요!`
 
   return (
@@ -62,23 +62,35 @@ const MatchingGraph: React.FC<MatchingGraphProps> = ({ categoryData }) => {
       <Title>카테고리별 매칭 분포</Title>
       <Description>{descriptionText}</Description>
 
-      <GraphContainer isEmpty={isAllZero}>
-        {categories.map((category) => (
-          <CategoryItem key={category.name}>
-            <CategoryBar
-              height={
-                isAllZero
-                  ? '0%'
-                  : `${Math.min((category.value / maxVal) * 90, 90)}%`
-              }
-              isTop={
-                top3Categories.includes(category.name) && category.value > 0
-              }
-            />
-            <CategoryLabel isHidden={isAllZero}>{category.name}</CategoryLabel>
-          </CategoryItem>
-        ))}
-      </GraphContainer>
+      {isAllZero ? (
+        <div
+          style={{
+            background: 'whitesmoke',
+            borderRadius: 12,
+            padding: '24px 0',
+            textAlign: 'center',
+            color: '#aaa',
+            fontSize: 14,
+            margin: '16px 0',
+          }}
+        >
+          아직 매칭을 진행하지 않았어요.
+        </div>
+      ) : (
+        <GraphContainer isEmpty={false}>
+          {categories.map((category) => (
+            <CategoryItem key={category.name}>
+              <CategoryBar
+                height={`${Math.min((category.value / maxVal) * 90, 90)}%`}
+                isTop={
+                  top3Categories.includes(category.name) && category.value > 0
+                }
+              />
+              <CategoryLabel isHidden={false}>{category.name}</CategoryLabel>
+            </CategoryItem>
+          ))}
+        </GraphContainer>
+      )}
     </MatchingGraphContainer>
   )
 }

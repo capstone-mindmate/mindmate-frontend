@@ -29,123 +29,102 @@ import MatchItem from '../../components/matching/matchItem'
 import RandomMatchingSelector from '../../components/matching/floating'
 import ModalComponent from '../../components/modal/modalComponent'
 import { css } from '@emotion/react'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+import { useToast } from '../../components/toast/ToastProvider'
 
-// 더미 데이터. API 연동 후 삭제 예정 - 2025-04-19 석지원
-const matchItemsData = [
-  {
-    id: 1,
-    department: '소프트웨어학과',
-    title: '소프트웨어학과 소개',
-    description: '소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다.',
-    matchType: '리스너',
-    category: '진로',
-    borderSet: true,
-    username: '행복한 돌멩이',
-    profileImage: '/public/image.png',
-    makeDate: '04월 19일 15:30',
-  },
-  {
-    id: 2,
-    department: '미디어학과',
-    title: '미디어학과 관련 질문',
-    description: '미디어학과에 관한 궁금한 점이 있습니다.',
-    matchType: '스피커',
-    category: '경제',
-    borderSet: true,
-    username: '건들면 짖는댕',
-    profileImage: '/public/image.png',
-    makeDate: '04월 19일 14:20',
-  },
-  {
-    id: 3,
-    department: '소프트웨어학과',
-    title: '취업 준비 방법',
-    description: '소프트웨어 분야 취업 준비는 어떻게 하면 좋을까요?',
-    matchType: '리스너',
-    category: '취업',
-    borderSet: true,
-    username: '말하고 싶어라',
-    profileImage: '/public/image copy.png',
-    makeDate: '04월 18일 22:15',
-  },
-  {
-    id: 4,
-    department: '미디어학과',
-    title: '미디어학과 진로',
-    description: '미디어학과를 졸업하면 어떤 진로를 선택할 수 있나요?',
-    matchType: '스피커',
-    category: '진로',
-    borderSet: true,
-    username: '마인드메이트',
-    profileImage: '/public/image copy 2.png',
-    makeDate: '04월 18일 18:05',
-  },
-  {
-    id: 5,
-    department: '소프트웨어학과',
-    title: '학업 고민',
-    description: '소프트웨어학과 공부가 너무 어려워요. 어떻게 해야 할까요?',
-    matchType: '리스너',
-    category: '학업',
-    borderSet: true,
-    username: '소프트웨어천재',
-    profileImage: '/public/image.png',
-    makeDate: '04월 17일 13:40',
-  },
-  {
-    id: 6,
-    department: '소프트웨어학과',
-    title: '프로젝트 협업',
-    description:
-      '소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다. 소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다. 소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다. 소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다. 소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다. 소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다.',
-    matchType: '스피커',
-    category: '인간관계',
-    borderSet: true,
-    username: '프론트엔드 개발자',
-    profileImage: '/public/image copy.png',
-    makeDate: '04월 17일 10:30',
-  },
-  {
-    id: 7,
-    department: '미디어학과',
-    title: '미디어학과 장비',
-    description: '미디어학과에서 사용하는 장비는 어떤 것들이 있나요?',
-    matchType: '리스너',
-    category: '학업',
-    borderSet: true,
-    username: '미디어 마니아',
-    profileImage: '/public/image copy 2.png',
-    makeDate: '04월 16일 21:45',
-  },
-  {
-    id: 8,
-    department: '소프트웨어학과',
-    title: '학자금 대출',
-    description: '학자금 대출은 어떻게 신청하나요?',
-    matchType: '스피커',
-    category: '경제',
-    borderSet: true,
-    username: '경제적 자유',
-    profileImage: '/public/image.png',
-    makeDate: '04월 16일 16:20',
-  },
-  {
-    id: 9,
-    department: '소프트웨어학과',
-    title: '인턴십 지원',
-    description: '소프트웨어 관련 인턴십은 어디에서 찾을 수 있나요?',
-    matchType: '리스너',
-    category: '취업',
-    borderSet: false,
-    username: '취업준비중',
-    profileImage: '/public/image copy.png',
-    makeDate: '04월 15일 14:10',
-  },
+// 매칭방 아이템 타입 정의 (API 응답 구조 기반)
+interface MatchItemType {
+  id: number
+  department: string
+  title: string
+  description: string
+  creatorRole: string
+  category?: string
+  matchType?: string
+  borderSet?: boolean
+  username?: string
+  profileImage?: string
+  makeDate?: string
+  userId: number
+  creatorId?: number
+}
+
+const departmentOptions = [
+  '기계공학과',
+  '산업공학과',
+  '화학공학과',
+  '환경안전공학과',
+  '건설시스템공학과',
+  '교통시스템공학과',
+  '건축학과',
+  'AI모빌리티학과',
+  '첨단신소재공학과',
+  '응용화학생명공학과',
+  '전자공학과',
+  '지능형반도체공학과',
+  '소프트웨어학과',
+  '사이버보안학과',
+  '소프트웨어융합학과',
+  '국방디지털융합학과',
+  '디지털미디어학과',
+  '수학과',
+  '물리학과',
+  '화학과',
+  '생명과학과',
+  '국어국문학과',
+  '영어영문학과',
+  '불어불문학과',
+  '사학과',
+  '문화콘텐츠학과',
+  '경제학과',
+  '심리학과',
+  '사회학과',
+  '정치외교학과',
+  '행정학과',
+  '경영학과',
+  'e-비즈니스학과',
+  '금융공학과',
+  '법학과',
+  '의학과',
+  '간호학과',
+  '약학과',
+  '바이오헬스규제과학과',
+  '프런티어과학학부',
+  '경제정치사회융합학부',
+  '다산학부대학',
+  '자유전공학부',
+  '국제학부',
 ]
+
+const categoryMap: Record<string, string> = {
+  ACADEMIC: '학업',
+  CAREER: '진로',
+  RELATIONSHIP: '인간관계',
+  MENTAL_HEALTH: '건강',
+  CAMPUS_LIFE: '학교생활',
+  PERSONAL_GROWTH: '자기계발',
+  FINANCIAL: '경제',
+  EMPLOYMENT: '취업',
+  OTHER: '기타',
+}
+
+// 한글 → 영문 카테고리 맵
+const categoryEngMap: Record<string, string> = {
+  학업: 'ACADEMIC',
+  진로: 'CAREER',
+  인간관계: 'RELATIONSHIP',
+  건강: 'MENTAL_HEALTH',
+  학교생활: 'CAMPUS_LIFE',
+  자기계발: 'PERSONAL_GROWTH',
+  경제: 'FINANCIAL',
+  취업: 'EMPLOYMENT',
+  기타: 'OTHER',
+}
 
 const Matching = () => {
   const navigate = useNavigate()
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const location = useLocation()
 
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
     null
@@ -153,57 +132,154 @@ const Matching = () => {
   const [isListenerActive, setIsListenerActive] = useState(false)
   const [isSpeakerActive, setIsSpeakerActive] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('전체')
-  const [filteredItems, setFilteredItems] = useState(matchItemsData)
+  const [matchItems, setMatchItems] = useState<MatchItemType[]>([])
+  const [filteredItems, setFilteredItems] = useState<MatchItemType[]>([])
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<
-    (typeof matchItemsData)[0] | null
-  >(null)
+  const [selectedItem, setSelectedItem] = useState<MatchItemType | null>(null)
   const [messageToSend, setMessageToSend] = useState('')
 
   const [isMatchFailure, setIsMatchFailure] = useState(false)
 
   const [isSearchActive, setIsSearchActive] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const { showToast } = useToast()
+
+  // 상세 정보 로딩 상태
+  const [isDetailLoading, setIsDetailLoading] = useState(false)
+
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const [loading, setLoading] = useState(false)
+
+  const loaderRef = useRef<HTMLDivElement | null>(null)
+
+  const fetchMatchings = async (pageNum = 0, append = false) => {
+    setLoading(true)
+    const params = new URLSearchParams()
+    params.append('pageable', pageNum.toString())
+    if (selectedCategory !== '전체')
+      params.append('category', categoryEngMap[selectedCategory])
+    if (selectedDepartment) params.append('department', selectedDepartment)
+    if (isListenerActive && !isSpeakerActive)
+      params.append('requiredRole', 'LISTENER')
+    if (!isListenerActive && isSpeakerActive)
+      params.append('requiredRole', 'SPEAKER')
+    if (searchQuery.trim() !== '') params.append('keyword', searchQuery.trim())
+    // 검색어가 있으면 /search, 없으면 /matchings
+    const endpoint =
+      searchQuery.trim() !== ''
+        ? `https://mindmate.shop/api/matchings/search?${params.toString()}`
+        : `https://mindmate.shop/api/matchings?${params.toString()}`
+    try {
+      const res = await fetchWithRefresh(endpoint, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!res.ok) throw new Error('매칭방 목록을 불러오지 못했습니다.')
+      const data = await res.json()
+      if (Array.isArray(data.content)) {
+        const mapped = data.content.map((item: any) => ({
+          ...item,
+          userId: item.userId ?? item.creatorId,
+          category: categoryMap[item.category?.trim()] || item.category,
+        }))
+        setMatchItems((prev) => (append ? [...prev, ...mapped] : mapped))
+        setHasMore(!data.last)
+      } else {
+        if (!append) setMatchItems([])
+        setHasMore(false)
+      }
+    } catch (e) {
+      if (!append) setMatchItems([])
+      setHasMore(false)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 필터 변경 시 첫 페이지부터 다시 불러오기
+  useEffect(() => {
+    setPage(0)
+    fetchMatchings(0, false)
+  }, [
+    selectedCategory,
+    selectedDepartment,
+    isListenerActive,
+    isSpeakerActive,
+    searchQuery,
+  ])
+
+  // 무한 스크롤 (IntersectionObserver)
+  useEffect(() => {
+    if (!hasMore || loading) return
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchMatchings(page + 1, true)
+          setPage((p) => p + 1)
+        }
+      },
+      { threshold: 1 }
+    )
+    if (loaderRef.current) observer.observe(loaderRef.current)
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current)
+    }
+  }, [hasMore, loading, page])
 
   useEffect(() => {
-    let filtered = matchItemsData
+    let filtered = matchItems
 
     if (selectedDepartment) {
       filtered = filtered.filter(
-        (item) => item.department === selectedDepartment
+        (item: MatchItemType) => item.department === selectedDepartment
       )
     }
 
     if (isListenerActive && !isSpeakerActive) {
-      filtered = filtered.filter((item) => item.matchType === '리스너')
+      filtered = filtered.filter(
+        (item: MatchItemType) => item.matchType === '리스너'
+      )
     } else if (!isListenerActive && isSpeakerActive) {
-      filtered = filtered.filter((item) => item.matchType === '스피커')
+      filtered = filtered.filter(
+        (item: MatchItemType) => item.matchType === '스피커'
+      )
     }
 
     if (selectedCategory !== '전체') {
-      filtered = filtered.filter((item) => item.category === selectedCategory)
+      filtered = filtered.filter(
+        (item: MatchItemType) => item.category === selectedCategory
+      )
     }
 
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
-        (item) =>
-          item.title.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query) ||
-          item.department.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query)
+        (item: MatchItemType) =>
+          (item.title ?? '').toLowerCase().includes(query) ||
+          (item.description ?? '').toLowerCase().includes(query) ||
+          (item.department ?? '').toLowerCase().includes(query) ||
+          (item.category ?? '').toLowerCase().includes(query)
       )
     }
 
     setFilteredItems(filtered)
   }, [
+    matchItems,
     selectedDepartment,
     isListenerActive,
     isSpeakerActive,
     selectedCategory,
     searchQuery,
   ])
+
+  // location.state 기반 자동 카테고리 필터링
+  useEffect(() => {
+    if (location.state && location.state.category) {
+      setSelectedCategory(location.state.category)
+    }
+  }, [location.state])
 
   const toggleSearch = () => {
     setIsSearchActive(!isSearchActive)
@@ -236,17 +312,97 @@ const Matching = () => {
     setIsSpeakerActive(isActive)
   }
 
-  const handleListenerSelect = () => {
-    // 리스너 랜덤 매칭 호출
+  const handleListenerSelect = async () => {
+    try {
+      const res = await fetchWithRefresh(
+        'https://mindmate.shop/api/matchings/auto',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userRole: 'LISTENER',
+            anonymous: true,
+            showDepartment: true, // 필요시 상태로 관리
+          }),
+        }
+      )
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message)
+      }
+      showToast('랜덤 매칭이 완료되었습니다!', 'success')
+    } catch (e: any) {
+      showToast(e.message, 'error')
+    }
   }
 
-  const handleSpeakerSelect = () => {
-    // 스피커 랜덤 매칭 호출
+  const handleSpeakerSelect = async () => {
+    try {
+      const res = await fetchWithRefresh(
+        'https://mindmate.shop/api/matchings/auto',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userRole: 'SPEAKER',
+            anonymous: true, // 필요시 상태로 관리
+            showDepartment: true, // 필요시 상태로 관리
+          }),
+        }
+      )
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message)
+      }
+      showToast('랜덤 매칭이 완료되었습니다!', 'success')
+    } catch (e: any) {
+      showToast(e.message, 'error')
+    }
   }
 
-  const handleOpenModal = (item: (typeof matchItemsData)[0]) => {
-    setSelectedItem(item)
+  const handleOpenModal = async (item: MatchItemType) => {
+    setIsDetailLoading(true)
     setIsModalOpen(true)
+    try {
+      const res = await fetchWithRefresh(
+        `https://mindmate.shop/api/matchings/${item.id}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+      if (!res.ok) throw new Error('매칭방 상세 정보를 불러오지 못했습니다.')
+      const data = await res.json()
+      setSelectedItem({
+        id: data.id,
+        department: data.creatorDepartment ?? '',
+        title: data.title ?? '',
+        description: data.description ?? '',
+        creatorRole: data.creatorRole ?? '',
+        category: data.category ?? '',
+        matchType: data.creatorRole === 'SPEAKER' ? '스피커' : '리스너',
+        borderSet: false,
+        username: data.creatorNickname ?? '',
+        profileImage: data.anonymous
+          ? 'https://mindmate.shop/api/profileImages/default-profile-image.png'
+          : `https://mindmate.shop/api${data.creatorProfileImage ?? ''}`,
+        makeDate: data.createdAt
+          ? new Date(data.createdAt).toLocaleString('ko-KR', {
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            })
+          : '',
+        userId: data.creatorId,
+        creatorId: data.creatorId,
+      })
+    } catch (e) {
+      setSelectedItem(null)
+      alert('매칭방 상세 정보를 불러오지 못했습니다.')
+    } finally {
+      setIsDetailLoading(false)
+    }
   }
 
   const handleCloseModal = () => {
@@ -266,18 +422,35 @@ const Matching = () => {
     setMessageToSend(value)
   }
 
-  const handleMatchingRequest = () => {
+  const handleMatchingRequest = async () => {
     if (selectedItem) {
-      console.log('매칭 신청:', {
-        ...selectedItem,
-        message: messageToSend,
-      })
-      setIsModalOpen(false)
-      setMessageToSend('')
+      try {
+        const res = await fetchWithRefresh(
+          `https://mindmate.shop/api/matchings/${selectedItem.id}/applications`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: messageToSend,
+              anonymous: false, // 익명 신청 여부, 필요시 상태로 관리
+            }),
+          }
+        )
+        if (!res.ok) {
+          const errorData = await res.json()
+          throw new Error(errorData.message || '매칭 신청에 실패했습니다.')
+        }
+        showToast('매칭 신청이 완료되었습니다!', 'success')
+        setIsModalOpen(false)
+        setMessageToSend('')
+      } catch (e: any) {
+        setIsModalOpen(false)
+        showToast(e.message, 'error')
+      }
     }
   }
 
-  const handleMatchItemClick = (item: (typeof matchItemsData)[0]) => {
+  const handleMatchItemClick = (item: MatchItemType) => {
     handleOpenModal(item)
   }
 
@@ -294,7 +467,8 @@ const Matching = () => {
           z-index: 1000;
           display: flex;
           align-items: center;
-          padding: ${isSearchActive ? '0 16px' : '0'};
+          padding: ${isSearchActive ? '0 24px' : '0'};
+          margin: ${isSearchActive ? '7px 0' : '0'};
           transition: all 0.3s ease;
           overflow: hidden;
           box-sizing: border-box;
@@ -340,8 +514,43 @@ const Matching = () => {
   }
 
   const renderModal = () => {
-    if (!isModalOpen || !selectedItem) return null
-
+    if (!isModalOpen) return null
+    if (isDetailLoading || !selectedItem) {
+      return (
+        <ModalComponent
+          modalType="매칭신청"
+          buttonText="매칭 신청하기"
+          buttonClick={handleMatchingRequest}
+          onClose={handleCloseModal}
+          isOpen={isModalOpen}
+          userProfileProps={{
+            profileImage: '',
+            name: '',
+            department: '',
+            makeDate: '',
+            userId: undefined,
+          }}
+          matchingInfoProps={{
+            title: '',
+            description: '로딩 중...',
+          }}
+          messageProps={{
+            onMessageChange: handleMessageChange,
+            messageValue: '',
+          }}
+          onProfileClick={() => {}}
+        />
+      )
+    }
+    const handleProfileClick = () => {
+      // userId 우선, 없으면 creatorId 사용
+      const userId = selectedItem?.userId ?? selectedItem?.creatorId
+      if (userId) {
+        navigate(`/mypage/${userId}`)
+      } else {
+        alert('상대방 프로필 정보를 찾을 수 없습니다.')
+      }
+    }
     return (
       <ModalComponent
         modalType="매칭신청"
@@ -350,19 +559,21 @@ const Matching = () => {
         onClose={handleCloseModal}
         isOpen={isModalOpen}
         userProfileProps={{
-          profileImage: selectedItem.profileImage,
-          name: selectedItem.username,
-          department: selectedItem.department,
-          makeDate: selectedItem.makeDate,
+          profileImage: selectedItem.profileImage ?? '',
+          name: selectedItem.username ?? '',
+          department: selectedItem.department ?? '',
+          makeDate: selectedItem.makeDate ?? '',
+          userId: selectedItem.userId || selectedItem.creatorId,
         }}
         matchingInfoProps={{
-          title: selectedItem.title,
-          description: selectedItem.description,
+          title: selectedItem.title ?? '',
+          description: selectedItem.description ?? '',
         }}
         messageProps={{
           onMessageChange: handleMessageChange,
           messageValue: messageToSend,
         }}
+        onProfileClick={handleProfileClick}
       />
     )
   }
@@ -409,7 +620,7 @@ const Matching = () => {
                   cursor: pointer;
                 `}
               >
-                <SearchIcon color="#392111" />
+                <SearchIcon color="#392111" width={21.5} height={21.5} />
               </div>
               <ListIcon
                 color="#392111"
@@ -469,7 +680,7 @@ const Matching = () => {
 
           <CategoryDetailContainer>
             <NormalSelectButton
-              options={['소프트웨어학과', '미디어학과']}
+              options={departmentOptions}
               onChange={handleDepartmentChange}
             />
 
@@ -486,23 +697,23 @@ const Matching = () => {
         </TopFixedContent>
 
         <MatchItemsContainer pageType="normal">
-          {filteredItems.length > 0 ? (
-            filteredItems.map((item, index) => (
+          {matchItems.length > 0 ? (
+            matchItems.map((item: MatchItemType, index: number) => (
               <MatchItem
                 key={item.id}
-                department={item.department}
-                title={item.title}
-                description={item.description}
-                matchType={item.matchType}
-                category={item.category}
-                borderSet={index < filteredItems.length - 1}
+                department={item.department ?? ''}
+                title={item.title ?? ''}
+                description={item.description ?? ''}
+                matchType={item.matchType ?? ''}
+                category={item.category ?? ''}
+                borderSet={index < matchItems.length - 1}
                 onClick={() => handleMatchItemClick(item)}
               />
             ))
           ) : (
             <div
               css={{
-                padding: '20px',
+                padding: '40px 0',
                 textAlign: 'center',
                 width: '100%',
                 color: '#888',
@@ -511,6 +722,7 @@ const Matching = () => {
               {searchQuery ? '검색 결과가 없습니다.' : '매칭방이 없습니다.'}
             </div>
           )}
+          <div ref={loaderRef} style={{ height: 1 }} />
         </MatchItemsContainer>
       </MatchingContainer>
 
