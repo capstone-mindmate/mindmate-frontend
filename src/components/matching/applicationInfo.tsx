@@ -13,6 +13,7 @@ interface ApplicationInfoProps {
   onClick: () => void
   message: string
   borderSet: boolean
+  onProfileClick?: () => void // 프로필 클릭 핸들러 추가
 }
 
 const applicationInfoStyle = {
@@ -38,7 +39,6 @@ const applicationInfoStyle = {
     flex-direction: row;
     align-items: center;
     gap: 12px;
-    cursor: pointer;
   `,
 
   rightSide: css`
@@ -57,6 +57,12 @@ const applicationInfoStyle = {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    cursor: pointer; /* 클릭 가능 표시 */
+    transition: transform 0.2s ease; /* 호버 효과 */
+
+    &:hover {
+      transform: scale(1.05);
+    }
   `,
 
   profileImageStyle: css`
@@ -134,7 +140,16 @@ const applicationInfo = ({
   onClick,
   message,
   borderSet,
+  onProfileClick, // 프로필 클릭 핸들러 받기
 }: ApplicationInfoProps) => {
+  // 프로필 이미지 클릭 핸들러
+  const handleProfileImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // 부모 요소의 클릭 이벤트 방지
+    if (onProfileClick) {
+      onProfileClick()
+    }
+  }
+
   return (
     <div className="container" css={applicationInfoStyle.container(borderSet)}>
       <div className="user-profile" css={applicationInfoStyle.userProfile}>
@@ -142,10 +157,13 @@ const applicationInfo = ({
           <div
             className="profile-image"
             css={applicationInfoStyle.profileImageWrapper}
+            onClick={handleProfileImageClick} // 프로필 이미지 클릭 이벤트 추가
+            title={`${name}의 프로필 보기`} // 툴팁 추가
           >
             <img
               src={profileImage}
               css={applicationInfoStyle.profileImageStyle}
+              alt={`${name}의 프로필 이미지`}
             />
           </div>
 

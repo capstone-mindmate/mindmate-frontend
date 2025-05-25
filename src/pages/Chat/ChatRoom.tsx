@@ -1064,6 +1064,15 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     }
   }, [stompClient, chatId])
 
+  // 프로필 이미지 클릭 핸들러
+  const handleProfileClick = () => {
+    if (otherUserId) {
+      navigate(`/mypage/${otherUserId}`)
+    } else {
+      showToast('상대방 정보를 찾을 수 없습니다.', 'error')
+    }
+  }
+
   return (
     <RootContainer>
       <TopBar
@@ -1175,6 +1184,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                           ? undefined
                           : otherProfileImageFromNav ||
                             '/default-profile-image.png'
+                      }
+                      onProfileClick={
+                        message.isMe ? undefined : handleProfileClick
                       }
                     >
                       <EmoticonWrapper>
@@ -1481,6 +1493,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         isContinuous={false}
                         isCustomFormMake={true}
                         onClick={handleFormClick}
+                        onProfileClick={
+                          message.isMe ? undefined : handleProfileClick
+                        }
                       />
                     </div>
                   )
@@ -1512,6 +1527,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         isContinuous={false}
                         isCustomFormMake={true}
                         onClick={handleFormClick}
+                        onProfileClick={
+                          message.isMe ? undefined : handleProfileClick
+                        }
                       />
                     </div>
                   )
@@ -1538,6 +1556,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         isContinuous={false}
                         isCustomFormMake={true}
                         onClick={handleFormClick}
+                        onProfileClick={
+                          message.isMe ? undefined : handleProfileClick
+                        }
                       />
                     </div>
                   )
@@ -1571,6 +1592,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         : otherProfileImageFromNav ||
                           '/default-profile-image.png'
                     }
+                    onProfileClick={
+                      message.isMe ? undefined : handleProfileClick
+                    }
                   >
                     {message.content}
                   </Bubble>
@@ -1585,6 +1609,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                 profileImage={
                   otherProfileImageFromNav || '/default-profile-image.png'
                 }
+                onProfileClick={handleProfileClick}
               >
                 <div style={{ padding: '4px 8px' }}>
                   <span style={{ fontSize: '14px' }}>입력 중...</span>
