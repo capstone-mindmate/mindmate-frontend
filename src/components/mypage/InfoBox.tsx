@@ -57,7 +57,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({
 
       <Section>
         <Label>매칭 횟수</Label>
-        <Value>{matchCount}회</Value>
+        <Value>{matchCount || 0}회</Value>
       </Section>
     </InfoBoxContainer>
   )
