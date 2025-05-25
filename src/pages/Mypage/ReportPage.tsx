@@ -39,13 +39,13 @@ const MAX_CHARS = 1000
 // 신고 사유 코드 매핑
 const REPORT_REASON_MAP: Record<string, string> = {
   '욕설, 폭언, 비방 및 혐오표현을 사용해요': 'ABUSIVE_LANGUAGE',
-  '성적 수치심을 유발하거나 노출해요': 'SEXUAL_CONTENT',
-  '도배 또는 반복적인 내용이에요': 'SPAM',
+  '성적 수치심을 유발하거나 노출해요': 'SEXUAL_HARASSMENT',
+  '도배 또는 반복적인 내용이에요': 'SPAM_OR_REPETITIVE',
   '스팸 또는 악성 링크가 포함되어 있어요': 'MALICIOUS_LINK',
-  '상업적 목적의 과도한 홍보예요': 'ADVERTISING',
-  '개인정보를 불법으로 요구하거나 유출했어요': 'PRIVACY_VIOLATION',
-  '불법 정보 또는 행위를 조장해요': 'ILLEGAL_ACTIVITY',
-  '기타 문제가 있어 신고하고 싶어요': 'ETC',
+  '상업적 목적의 과도한 홍보예요': 'EXCESSIVE_PROMOTION',
+  '개인정보를 불법으로 요구하거나 유출했어요': 'PERSONAL_INFO_VIOLATION',
+  '불법 정보 또는 행위를 조장해요': 'ILLEGAL_CONTENT',
+  '기타 문제가 있어 신고하고 싶어요': 'OTHER',
 }
 
 const ReportPage = ({
@@ -95,21 +95,45 @@ const ReportPage = ({
   const handleReportSubmit = async () => {
     if (selectedReports.length > 0) {
       const reportReason = REPORT_REASON_MAP[selectedReports[0]] || 'ETC'
+      // fromPage 값을 ReportTarget 열거형으로 변환하는 함수
+      const mapFromPageToReportTarget = (
+        fromPage: string | undefined
+      ): string => {
+        switch (fromPage?.toLowerCase()) {
+          case 'matching':
+            return 'MATCHING'
+          case 'chatroom':
+            return 'CHATROOM'
+          case 'profile':
+            return 'PROFILE'
+          case 'magazine':
+            return 'MAGAZINE'
+          case 'review':
+            return 'REVIEW'
+          default:
+            return 'PROFILE' // 기본값
+        }
+      }
+
+      // 요청 본문 구성
       const body = {
-        reportedUserId,
-        reportReason,
+        reportedUserId: reportedUserId,
+        reportReason: reportReason,
         additionalComment: reportText,
-        reportTarget: fromPage,
+        reportTarget: mapFromPageToReportTarget(fromPage),
         targetId: targetUserId,
       }
       try {
-        const res = await fetchWithRefresh('https://mindmate.shop/api/report', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(body),
-        })
+        const res = await fetchWithRefresh(
+          'https://mindmate.shop/api/reports',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+          }
+        )
         if (!res.ok) {
           throw new Error('신고 제출 실패')
         }

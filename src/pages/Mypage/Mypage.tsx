@@ -1,4 +1,4 @@
-import { SettingIcon } from '../../components/icon/iconComponents'
+import { SettingIcon, KebabIcon } from '../../components/icon/iconComponents'
 import InfoBox from '../../components/mypage/InfoBox'
 import MatchingGraph from '../../components/mypage/MatchingGraph'
 import ProfileEdit from '../../components/mypage/ProfileEdit'
@@ -6,6 +6,7 @@ import NavigationComponent from '../../components/navigation/navigationComponent
 import DetailReview from '../../components/review/DetailReview'
 import TagReview from '../../components/review/TagReview'
 import TopBar from '../../components/topbar/Topbar'
+import BottomSheet from '../../components/bottomSheet/BottomSheet'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   ContentContainer,
@@ -56,6 +57,7 @@ const MyPage = () => {
   const [userReviews, setUserReviews] = useState<any[]>([])
   const [pointBalance, setPointBalance] = useState<number | null>(null)
   const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
 
   const realProfileImageUrl = userProfile?.profileImage
     ? `https://mindmate.shop/api${userProfile.profileImage}`
@@ -99,6 +101,7 @@ const MyPage = () => {
             averageScore: profileData.averageRating,
             coins: profileData.points,
             matchCount: profileData.totalCounselingCount,
+            avgResponseTime: profileData.avgResponseTime,
           })
           // categoryData를 한글로 변환
           const convertedCategoryData = Object.entries(
@@ -178,6 +181,7 @@ const MyPage = () => {
             averageScore: profileData.averageRating,
             coins: profileData.points,
             matchCount: profileData.totalCounselingCount,
+            avgResponseTime: profileData.avgResponseTime,
           })
           // categoryData를 한글로 변환
           const convertedCategoryData = Object.entries(
@@ -260,14 +264,16 @@ const MyPage = () => {
     fetchPointBalance()
   }, [userId, user])
 
-  // TODO: 프로필 편집 버튼 클릭 핸들러
   const handleProfileEdit = () => {
     navigate('/profile/edit')
   }
 
-  // TODO: 설정 버튼 클릭 핸들러
   const handleSettingClick = () => {
     navigate('/profile/setting')
+  }
+
+  const handleKebabClick = () => {
+    setIsBottomSheetOpen(true)
   }
 
   // 리뷰 전체보기 클릭 핸들러 - 상세 리뷰 페이지로 이동
@@ -283,17 +289,37 @@ const MyPage = () => {
     <MypageContainer>
       <ContentContainer>
         <TopBar
-          leftContent={<LogoText>마이페이지</LogoText>}
+          leftContent={
+            <LogoText>{isOwnProfile ? '마이페이지' : '프로필'}</LogoText>
+          }
           rightContent={
-            isOwnProfile && (
+            isOwnProfile ? (
               <button onClick={handleSettingClick}>
                 <SettingIcon color="#392111" />
+              </button>
+            ) : (
+              <button onClick={handleKebabClick}>
+                <KebabIcon />
               </button>
             )
           }
           showBorder={false}
           isFixed={true}
         />
+        {!isOwnProfile && (
+          <BottomSheet
+            isOpen={isBottomSheetOpen}
+            onClose={() => setIsBottomSheetOpen(false)}
+            menuItems={[
+              {
+                text: '신고',
+                onClick: () => {
+                  navigate(`/report/${user?.id}/${userId}/PROFILE`)
+                },
+              },
+            ]}
+          />
+        )}
         <ComponentContainer>
           <ProfileEdit
             profileImage={
@@ -317,8 +343,17 @@ const MyPage = () => {
           <InfoBoxContainer>
             <InfoBox
               averageScore={userStats?.averageScore}
-              coins={pointBalance !== null ? pointBalance : userStats?.coins}
+              coins={
+                isOwnProfile
+                  ? pointBalance !== null
+                    ? pointBalance
+                    : userStats?.coins
+                  : undefined
+              }
               matchCount={userStats?.matchCount}
+              avgResponseTime={
+                !isOwnProfile ? userStats?.avgResponseTime : undefined
+              }
             />
           </InfoBoxContainer>
           <MatchingGraphContainer>

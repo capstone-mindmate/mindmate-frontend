@@ -12,14 +12,16 @@ import {
 
 interface InfoBoxProps {
   averageScore: number
-  coins: number
+  coins?: number
   matchCount: number
+  avgResponseTime?: number
 }
 
 const InfoBox: React.FC<InfoBoxProps> = ({
   averageScore,
   coins,
   matchCount,
+  avgResponseTime,
 }) => {
   return (
     <InfoBoxContainer>
@@ -38,8 +40,17 @@ const InfoBox: React.FC<InfoBoxProps> = ({
       <Divider />
 
       <Section>
-        <Label>보유 코인</Label>
-        <Value>{coins}개</Value>
+        {coins !== undefined ? (
+          <>
+            <Label>보유 코인</Label>
+            <Value>{coins}개</Value>
+          </>
+        ) : (
+          <>
+            <Label>평균 응답 시간</Label>
+            <Value>{avgResponseTime || 0}분</Value>
+          </>
+        )}
       </Section>
 
       <Divider />
