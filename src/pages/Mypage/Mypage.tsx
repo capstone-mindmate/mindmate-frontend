@@ -342,7 +342,7 @@ const MyPage = () => {
           )}
           <InfoBoxContainer>
             <InfoBox
-              averageScore={userStats?.averageScore}
+              averageScore={userStats?.averageScore || 0}
               coins={
                 isOwnProfile
                   ? pointBalance !== null
