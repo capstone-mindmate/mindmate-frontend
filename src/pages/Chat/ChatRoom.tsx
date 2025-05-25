@@ -1084,7 +1084,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           {
             text: '신고',
             onClick: () => {
-              navigate(`/report/${myUserId}/${otherUserId}/MATCHING`)
+              navigate(`/chat/${chatId}/report/${myUserId}/${otherUserId}`)
             },
           },
           { text: '종료 요청', onClick: handleCloseRequest },

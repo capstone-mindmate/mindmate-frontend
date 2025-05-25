@@ -314,7 +314,7 @@ const MyPage = () => {
               {
                 text: '신고',
                 onClick: () => {
-                  navigate(`/report/${user?.id}/${userId}/PROFILE`)
+                  navigate(`/profile/${userId}/report/${user?.id}/${userId}`)
                 },
               },
             ]}

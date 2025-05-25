@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import TopBar from '../../components/topbar/Topbar'
 import { ReportItem, ReportButton } from '../../components/buttons/reportButton'
 import ModalComponent from '../../components/modal/modalComponent'
@@ -14,13 +14,6 @@ import {
   CharCounter,
   ReportButtonContainer,
 } from './ReportPageStyles'
-import { expect } from 'chai'
-
-interface CustomFormViewProps {
-  reportedUserId: string | undefined
-  targetUserId: string | undefined
-  fromPage: string | undefined
-}
 
 // 신고 사유 옵션 데이터
 const REPORT_OPTIONS = [
@@ -36,7 +29,7 @@ const REPORT_OPTIONS = [
 
 const MAX_CHARS = 1000
 
-// 신고 사유 코드 매핑
+// 신고 사유 코드 매핑 (백엔드 ReportReason 열거형과 일치)
 const REPORT_REASON_MAP: Record<string, string> = {
   '욕설, 폭언, 비방 및 혐오표현을 사용해요': 'ABUSIVE_LANGUAGE',
   '성적 수치심을 유발하거나 노출해요': 'SEXUAL_HARASSMENT',
@@ -48,12 +41,85 @@ const REPORT_REASON_MAP: Record<string, string> = {
   '기타 문제가 있어 신고하고 싶어요': 'OTHER',
 }
 
-const ReportPage = ({
-  reportedUserId,
-  targetUserId,
-  fromPage,
-}: CustomFormViewProps) => {
+// fromPage 값을 ReportTarget 열거형으로 변환하는 함수
+const mapFromPageToReportTarget = (fromPage: string | undefined): string => {
+  switch (fromPage?.toLowerCase()) {
+    case 'matching':
+      return 'MATCHING'
+    case 'chatroom':
+      return 'CHATROOM'
+    case 'profile':
+      return 'PROFILE'
+    case 'magazine':
+      return 'MAGAZINE'
+    case 'review':
+      return 'REVIEW'
+    default:
+      return 'PROFILE' // 기본값
+  }
+}
+
+// reportTarget에 따라 적절한 targetId를 반환하는 함수
+const getTargetId = (
+  reportTarget: string,
+  targetUserId: string | undefined,
+  targetItemId: string | undefined
+): string => {
+  //console.log('getTargetId 호출:', { reportTarget, targetUserId, targetItemId })
+
+  switch (reportTarget) {
+    case 'MATCHING':
+      // 매칭 신고의 경우 매칭 ID, 없으면 targetUserId 사용
+      return targetItemId || targetUserId || '0'
+    case 'CHATROOM':
+      // 채팅방 신고의 경우 채팅방 ID, 없으면 targetUserId 사용
+      return targetItemId || targetUserId || '0'
+    case 'PROFILE':
+      // 프로필 신고의 경우 프로필 ID (= 사용자 ID)
+      return targetUserId || '0'
+    case 'REVIEW':
+      // 리뷰 신고의 경우 리뷰 ID, 없으면 targetUserId 사용
+      return targetItemId || targetUserId || '0'
+    case 'MAGAZINE':
+      // 매거진 신고의 경우 매거진 ID, 없으면 targetUserId 사용
+      return targetItemId || targetUserId || '0'
+    default:
+      // 기본값으로 targetUserId 사용
+      return targetUserId || '0'
+  }
+}
+
+const ReportPage = () => {
   const navigate = useNavigate()
+
+  // URL 파라미터에서 값들을 가져옵니다
+  const params = useParams<{
+    reportedUserId?: string
+    targetUserId?: string
+    fromPage?: string
+    targetItemId?: string
+    chatId?: string // 채팅방 신고용
+    profileId?: string // 프로필 신고용
+  }>()
+
+  // 채팅방 신고인지 확인 (URL에 chatId가 있으면 채팅방 신고)
+  const isChatReport = !!params.chatId
+  // 프로필 신고인지 확인 (URL에 profileId가 있으면 프로필 신고)
+  const isProfileReport = !!params.profileId
+
+  // 신고 유형에 따라 값들을 자동으로 설정
+  const reportedUserId = params.reportedUserId
+  const targetUserId = params.targetUserId
+  const fromPage = isChatReport
+    ? 'CHATROOM'
+    : isProfileReport
+      ? 'PROFILE'
+      : params.fromPage
+  const targetItemId = isChatReport
+    ? params.chatId
+    : isProfileReport
+      ? params.profileId
+      : params.targetItemId
 
   // 선택된 신고 사유들을 추적합니다
   const [selectedReports, setSelectedReports] = useState<string[]>([])
@@ -66,6 +132,9 @@ const ReportPage = ({
 
   // 모달 표시 상태
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // 신고 제출 중 상태 (중복 클릭 방지)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // 선택된 신고 사유 변경시 버튼 활성화 상태 업데이트
   useEffect(() => {
@@ -93,55 +162,71 @@ const ReportPage = ({
 
   // 신고하기 버튼 클릭 핸들러
   const handleReportSubmit = async () => {
-    if (selectedReports.length > 0) {
-      const reportReason = REPORT_REASON_MAP[selectedReports[0]] || 'ETC'
-      // fromPage 값을 ReportTarget 열거형으로 변환하는 함수
-      const mapFromPageToReportTarget = (
-        fromPage: string | undefined
-      ): string => {
-        switch (fromPage?.toLowerCase()) {
-          case 'matching':
-            return 'MATCHING'
-          case 'chatroom':
-            return 'CHATROOM'
-          case 'profile':
-            return 'PROFILE'
-          case 'magazine':
-            return 'MAGAZINE'
-          case 'review':
-            return 'REVIEW'
-          default:
-            return 'PROFILE' // 기본값
-        }
-      }
+    // 이미 제출 중이거나 신고 사유가 선택되지 않은 경우 리턴
+    if (isSubmitting || selectedReports.length === 0) {
+      return
+    }
 
-      // 요청 본문 구성
+    setIsSubmitting(true) // 제출 중 상태로 변경
+
+    try {
+      const reportReason = REPORT_REASON_MAP[selectedReports[0]] || 'OTHER'
+      const reportTarget = mapFromPageToReportTarget(fromPage)
+      const targetId = getTargetId(reportTarget, targetUserId, targetItemId)
+
+      // 백엔드 ReportRequest DTO 형식에 맞게 요청 본문 구성
       const body = {
-        reportedUserId: reportedUserId,
+        reportedUserId: parseInt(targetUserId || '0'), // 신고받는 사용자 ID (숫자로 변환)
         reportReason: reportReason,
         additionalComment: reportText,
-        reportTarget: mapFromPageToReportTarget(fromPage),
-        targetId: targetUserId,
+        reportTarget: reportTarget,
+        targetId: parseInt(targetId), // 숫자로 변환
       }
-      try {
-        const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/reports',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
+
+      //console.log('최종 전송할 요청 본문:', body)
+
+      const res = await fetchWithRefresh('https://mindmate.shop/api/reports', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // 인증 쿠키 전송
+        body: JSON.stringify(body),
+      })
+
+      if (!res.ok) {
+        const errorText = await res.text()
+        console.error('서버 응답 에러:', errorText)
+
+        try {
+          const errorData = JSON.parse(errorText)
+          // 중복 신고 에러 처리
+          if (errorData.error === 'DUPLICATE_REPORT') {
+            alert('이미 신고한 내용입니다.')
+            navigate(-1) // 중복 신고 시 이전 페이지로 이동
+            return
           }
-        )
-        if (!res.ok) {
-          throw new Error('신고 제출 실패')
+          // 기타 에러의 경우 메시지가 있으면 표시
+          if (errorData.message) {
+            alert(errorData.message)
+          } else {
+            alert('신고 제출에 실패했습니다. 다시 시도해주세요.')
+          }
+        } catch (parseError) {
+          // JSON 파싱 실패 시 기본 메시지
+          alert('신고 제출에 실패했습니다. 다시 시도해주세요.')
         }
-        setIsModalOpen(true)
-      } catch (error) {
-        console.error('신고 제출 실패:', error)
+        return
       }
+
+      // 성공 시 모달 표시
       setIsModalOpen(true)
+    } catch (error) {
+      console.error('신고 제출 실패:', error)
+      // 네트워크 에러 등의 경우
+      alert('신고 제출에 실패했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsSubmitting(false) // 제출 완료 후 상태 리셋
     }
   }
 
@@ -192,7 +277,7 @@ const ReportPage = ({
         <ReportButtonContainer>
           <ReportButton
             onActiveChange={handleReportSubmit}
-            isActivated={isButtonActivated}
+            isActivated={isButtonActivated && !isSubmitting} // 제출 중일 때는 비활성화
           />
         </ReportButtonContainer>
       </ContentContainer>
