@@ -43,7 +43,7 @@ const DetailReviewPage: React.FC = () => {
             profileId = user.profileId
           } else {
             const myProfileRes = await fetchWithRefresh(
-              `http://localhost/api/profiles/users/${user?.id}`,
+              `https://mindmate.shop/api/profiles/users/${user?.id}`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -55,7 +55,7 @@ const DetailReviewPage: React.FC = () => {
         } else {
           // 타인 프로필
           const otherRes = await fetchWithRefresh(
-            `http://localhost/api/profiles/users/${userId}`,
+            `https://mindmate.shop/api/profiles/users/${userId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -66,7 +66,7 @@ const DetailReviewPage: React.FC = () => {
         }
         // 리뷰 목록
         const reviewRes = await fetchWithRefresh(
-          `http://localhost/api/reviews/profile/${profileId}`,
+          `https://mindmate.shop/api/reviews/profile/${profileId}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -75,7 +75,7 @@ const DetailReviewPage: React.FC = () => {
         const reviewData = await reviewRes.json()
         setReviewsData(
           (reviewData.content || []).map((r: any) => ({
-            profileImage: 'http://localhost/api' + r.reviewerProfileImage,
+            profileImage: 'https://mindmate.shop/api' + r.reviewerProfileImage,
             username: r.reviewerNickname,
             rating: r.rating,
             date: r.createdAt
