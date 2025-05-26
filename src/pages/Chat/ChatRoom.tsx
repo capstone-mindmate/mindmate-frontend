@@ -1191,6 +1191,9 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                     >
                       <EmoticonWrapper>
                         <EmoticonComponent
+                          emoticonURL={
+                            'https://mindmate.shop/api' + message.emoticonUrl
+                          }
                           type={message.emoticonType}
                           size="large"
                           inChat={true}

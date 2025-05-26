@@ -20,6 +20,7 @@ interface EmoticonPickerProps {
 interface EmoticonData {
   id: string
   type: EmoticonType
+  imageUrl: string
 }
 
 function EmoticonPicker({
@@ -52,6 +53,7 @@ function EmoticonPicker({
           ? data.map((item) => ({
               id: item.id,
               type: item.name,
+              imageUrl: item.imageUrl,
             }))
           : []
         setAvailableEmoticons(emoticons)
@@ -94,6 +96,7 @@ function EmoticonPicker({
                 onClick={() => handleEmoticonClick(emoticon.id)}
               >
                 <Emoticon
+                  emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
                   type={emoticon.type}
                   size="medium"
                   alt={`${emoticon.type} 이모티콘`}
