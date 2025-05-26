@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import { BackIcon } from '../icon/iconComponents'
+
 interface ModalUserProfileProps {
   profileImage: string
   name: string
@@ -35,6 +36,16 @@ const profileStyles = {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    cursor: pointer; /* 클릭 가능 표시 */
+    transition: transform 0.2s ease; /* 호버 효과 */
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
   `,
 
   profileImageStyle: css`
@@ -115,15 +126,43 @@ export const ModalMatchingUserProfile = ({
   makeDate,
   onClick,
 }: ModalUserProfileProps) => {
+  // 프로필 이미지 클릭 핸들러
+  const handleProfileImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // 부모 요소의 클릭 이벤트 방지
+    if (onClick) {
+      onClick()
+    }
+  }
+
+  // 전체 컨테이너 클릭 핸들러 (기존 onClick 유지)
+  const handleContainerClick = () => {
+    if (onClick) {
+      onClick()
+    }
+  }
+
   return (
     <div
       className="container"
       css={profileStyles.container}
-      onClick={onClick}
+      onClick={handleContainerClick}
       style={{ cursor: onClick ? 'pointer' : undefined }}
+      data-testid="profile-container"
     >
-      <div className="profile-image" css={profileStyles.profileImageWrapper}>
-        <img src={profileImage} css={profileStyles.profileImageStyle} />
+      <div
+        className="profile-image"
+        css={profileStyles.profileImageWrapper}
+        onClick={handleProfileImageClick}
+        title={onClick ? `${name}의 프로필 보기` : undefined}
+        style={{
+          cursor: onClick ? 'pointer' : 'default',
+        }}
+      >
+        <img
+          src={profileImage}
+          css={profileStyles.profileImageStyle}
+          alt={`${name}의 프로필 이미지`}
+        />
       </div>
 
       <div className="info-wrapper" css={profileStyles.infoWrapper}>
@@ -145,12 +184,33 @@ export const ModalMatchingFailureUserProfile = ({
   department,
   onBackClick,
   showDetails,
+  onClick, // 프로필 클릭 핸들러 받기
 }: ModalUserProfileProps) => {
+  // 프로필 이미지 클릭 핸들러
+  const handleProfileImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // 부모 요소의 클릭 이벤트 방지
+    if (onClick) {
+      onClick()
+    }
+  }
+
   return (
     <div className="container" css={profileStyles.containerFailure}>
       <div className="leftBox" css={profileStyles.modalFailureLeftBox}>
-        <div className="profile-image" css={profileStyles.profileImageWrapper}>
-          <img src={profileImage} css={profileStyles.profileImageStyle} />
+        <div
+          className="profile-image"
+          css={profileStyles.profileImageWrapper}
+          onClick={handleProfileImageClick}
+          title={onClick ? `${name}의 프로필 보기` : undefined}
+          style={{
+            cursor: onClick ? 'pointer' : 'default',
+          }}
+        >
+          <img
+            src={profileImage}
+            css={profileStyles.profileImageStyle}
+            alt={`${name}의 프로필 이미지`}
+          />
         </div>
 
         <div className="info-wrapper" css={profileStyles.infoWrapper}>
@@ -167,6 +227,7 @@ export const ModalMatchingFailureUserProfile = ({
         <BackIcon
           css={profileStyles.backIcon(showDetails)}
           onClick={onBackClick}
+          data-testid="back-icon"
         />
       </div>
     </div>

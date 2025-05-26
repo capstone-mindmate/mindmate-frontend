@@ -367,6 +367,14 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
     setCreatorProfile(null)
   }
 
+  const handleProfileClick = (userId: number, isAnonymous: boolean = false) => {
+    if (!isAnonymous && userId) {
+      navigate(`/mypage/${userId}`)
+    } else {
+      showToast('익명 사용자의 프로필은 볼 수 없습니다.', 'error')
+    }
+  }
+
   const handleMatchingCancelRequest = async () => {
     if (!selectedApplication) return
 
@@ -443,6 +451,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
             onMessageChange: () => {},
             messageValue: '',
           }}
+          onProfileClick={() => {}}
         />
       )
     }
@@ -472,6 +481,9 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
             onMessageChange: () => {},
             messageValue: selectedApplication.message || '',
           }}
+          onProfileClick={() =>
+            handleProfileClick(creatorProfile.userId, matchingDetail.anonymous)
+          }
         />
       )
     }
@@ -498,6 +510,12 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
           onMessageChange: () => {},
           messageValue: selectedApplication.message || '',
         }}
+        onProfileClick={() =>
+          handleProfileClick(
+            selectedApplication.creatorId,
+            selectedApplication.anonymous
+          )
+        }
       />
     )
   }

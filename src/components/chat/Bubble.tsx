@@ -20,6 +20,7 @@ interface BubbleProps {
   isLastMessage?: boolean
   isRead?: boolean
   isContinuous?: boolean
+  onProfileClick?: () => void // 프로필 클릭 핸들러 추가
 }
 
 const Bubble: React.FC<BubbleProps> = ({
@@ -31,7 +32,16 @@ const Bubble: React.FC<BubbleProps> = ({
   isLastMessage = false,
   isRead = false,
   isContinuous = false,
+  onProfileClick, // 프로필 클릭 핸들러 받기
 }) => {
+  // 프로필 이미지 클릭 핸들러
+  const handleProfileImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // 부모 요소의 클릭 이벤트 방지
+    if (onProfileClick) {
+      onProfileClick()
+    }
+  }
+
   const checkForEmoticon = (child: React.ReactNode): boolean => {
     // React 요소인지 확인
     if (!React.isValidElement(child)) return false
@@ -73,6 +83,11 @@ const Bubble: React.FC<BubbleProps> = ({
           <ProfileImage
             src={profileImage}
             alt="프로필"
+            onClick={handleProfileImageClick} // 클릭 이벤트 추가
+            style={{
+              cursor: onProfileClick ? 'pointer' : 'default', // 클릭 가능할 때만 포인터 커서
+            }}
+            title={onProfileClick ? '프로필 보기' : undefined} // 툴팁 추가
             onError={(e) => {
               console.error('프로필 이미지 로드 실패:', profileImage)
               // 기본 이미지로 대체

@@ -94,6 +94,10 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
     handleOpenModal(application)
   }
 
+  const handleProfileClick = (userId: number) => {
+    navigate(`/mypage/${userId}`)
+  }
+
   const handleMatchingRequest = async () => {
     if (!selectedApplication || !matchedRoom) return
 
@@ -149,6 +153,9 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
           onMessageChange: () => {},
           messageValue: selectedApplication.message,
         }}
+        onProfileClick={() =>
+          handleProfileClick(selectedApplication.waitingUserId)
+        }
       />
     )
   }
@@ -179,6 +186,9 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
                 onClick={() => handleMatchApplicationClick(application)}
                 message={application.message}
                 borderSet={index < applications.length - 1}
+                onProfileClick={() =>
+                  handleProfileClick(application.waitingUserId)
+                }
               />
             ))
           ) : (

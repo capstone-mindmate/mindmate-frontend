@@ -37,7 +37,7 @@ interface ModalComponentProps {
     size: string
     price: number
   }
-  onProfileClick?: () => void
+  onProfileClick?: () => void // 프로필 클릭 핸들러
   onAccept?: () => void
   onReject?: () => void
 }
@@ -67,7 +67,7 @@ const ModalComponent = ({
     size: 'xlarge',
     price: 10,
   },
-  onProfileClick,
+  onProfileClick, // 프로필 클릭 핸들러 받기
   onAccept,
   onReject,
 }: ModalComponentProps) => {
@@ -389,6 +389,7 @@ const ModalComponent = ({
                   showDetails ? setShowDetails(false) : setShowDetails(true)
                 }}
                 showDetails={showDetails}
+                onClick={onProfileClick}
               />
             </div>
 
@@ -472,6 +473,7 @@ const ModalComponent = ({
                 name={userProfileProps.name}
                 department={userProfileProps.department}
                 makeDate={userProfileProps.makeDate}
+                onClick={onProfileClick}
               />
             </div>
           </div>
@@ -509,6 +511,7 @@ const ModalComponent = ({
                   showDetails ? setShowDetails(false) : setShowDetails(true)
                 }}
                 showDetails={showDetails}
+                onClick={onProfileClick}
               />
             </div>
 
@@ -591,6 +594,7 @@ const ModalComponent = ({
                   showDetails ? setShowDetails(false) : setShowDetails(true)
                 }}
                 showDetails={showDetails}
+                onClick={onProfileClick}
               />
             </div>
 
