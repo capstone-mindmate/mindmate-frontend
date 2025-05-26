@@ -54,6 +54,14 @@ interface PopularMagazine {
   updatedAt: string
 }
 
+interface CardNews {
+  title: string
+  article_types: string[]
+  article_url: string
+  image_urls: string[]
+  upload_date: string
+}
+
 // 인기 이모티콘 데이터 인터페이스 정의
 interface PopularEmoticon {
   id: number
@@ -72,6 +80,7 @@ const HomePage = () => {
   const [popularEmoticons, setPopularEmoticons] = useState<PopularEmoticon[]>(
     []
   )
+  const [cardNews, setCardNews] = useState<CardNews[]>([])
 
   // 인기 매거진 데이터 가져오기
   useEffect(() => {
@@ -167,12 +176,23 @@ const HomePage = () => {
 
   // 학생 소식 가져오기
   useEffect(() => {
-    // const fetchRecommendedEmoticons = async () => {
-    //   const res = await fetchWithRefresh('https://mindmate.shop/api/emoticons/available', {
-    //     method: 'GET',
-    //   })
-    // }
-    // fetchRecommendedEmoticons();
+    const fetchRecommendedEmoticons = async () => {
+      const res = await fetchWithRefresh('https://mindmate.shop/forstudent', {
+        method: 'GET',
+      })
+
+      if (!res.ok) {
+        throw new Error(`API 호출 실패: ${res.status} ${res.statusText}`)
+      }
+
+      const data = await res.json()
+
+      setCardNews(data)
+
+      console.log(cardNews)
+    }
+
+    fetchRecommendedEmoticons()
   }, [])
 
   // 알람 아이콘 클릭 핸들러
@@ -354,48 +374,20 @@ const HomePage = () => {
 
             {/* 카드 뉴스 컴포넌트 영역 */}
             <CardNewsScrollContainer>
-              <ClickableCard
-                onClick={() =>
-                  handleCardNewsClick(
-                    'https://github.com/capstone-mindmate/mindmate-frontend'
-                  )
-                }
-              >
-                <CardNewsComponent
-                  imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
-                  title="슬기로운 방학생활"
-                  organization="인권센터 학생상담소"
-                  date="2025-01-16"
-                />
-              </ClickableCard>
-              <ClickableCard
-                onClick={() =>
-                  handleCardNewsClick(
-                    'https://github.com/capstone-mindmate/mindmate-frontend'
-                  )
-                }
-              >
-                <CardNewsComponent
-                  imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
-                  title="나의 솔로해방 일지"
-                  organization="인권센터 학생상담소"
-                  date="2025-01-15"
-                />
-              </ClickableCard>
-              <ClickableCard
-                onClick={() =>
-                  handleCardNewsClick(
-                    'https://github.com/capstone-mindmate/mindmate-frontend'
-                  )
-                }
-              >
-                <CardNewsComponent
-                  imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
-                  title="스트레스 관리 방법"
-                  organization="인권센터 학생상담소"
-                  date="2025-01-10"
-                />
-              </ClickableCard>
+              {cardNews
+                .filter((news) => news.title.trim() !== '')
+                .map((news) => (
+                  <ClickableCard
+                    onClick={() => handleCardNewsClick(news.article_url)}
+                  >
+                    <CardNewsComponent
+                      imgUrl={news.image_urls[0]}
+                      title={news.title}
+                      organization="인권센터 학생상담소"
+                      date={news.upload_date}
+                    />
+                  </ClickableCard>
+                ))}
             </CardNewsScrollContainer>
           </PlainSectionContainer>
 
