@@ -27,6 +27,7 @@ import {
 import FloatingButton from '../../components/buttons/floatingButton'
 import { getTokenCookie } from '../../utils/fetchWithRefresh'
 import { FrameData } from './FrameSlider'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 // 매거진 데이터 인터페이스 정의
 interface MagazineContent {
@@ -53,6 +54,21 @@ interface PopularMagazine {
   updatedAt: string
 }
 
+interface CardNews {
+  title: string
+  article_types: string[]
+  article_url: string
+  image_urls: string[]
+  upload_date: string
+}
+
+// 인기 이모티콘 데이터 인터페이스 정의
+interface PopularEmoticon {
+  id: number
+  name: string
+  imageUrl: string
+}
+
 const HomePage = () => {
   const navigate = useNavigate()
   const [popularMagazines, setPopularMagazines] = useState<PopularMagazine[]>(
@@ -61,6 +77,10 @@ const HomePage = () => {
   const [magazineFrames, setMagazineFrames] = useState<FrameData[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const [popularEmoticons, setPopularEmoticons] = useState<PopularEmoticon[]>(
+    []
+  )
+  const [cardNews, setCardNews] = useState<CardNews[]>([])
 
   // 인기 매거진 데이터 가져오기
   useEffect(() => {
@@ -76,7 +96,7 @@ const HomePage = () => {
         const apiUrl = `https://mindmate.shop/api/magazines/popular?limit=5`
 
         // API 호출
-        const response = await fetch(apiUrl, {
+        const response = await fetchWithRefresh(apiUrl, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -122,6 +142,58 @@ const HomePage = () => {
 
     fetchPopularMagazines()
   }, []) // 컴포넌트 마운트 시 한 번만 실행
+
+  // 현재 이모티콘 목록 가져오기
+  useEffect(() => {
+    const fetchRecommendedEmoticons = async () => {
+      try {
+        const res = await fetchWithRefresh(
+          'https://mindmate.shop/api/emoticons/popular/used',
+          {
+            method: 'GET',
+          }
+        )
+
+        if (!res.ok) {
+          throw new Error(`API 호출 실패: ${res.status} ${res.statusText}`)
+        }
+
+        const data = await res.json()
+
+        setPopularEmoticons(data)
+      } catch (error) {
+        console.error('인기 이모티콘 조회 오류:', error)
+        setError(
+          error instanceof Error
+            ? error.message
+            : '인기 이모티콘 목록을 불러오는 중 오류가 발생했습니다'
+        )
+      }
+    }
+
+    fetchRecommendedEmoticons()
+  }, [])
+
+  // 학생 소식 가져오기
+  useEffect(() => {
+    const fetchRecommendedEmoticons = async () => {
+      const res = await fetchWithRefresh('https://mindmate.shop/forstudent', {
+        method: 'GET',
+      })
+
+      if (!res.ok) {
+        throw new Error(`API 호출 실패: ${res.status} ${res.statusText}`)
+      }
+
+      const data = await res.json()
+
+      setCardNews(data)
+
+      console.log(cardNews)
+    }
+
+    fetchRecommendedEmoticons()
+  }, [])
 
   // 알람 아이콘 클릭 핸들러
   const handleAlarmClick = () => {
@@ -281,26 +353,14 @@ const HomePage = () => {
 
           {/* 이모티콘 그리드 */}
           <EmoticonGrid>
-            <Emoticon
-              type="normal"
-              size="medium"
-              onClick={() => handleEmoticonClick('normal')}
-            />
-            <Emoticon
-              type="love"
-              size="medium"
-              onClick={() => handleEmoticonClick('love')}
-            />
-            <Emoticon
-              type="couple"
-              size="medium"
-              onClick={() => handleEmoticonClick('couple')}
-            />
-            <Emoticon
-              type="talking"
-              size="medium"
-              onClick={() => handleEmoticonClick('talking')}
-            />
+            {popularEmoticons.map((emoticon) => (
+              <Emoticon
+                emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+                type={emoticon.name as any}
+                size="medium"
+                onClick={() => handleEmoticonClick(emoticon.name as any)}
+              />
+            ))}
           </EmoticonGrid>
 
           {/* 지금 필요한 학생소식 섹션 */}
@@ -314,48 +374,20 @@ const HomePage = () => {
 
             {/* 카드 뉴스 컴포넌트 영역 */}
             <CardNewsScrollContainer>
-              <ClickableCard
-                onClick={() =>
-                  handleCardNewsClick(
-                    'https://github.com/capstone-mindmate/mindmate-frontend'
-                  )
-                }
-              >
-                <CardNewsComponent
-                  imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
-                  title="슬기로운 방학생활"
-                  organization="인권센터 학생상담소"
-                  date="2025-01-16"
-                />
-              </ClickableCard>
-              <ClickableCard
-                onClick={() =>
-                  handleCardNewsClick(
-                    'https://github.com/capstone-mindmate/mindmate-frontend'
-                  )
-                }
-              >
-                <CardNewsComponent
-                  imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
-                  title="나의 솔로해방 일지"
-                  organization="인권센터 학생상담소"
-                  date="2025-01-15"
-                />
-              </ClickableCard>
-              <ClickableCard
-                onClick={() =>
-                  handleCardNewsClick(
-                    'https://github.com/capstone-mindmate/mindmate-frontend'
-                  )
-                }
-              >
-                <CardNewsComponent
-                  imgUrl="https://ascc.ajou.ac.kr/_attach/ajou/editor-image/2024/12/JdgawSPIUDxxxGOibddSJULmkn.jpg"
-                  title="스트레스 관리 방법"
-                  organization="인권센터 학생상담소"
-                  date="2025-01-10"
-                />
-              </ClickableCard>
+              {cardNews
+                .filter((news) => news.title.trim() !== '')
+                .map((news) => (
+                  <ClickableCard
+                    onClick={() => handleCardNewsClick(news.article_url)}
+                  >
+                    <CardNewsComponent
+                      imgUrl={news.image_urls[0]}
+                      title={news.title}
+                      organization="인권센터 학생상담소"
+                      date={news.upload_date}
+                    />
+                  </ClickableCard>
+                ))}
             </CardNewsScrollContainer>
           </PlainSectionContainer>
 

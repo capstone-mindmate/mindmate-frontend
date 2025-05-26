@@ -207,6 +207,7 @@ const EmoticonHome = () => {
             {shopEmoticons.map((emoticon) => (
               <EmotionWrapper key={emoticon.id}>
                 <Emoticon
+                  emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
                   type={emoticon.name as any}
                   size="large"
                   onClick={() => handleEmoticonClick(emoticon.name)}
@@ -223,7 +224,11 @@ const EmoticonHome = () => {
           <OwnedEmoticonList>
             {ownedEmoticons.map((emoticon) => (
               <EmotionWrapper key={emoticon.id}>
-                <Emoticon type={emoticon.name as any} size="large" />
+                <Emoticon
+                  emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+                  type={emoticon.name as any}
+                  size="large"
+                />
               </EmotionWrapper>
             ))}
           </OwnedEmoticonList>

@@ -30,6 +30,7 @@ interface EmoticonProps {
   className?: string
   alt?: string
   inChat?: boolean
+  emoticonURL?: string
 }
 
 const Emoticon: React.FC<EmoticonProps> = ({
@@ -39,9 +40,13 @@ const Emoticon: React.FC<EmoticonProps> = ({
   className,
   alt = '이모티콘',
   inChat = false,
+  emoticonURL,
 }) => {
   // 이모티콘 이미지 경로
   const getEmoticonSrc = (): string => {
+    if (emoticonURL) {
+      return emoticonURL
+    }
     // 이미지 경로 매핑
     switch (type) {
       case 'normal':
