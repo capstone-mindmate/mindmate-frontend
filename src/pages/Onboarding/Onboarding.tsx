@@ -2,8 +2,6 @@
 import { css } from '@emotion/react'
 import { useState, useEffect, TouchEvent, MouseEvent } from 'react'
 import Emoticon from '../../components/emoticon/Emoticon'
-import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
-import { GoogleOAuthProvider } from '@react-oauth/google'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import {
   pageContainerStyle,
@@ -29,9 +27,6 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { setTokenCookie } from '../../utils/fetchWithRefresh'
 import { useAuthStore } from '../../stores/userStore'
-
-const clientId =
-  '886143898358-4cja76nlu7mp5upid042la3k3vovnd8p.apps.googleusercontent.com'
 
 // 반응형을 위한 화면 크기 감지 hook
 const useWindowSize = () => {
@@ -98,114 +93,67 @@ function OnboardingContent() {
     },
   ]
 
-  const TEMP_PASSWORD = '@Test1234!'
+  // URL에서 토큰 추출하는 함수
+  const extractTokensFromURL = () => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const token = urlParams.get('token')
+    const refreshToken = urlParams.get('refreshToken')
 
-  // 구글 로그인 성공 시 서버에 access_token 전달
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      // 1. 구글 유저 정보 가져오기 (여기는 credentials 필요 없음)
-      const googleUserInfo = await fetch(
-        'https://www.googleapis.com/oauth2/v3/userinfo',
-        {
-          headers: {
-            Authorization: `Bearer ${tokenResponse.access_token}`,
-          },
-        }
-      ).then((res) => res.json())
+    if (token && refreshToken) {
+      // 토큰을 쿠키에 저장
+      setTokenCookie(token, 'accessToken')
+      setTokenCookie(refreshToken, 'refreshToken')
 
-      // 2. 회원가입 시도 (credentials: 'include')
-      const registerRes = await fetch(
-        'https://mindmate.shop/api/auth/register',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            email: googleUserInfo.email,
-            password: TEMP_PASSWORD,
-            confirmPassword: TEMP_PASSWORD,
-            agreeToTerm: true,
-          }),
-        }
-      ).then((res) => res.json())
+      // 사용자 정보 가져오기
+      fetchUserInfo(token)
 
-      // 3. 로그인 시도 (credentials: 'include')
-      const loginRes = await fetch('https://mindmate.shop/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      // URL에서 토큰 파라미터 제거
+      const newUrl = window.location.pathname
+      window.history.replaceState({}, document.title, newUrl)
+    }
+  }
+
+  // 사용자 정보 가져오기
+  const fetchUserInfo = async (accessToken: string) => {
+    try {
+      const response = await fetch('https://mindmate.shop/api/user/me', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
         credentials: 'include',
-        body: JSON.stringify({
-          email: googleUserInfo.email,
-          password: TEMP_PASSWORD,
-          fcmToken: '',
-        }),
       })
 
-      if (loginRes.ok) {
-        loginRes.json().then(async (data) => {
-          if (data.accessToken && data.refreshToken) {
-            // 프로필 입력 안한 사용자
-            if (data.currentRole == 'ROLE_USER') {
-              setTokenCookie(data.accessToken, 'accessToken')
-              setTokenCookie(data.refreshToken, 'refreshToken')
-              navigate('/register')
-            }
-            //프로필 입력 한 사용자
-            else if (data.currentRole == 'ROLE_PROFILE') {
-              setTokenCookie(data.accessToken, 'accessToken')
-              setTokenCookie(data.refreshToken, 'refreshToken')
-
-              const res = await fetchWithRefresh(
-                `https://mindmate.shop/api/profiles`,
-                {
-                  method: 'GET',
-                  headers: { 'Content-Type': 'application/json' },
-                }
-              )
-              const ProfileData = await res.json()
-              if (!res.ok) throw new Error(res.statusText)
-
-              setUser(ProfileData)
-
-              navigate('/home')
-            }
-            // 어드민 일때
-            else if (data.currentRole == 'ROLE_ADMIN') {
-              setTokenCookie(data.accessToken, 'accessToken')
-              setTokenCookie(data.refreshToken, 'refreshToken')
-
-              const res = await fetchWithRefresh(
-                `https://mindmate.shop/api/profiles`,
-                {
-                  method: 'GET',
-                  headers: { 'Content-Type': 'application/json' },
-                }
-              )
-              const ProfileData = await res.json()
-              if (!res.ok) throw new Error('프로필 생성 실패')
-
-              setUser(ProfileData)
-
-              navigate('/home')
-            }
-            //정지된 사용자
-            else if (data.currentRole == 'ROLE_SUSPENDED') {
-              navigate('/onboarding')
-            }
-          }
-        })
+      if (response.ok) {
+        const userData = await response.json()
+        setUser(userData)
+        navigate('/home', { replace: true })
+      } else {
+        console.error('사용자 정보 가져오기 실패:', response.status)
+        alert('사용자 정보를 가져오는데 실패했습니다.')
       }
-    },
-    onError: (errorResponse) => {
-      alert('구글 로그인에 실패했습니다.')
-      console.error(errorResponse)
-    },
-    flow: 'implicit',
-  })
+    } catch (error) {
+      console.error('사용자 정보 가져오기 중 오류 발생:', error)
+      alert('사용자 정보를 가져오는 중 오류가 발생했습니다.')
+    }
+  }
+
+  // 구글 로그인 처리
+  const handleGoogleLogin = () => {
+    // 직접 OAuth URL로 이동
+    // 백엔드에서 인증 완료 후 프론트엔드로 토큰과 함께 리디렉션해야 함
+    window.location.href = 'https://mindmate.shop/api/oauth2/authorize/google'
+  }
 
   // ProgressBar 관련 기능 구현
   useEffect(() => {
     setIsInitialized(true)
+  }, [])
+
+  // 컴포넌트 마운트 시 URL에서 토큰 추출
+  useEffect(() => {
+    extractTokensFromURL()
   }, [])
 
   useEffect(() => {
@@ -388,7 +336,7 @@ function OnboardingContent() {
             <div css={buttonContainerStyle}>
               <button
                 css={googleButtonStyle}
-                onClick={() => googleLogin()}
+                onClick={handleGoogleLogin}
                 type="button"
               >
                 <img
@@ -407,11 +355,7 @@ function OnboardingContent() {
 }
 
 const OnboardingPage = () => {
-  return (
-    <GoogleOAuthProvider clientId={clientId}>
-      <OnboardingContent />
-    </GoogleOAuthProvider>
-  )
+  return <OnboardingContent />
 }
 
 export default OnboardingPage

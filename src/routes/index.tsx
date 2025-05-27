@@ -29,6 +29,7 @@ import TermsOfUse from '../pages/Register/steps/TermsOfUse'
 import WithdrawMindMate from '../pages/Profile/WithdrawMindMate'
 import CustomFormMake from '../pages/Chat/CustomFormMake'
 import CustomFormView from '../pages/Chat/CustomFormView'
+import Auth from '../pages/Onboarding/Auth.tsx'
 
 import ChatHome from '../pages/Chat/ChatHome'
 import ChatRoom from '../pages/Chat/ChatRoom'
@@ -158,6 +159,10 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <Navigate to="/home" replace />,
+  },
+  {
+    path: '/auth',
+    element: <Auth />,
   },
   {
     path: '/register',
