@@ -47,6 +47,8 @@ interface AuthStore {
   hydrated: boolean
   setHydrated: (hydrated: boolean) => void
   restoreUserFromStorage: () => void
+  setUserEmail: (email: string) => void
+  getUserEmail: () => string | undefined
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -62,6 +64,14 @@ export const useAuthStore = create<AuthStore>()(
       hydrated: false,
       setHydrated: (hydrated: boolean) => {
         set({ hydrated })
+      },
+      setUserEmail: (email: string) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, email } : null,
+        }))
+      },
+      getUserEmail: () => {
+        return get().user?.email
       },
       restoreUserFromStorage: () => {
         const raw = localStorage.getItem('auth-store')

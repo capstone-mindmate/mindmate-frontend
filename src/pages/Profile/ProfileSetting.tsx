@@ -17,8 +17,10 @@ interface ProfileSettingProps {}
 
 const ProfileSetting = ({}: ProfileSettingProps) => {
   const navigate = useNavigate()
-  const { user, clearUser } = useAuthStore()
+  const { user, clearUser, getUserEmail } = useAuthStore()
   const [toggleState, setToggleState] = useState(false)
+
+  console.log(getUserEmail())
 
   const handleTogglePush = () => {
     setToggleState(!toggleState)
