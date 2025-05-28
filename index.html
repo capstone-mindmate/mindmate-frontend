@@ -11,17 +11,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-          .getRegistrations()
-          .then(function (registrations) {
-            for (let registration of registrations) {
-              registration.unregister()
-            }
-          })
-      }
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

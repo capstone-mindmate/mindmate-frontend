@@ -31,7 +31,7 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         runtimeCaching: [
           {
-            urlPattern: /^\/api\//,
+            urlPattern: new RegExp('^/api/'),
             handler: 'NetworkOnly',
             method: 'GET',
           },
