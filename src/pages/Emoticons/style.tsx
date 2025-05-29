@@ -94,7 +94,7 @@ export const EmotionWrapper = styled.div`
 
 export const TopItemContainer = styled.div`
   width: 100%;
-  margin-top: 70px;
+  margin-top: 28px;
   margin-bottom: 25px;
 `
 

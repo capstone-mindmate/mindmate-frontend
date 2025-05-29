@@ -214,11 +214,15 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       return
     }
 
+    // 초기 로드는 true로
+    fetchMessages(true)
+    fetchEmoticons()
+
     if (!stompClient || !isConnected) {
       setIsRoomConnected(false)
       // 웹소켓 연결이 안되어도 초기 메시지는 REST API로 로드
-      fetchMessages()
-      fetchEmoticons()
+      // fetchMessages()
+      // fetchEmoticons()
       return
     }
 
@@ -305,12 +309,19 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       })
       subscriptionsRef.current = []
     }
+    // 웹소켓 연결 후 동기화는 false로 (로딩 표시 안함)
+    fetchMessages(false)
   }, [chatId, stompClient, isConnected, myUserId])
 
   // 초기 메시지 로드 - REST API 사용 (백오프 전략 구현)
-  const fetchMessages = async () => {
+  const fetchMessages = async (isInitialLoad = false) => {
     if (!chatId) return
-    setIsLoadingMessages(true)
+
+    // 초기 로드이고 메시지가 없을 때만 로딩 표시
+    if (isInitialLoad && messages.length === 0) {
+      setIsLoadingMessages(true)
+    }
+
     loadAttemptRef.current += 1
 
     try {
@@ -340,11 +351,38 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         throw new Error(`메시지 목록을 불러오지 못했습니다. (${res.status})`)
       }
 
-      const data = await res.json()
+      // 응답이 JSON인지 확인
+      const contentType = res.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('서버가 JSON이 아닌 응답을 반환했습니다:', contentType)
+        throw new Error('인증이 필요하거나 서버 오류가 발생했습니다.')
+      }
 
-      setMessages(
-        Array.isArray(data.messages) ? data.messages.map(parseMessage) : []
-      )
+      const data = await res.json()
+      const newMessages = Array.isArray(data.messages)
+        ? data.messages.map(parseMessage)
+        : []
+
+      //기존 메시지와 스마트 병합
+      setMessages((prev) => {
+        if (prev.length === 0) {
+          // 기존 메시지가 없으면 새 메시지로 설정
+          return newMessages
+        } else {
+          // 기존 메시지가 있으면 중복 제거하고 병합
+          const existingIds = new Set(prev.map((m) => m.id))
+          const uniqueNewMessages = newMessages.filter(
+            (m) => !existingIds.has(m.id)
+          )
+
+          // 시간 순으로 정렬하여 반환
+          return [...prev, ...uniqueNewMessages].sort(
+            (a, b) =>
+              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          )
+        }
+      })
+
       loadAttemptRef.current = 0
       setErrorMessage(null)
 
@@ -380,13 +418,17 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     } catch (e) {
       const error = e as Error
       console.error('메시지 조회 실패:', error)
-      if (loadAttemptRef.current < 3) {
-        setTimeout(() => fetchMessages(), 1000 * loadAttemptRef.current)
+      if (loadAttemptRef.current < 8) {
+        // 3번 -> 8번
+        setTimeout(() => fetchMessages(), 2000 * loadAttemptRef.current)
       } else {
-        setErrorMessage(error.message)
+        loadAttemptRef.current = 0 // 리셋하여 나중에 다시 시도 가능하게
       }
     } finally {
-      setIsLoadingMessages(false)
+      // 초기 로드일 때만 로딩 상태 해제
+      if (isInitialLoad) {
+        setIsLoadingMessages(false)
+      }
     }
   }
 
@@ -1107,51 +1149,8 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           <LoadingText>사용자 정보 로딩 중...</LoadingText>
         ) : isLoadingMessages ? (
           <LoadingText>채팅 내용을 불러오는 중...</LoadingText>
-        ) : errorMessage ? (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '40px 20px',
-              color: '#e74c3c',
-            }}
-          >
-            <div>{errorMessage}</div>
-            <button
-              onClick={handleRetry}
-              style={{
-                marginTop: '16px',
-                padding: '8px 16px',
-                backgroundColor: '#392111',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              다시 시도
-            </button>
-          </div>
         ) : (
           <>
-            {isLoadingPrev && (
-              <div
-                style={{ textAlign: 'center', padding: '8px', color: '#888' }}
-              >
-                이전 메시지 불러오는 중...
-              </div>
-            )}
-            {!hasMorePrev && messages.length > 0 && (
-              <div
-                style={{
-                  textAlign: 'center',
-                  padding: '8px',
-                  color: '#aaa',
-                  fontSize: '13px',
-                }}
-              >
-                더 이상 불러올 메시지가 없습니다.
-              </div>
-            )}
             {messages.map((message: any, index) => {
               // 상대방 프로필 이미지 추출
               const otherProfileImage =
@@ -1620,6 +1619,18 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
               </Bubble>
             )}
             <div ref={chatEndRef} />
+            {/* 메시지가 없을 때만 안내 메시지 */}
+            {messages.length === 0 && !isLoadingMessages && (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '40px 20px',
+                  color: '#888',
+                }}
+              >
+                채팅 내용을 불러오는 중입니다...
+              </div>
+            )}
           </>
         )}
       </ChatContainer>
