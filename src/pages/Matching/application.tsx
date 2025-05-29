@@ -35,9 +35,11 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
   const [applications, setApplications] = useState<WaitingUser[]>([])
   const [matchedRoom, setMatchedRoom] = useState(item || null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] =
     useState<WaitingUser | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const { showToast } = useToast()
 
   useEffect(() => {
@@ -90,6 +92,14 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
     setIsModalOpen(false)
   }
 
+  const handleOpenDeleteModal = () => {
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+  }
+
   const handleMatchApplicationClick = (application: WaitingUser) => {
     handleOpenModal(application)
   }
@@ -121,6 +131,34 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
       navigate('/matching')
     } catch (error: any) {
       showToast(error.message, 'error')
+    }
+  }
+
+  const handleDeleteMatchingRoom = async () => {
+    if (!matchedRoom) return
+
+    setIsDeleting(true)
+    try {
+      const res = await fetchWithRefresh(
+        `https://mindmate.shop/api/matchings/${matchedRoom.id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message || '매칭방 삭제에 실패했습니다.')
+      }
+
+      showToast('매칭방이 삭제되었습니다.', 'success')
+      navigate('/matching/matched')
+    } catch (error: any) {
+      showToast(error.message, 'error')
+    } finally {
+      setIsDeleting(false)
+      setIsDeleteModalOpen(false)
     }
   }
 
@@ -160,13 +198,43 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
     )
   }
 
+  const renderDeleteModal = () => {
+    if (!isDeleteModalOpen) return null
+
+    return (
+      <ModalComponent
+        modalType="매칭방삭제"
+        buttonText={isDeleting ? '삭제 중...' : '삭제하기'}
+        buttonClick={handleDeleteMatchingRoom}
+        onClose={handleCloseDeleteModal}
+        isOpen={isDeleteModalOpen}
+        onReject={handleCloseDeleteModal}
+        userProfileProps={{
+          profileImage: '',
+          name: '',
+          department: '',
+          makeDate: '',
+        }}
+        matchingInfoProps={{
+          title: '매칭방 삭제',
+          description: '이 매칭방을 삭제하시겠습니까?',
+        }}
+        messageProps={{
+          onMessageChange: () => {},
+          messageValue: '',
+        }}
+      />
+    )
+  }
+
   return (
     <RootContainer>
       <TopBar
         title="매칭 신청 정보"
         showBackButton
-        actionText=""
+        actionText="삭제"
         onBackClick={() => navigate('/matching/matched')}
+        onActionClick={handleOpenDeleteModal}
       />
       <MatchingContainer>
         <ApplicationList pageType="matched">
@@ -200,6 +268,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
       </MatchingContainer>
 
       {renderModal()}
+      {renderDeleteModal()}
     </RootContainer>
   )
 }
