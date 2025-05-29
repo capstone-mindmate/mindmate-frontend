@@ -74,15 +74,18 @@ const DetailReviewPage: React.FC = () => {
         )
         const reviewData = await reviewRes.json()
         setReviewsData(
-          (reviewData.content || []).map((r: any) => ({
-            profileImage: 'https://mindmate.shop/api' + r.reviewerProfileImage,
-            username: r.reviewerNickname,
-            rating: r.rating,
-            date: r.createdAt
-              ? r.createdAt.slice(2, 10).replace(/-/g, '.')
-              : '',
-            content: r.comment,
-          }))
+          (reviewData.content || [])
+            .filter((r: any) => r.comment !== '')
+            .map((r: any) => ({
+              profileImage:
+                'https://mindmate.shop/api' + r.reviewerProfileImage,
+              username: r.reviewerNickname,
+              rating: r.rating,
+              date: r.createdAt
+                ? r.createdAt.slice(2, 10).replace(/-/g, '.')
+                : '',
+              content: r.comment,
+            }))
         )
       } catch (e) {
         setReviewsData([])

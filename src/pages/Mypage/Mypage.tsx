@@ -137,16 +137,18 @@ const MyPage = () => {
 
           // 상세 리뷰 (응답의 reviews 배열 활용)
           setUserReviews(
-            (reveiwListData.content || []).map((r: any) => ({
-              profileImage:
-                'https://mindmate.shop/api' + r.reviewerProfileImage,
-              username: r.reviewerNickname,
-              rating: r.rating,
-              date: r.createdAt
-                ? r.createdAt.slice(2, 10).replace(/-/g, '.')
-                : '',
-              content: r.comment,
-            }))
+            (reveiwListData.content || [])
+              .filter((r: any) => r.comment !== '')
+              .map((r: any) => ({
+                profileImage:
+                  'https://mindmate.shop/api' + r.reviewerProfileImage,
+                username: r.reviewerNickname,
+                rating: r.rating,
+                date: r.createdAt
+                  ? r.createdAt.slice(2, 10).replace(/-/g, '.')
+                  : '',
+                content: r.comment,
+              }))
           )
         } else {
           // 타인 프로필 (상대방 userId)
@@ -218,16 +220,18 @@ const MyPage = () => {
 
           // 상세 리뷰 (응답의 reviews 배열 활용)
           setUserReviews(
-            (reveiwListData.content || []).map((r: any) => ({
-              profileImage:
-                'https://mindmate.shop/api' + r.reviewerProfileImage,
-              username: r.reviewerNickname,
-              rating: r.rating,
-              date: r.createdAt
-                ? r.createdAt.slice(2, 10).replace(/-/g, '.')
-                : '',
-              content: r.comment,
-            }))
+            (reveiwListData.content || [])
+              .filter((r: any) => r.comment !== '')
+              .map((r: any) => ({
+                profileImage:
+                  'https://mindmate.shop/api' + r.reviewerProfileImage,
+                username: r.reviewerNickname,
+                rating: r.rating,
+                date: r.createdAt
+                  ? r.createdAt.slice(2, 10).replace(/-/g, '.')
+                  : '',
+                content: r.comment,
+              }))
           )
         }
       } catch (e) {
