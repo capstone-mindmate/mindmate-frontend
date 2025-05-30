@@ -9,8 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       strategies: 'injectManifest',
-      srcDir: 'src',
-      filename: 'custom-sw.js',
+      filename: 'custom-service-worker.js',
       registerType: 'autoUpdate',
       manifest: {
         name: 'My App',
