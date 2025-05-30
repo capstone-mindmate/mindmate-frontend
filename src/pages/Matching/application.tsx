@@ -125,10 +125,30 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
         throw new Error(errorData.message || '매칭 수락에 실패했습니다.')
       }
 
-      // 성공 시 모달 닫기 및 리스트 새로고침
+      const chatRoomId = await res.json() // 응답이 바로 채팅방 ID (예: 8)
+
+      // 성공 시 모달 닫기
       handleCloseModal()
 
-      navigate('/matching')
+      // 상대방 정보 안전하게 추출
+      const partnerNickname =
+        selectedApplication.waitingUserNickname || '상대방'
+      const partnerProfileImage =
+        selectedApplication.waitingUserProfileImage ||
+        '/default-profile-image.png'
+      const partnerId = selectedApplication.waitingUserId
+
+      // 바로 채팅방으로 이동 (ChatHome과 동일한 방식으로 state 전달)
+      navigate(`/chat/${chatRoomId}`, {
+        state: {
+          profileImage: partnerProfileImage,
+          userName: partnerNickname,
+          matchingId: matchedRoom.id,
+          oppositeId: partnerId,
+        },
+      })
+
+      showToast('매칭이 성사되었습니다! 채팅을 시작해보세요.', 'success')
     } catch (error: any) {
       showToast(error.message, 'error')
     }
