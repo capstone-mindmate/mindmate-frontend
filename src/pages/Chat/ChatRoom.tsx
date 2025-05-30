@@ -1138,10 +1138,10 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
               navigate(`/chat/${chatId}/report/${myUserId}/${otherUserId}`)
             },
           },
-          { text: '종료 요청', onClick: handleCloseRequest },
+          // 조건부 렌더링: CLOSED 상태이면 채팅 제거, 아니면 종료 요청
           ...(roomStatus === 'CLOSED'
             ? [{ text: '채팅 제거', onClick: () => {} }]
-            : []),
+            : [{ text: '종료 요청', onClick: handleCloseRequest }]),
         ]}
       />
       <ChatContainer ref={chatContainerRef}>

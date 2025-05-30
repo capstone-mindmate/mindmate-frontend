@@ -288,6 +288,23 @@ const ModalComponent = ({
       align-items: center;
       gap: 12px;
     `,
+
+    deleteModalBody: css`
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+      text-align: center;
+    `,
+
+    deleteModalFooter: css`
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    `,
   }
 
   if (modalType === '매칭신청') {
@@ -640,6 +657,60 @@ const ModalComponent = ({
           </div>
 
           <div className="modal-footer">
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={buttonClick}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  } else if (modalType === '매칭방삭제') {
+    return (
+      <div
+        className="container"
+        css={modalStyles.container}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose()
+          }
+        }}
+      >
+        <div
+          className="modal-content"
+          css={modalStyles.modalContent}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>
+              이 매칭방을 삭제하시겠습니까?
+            </p>
+          </div>
+
+          <div className="modal-body" css={modalStyles.deleteModalBody}>
+            <p style={{ fontSize: '14px', color: '#666', margin: '0' }}>
+              삭제된 매칭방은 복구할 수 없습니다.
+            </p>
+          </div>
+
+          <div className="modal-footer" css={modalStyles.deleteModalFooter}>
+            <div className="cancel-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText="취소"
+                onActiveChange={onReject || onClose}
+              />
+            </div>
             <div className="confirm-btn" css={modalStyles.confirmBtn}>
               <BrownRectButton
                 buttonText={buttonText}
