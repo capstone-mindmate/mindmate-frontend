@@ -12,17 +12,24 @@ export default defineConfig({
       filename: 'custom-service-worker.js',
       registerType: 'autoUpdate',
       manifest: {
-        name: 'My App',
-        short_name: 'App',
+        name: 'MindMate',
+        short_name: 'MindMate',
         theme_color: '#ffffff',
+        lang: 'ko',
+        id: '/?source=pwa',
+        start_url: '/?source=pwa',
+        display: 'standalone',
+        background_color: '#ffffff',
+        orientation: 'portrait',
+        scope: '/',
         icons: [
           {
-            src: '/icons/icon-192x192.png',
+            src: '/fav/favicon-196x196.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/icons/icon-512x512.png',
+            src: '/fav/favicon-96x96.png',
             sizes: '512x512',
             type: 'image/png',
           },
