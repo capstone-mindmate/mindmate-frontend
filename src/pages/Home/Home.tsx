@@ -82,22 +82,6 @@ const HomePage = () => {
   )
   const [cardNews, setCardNews] = useState<CardNews[]>([])
 
-  useEffect(() => {
-    async function handleAllowNotification() {
-      const permission = await Notification.requestPermission()
-
-      if (permission === 'granted') {
-        console.log('알림 권한이 허용되었습니다.')
-      } else if (permission === 'denied') {
-        console.log('알림 권한이 거부되었습니다.')
-      } else {
-        console.log('사용자가 알림 권한을 결정하지 않았습니다.')
-      }
-    }
-
-    handleAllowNotification()
-  }, [])
-
   // 인기 매거진 데이터 가져오기
   useEffect(() => {
     const fetchPopularMagazines = async () => {
