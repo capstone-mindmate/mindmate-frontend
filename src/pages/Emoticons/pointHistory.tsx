@@ -33,7 +33,7 @@ const PointHistoryPage = () => {
       try {
         // 코인 잔액은 /profiles에서 받아옴
         const profileRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/profiles',
+          'http://localhost/api/profiles',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -44,7 +44,7 @@ const PointHistoryPage = () => {
 
         // 코인 내역은 /porints/transactions에서 받아옴
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/points/transactions',
+          'http://localhost/api/points/transactions',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },

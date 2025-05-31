@@ -89,7 +89,7 @@ const Register = () => {
   // 프로필 생성 mutation
   const profileMutation = useMutation({
     mutationFn: async (profileData: any) => {
-      const res = await fetchWithRefresh('https://mindmate.shop/api/profiles', {
+      const res = await fetchWithRefresh('http://localhost/api/profiles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profileData),
@@ -101,7 +101,7 @@ const Register = () => {
     onSuccess: async (data) => {
       localStorage.setItem('userId', data.id)
 
-      const res = await fetchWithRefresh(`https://mindmate.shop/api/profiles`, {
+      const res = await fetchWithRefresh(`http://localhost/api/profiles`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       })
@@ -146,7 +146,7 @@ const Register = () => {
         const formData = new FormData()
         formData.append('file', imageFile)
         const imageRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/profiles/image',
+          'http://localhost/api/profiles/image',
           {
             method: 'POST',
             body: formData,

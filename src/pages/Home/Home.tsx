@@ -93,7 +93,7 @@ const HomePage = () => {
         const accessToken = getTokenCookie('accessToken')
 
         // API URL
-        const apiUrl = `https://mindmate.shop/api/magazines/popular?limit=5`
+        const apiUrl = `http://localhost/api/magazines/popular?limit=5`
 
         // API 호출
         const response = await fetchWithRefresh(apiUrl, {
@@ -148,7 +148,7 @@ const HomePage = () => {
     const fetchRecommendedEmoticons = async () => {
       try {
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/popular/used',
+          'http://localhost/api/emoticons/popular/used',
           {
             method: 'GET',
           }
@@ -177,7 +177,7 @@ const HomePage = () => {
   // 학생 소식 가져오기
   useEffect(() => {
     const fetchRecommendedEmoticons = async () => {
-      const res = await fetchWithRefresh('https://mindmate.shop/forstudent', {
+      const res = await fetchWithRefresh('http://localhost/forstudent', {
         method: 'GET',
       })
 
@@ -243,7 +243,7 @@ const HomePage = () => {
     if (imageContent && imageContent.imageUrl) {
       return imageContent.imageUrl.startsWith('http')
         ? imageContent.imageUrl
-        : `https://mindmate.shop/api${imageContent.imageUrl}`
+        : `http://localhost/api${imageContent.imageUrl}`
     }
 
     return '/default-profile-image.png' // 기본 이미지 경로
@@ -355,7 +355,7 @@ const HomePage = () => {
           <EmoticonGrid>
             {popularEmoticons.map((emoticon) => (
               <Emoticon
-                emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+                emoticonURL={'http://localhost/api' + emoticon.imageUrl}
                 type={emoticon.name as any}
                 size="medium"
                 onClick={() => handleEmoticonClick(emoticon.name as any)}

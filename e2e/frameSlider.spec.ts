@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('FrameSlider 컴포넌트', () => {
   test.beforeEach(async ({ page }) => {
     // 애플리케이션의 홈 페이지로 이동
-    await page.goto('https://mindmate.shop:5173/home')
+    await page.goto('http://localhost:5173/home')
 
     // 페이지가 완전히 로드될 때까지 기다림
     await page.waitForLoadState('networkidle')

@@ -185,7 +185,7 @@ const ReportPage = () => {
 
       //console.log('최종 전송할 요청 본문:', body)
 
-      const res = await fetchWithRefresh('https://mindmate.shop/api/reports', {
+      const res = await fetchWithRefresh('http://localhost/api/reports', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
