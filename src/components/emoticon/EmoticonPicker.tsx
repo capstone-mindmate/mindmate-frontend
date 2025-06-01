@@ -41,7 +41,7 @@ function EmoticonPicker({
       setError(null)
       try {
         const res = await fetchWithRefresh(
-          'http://localhost/api/emoticons/available',
+          'https://mindmate.shop/api/emoticons/available',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -96,7 +96,7 @@ function EmoticonPicker({
                 onClick={() => handleEmoticonClick(emoticon.id)}
               >
                 <Emoticon
-                  emoticonURL={'http://localhost/api' + emoticon.imageUrl}
+                  emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
                   type={emoticon.type}
                   size="medium"
                   alt={`${emoticon.type} 이모티콘`}
