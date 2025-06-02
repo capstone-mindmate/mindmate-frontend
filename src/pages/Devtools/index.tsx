@@ -196,6 +196,13 @@ function App() {
           onActionClick={handleAction}
         />
         <CoinBox coinCount={500} />
+        <button
+          onClick={() => {
+            throw new Error('테스트 에러!')
+          }}
+        >
+          에러 테스트
+        </button>
         <div
           style={{
             margin: '0 24px',

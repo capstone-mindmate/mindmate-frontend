@@ -5,6 +5,7 @@ import { useAuthStore } from './stores/userStore'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { requestPermission, listenForegroundMessage } from './utils/settingFCM'
 import { useEffect } from 'react'
+import * as Sentry from '@sentry/react'
 
 function App() {
   const queryClient = new QueryClient()
@@ -18,7 +19,47 @@ function App() {
   return (
     <GoogleOAuthProvider clientId="886143898358-4cja76nlu7mp5upid042la3k3vovnd8p.apps.googleusercontent.com">
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <Sentry.ErrorBoundary
+          fallback={({ error, resetError }) => (
+            <div
+              style={{
+                padding: '20px',
+                textAlign: 'center',
+                minHeight: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontFamily: 'Pretendard, sans-serif',
+              }}
+            >
+              <h2 style={{ color: '#392111', marginBottom: '16px' }}>
+                문제가 발생했습니다
+              </h2>
+              <p style={{ color: '#666', marginBottom: '24px' }}>
+                예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
+              </p>
+              <button
+                onClick={resetError}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#392111',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontFamily: 'Pretendard, sans-serif',
+                }}
+              >
+                다시 시도
+              </button>
+            </div>
+          )}
+          showDialog
+        >
+          <RouterProvider router={router} />
+        </Sentry.ErrorBoundary>
       </QueryClientProvider>
     </GoogleOAuthProvider>
   )
