@@ -137,29 +137,26 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
       return
     }
     try {
-      const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/matchings',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title,
-            description,
-            category: categoryMap[category] || 'ETC',
-            creatorRole: getCreatorRole(),
-            showDepartment: !isDepartmentHidden,
-            allowRandom: isRandomMatchingAllowed,
-            anonymous: isAnonymous,
-          }),
-        }
-      )
+      const res = await fetchWithRefresh('http://localhost/api/matchings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description,
+          category: categoryMap[category] || 'ETC',
+          creatorRole: getCreatorRole(),
+          showDepartment: !isDepartmentHidden,
+          allowRandom: isRandomMatchingAllowed,
+          anonymous: isAnonymous,
+        }),
+      })
 
       if (!res.ok) {
         const errorData = await res.json()
         throw new Error(errorData.message || res.statusText)
       }
       showToast('매칭방이 성공적으로 생성되었습니다!', 'success')
-      navigate('/matching')
+      navigate('/chat')
       // TODO: 성공 시 이동 처리 (예: 홈/매칭방 목록 등)
     } catch (e: any) {
       showToast(e.message, 'error')

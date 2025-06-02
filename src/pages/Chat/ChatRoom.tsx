@@ -131,6 +131,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   >('LISTENER')
 
   const [listener, setListener] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   // 메시지 파싱 함수 (type별로 필요한 필드 보완)
   const parseMessage = (
@@ -226,7 +227,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       return
     }
 
-    console.log('채팅방 구독 시작:', chatId)
+    //console.log('채팅방 구독 시작:', chatId)
     setIsRoomConnected(true)
     setErrorMessage(null)
 
@@ -334,7 +335,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       }
 
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/messages`,
+        `http://localhost/api/chat/rooms/${chatId}/messages`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -342,11 +343,24 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       )
 
       if (!res.ok) {
-        if (res.status === 429) {
-          const retryAfter = res.headers.get('Retry-After') || '5'
-          throw new Error(
-            `요청 제한 (429). ${retryAfter}초 후 다시 시도합니다.`
+        if (res.status === 500) {
+          setErrorMessage(
+            '서버에서 채팅방 정보를 처리하는 중 오류가 발생했습니다. 관리자에게 문의해주세요.'
           )
+          setIsLoadingMessages(false)
+          return
+        }
+
+        if (res.status === 401) {
+          setErrorMessage('인증이 필요합니다. 다시 로그인해주세요.')
+          setIsLoadingMessages(false)
+          return
+        }
+
+        if (res.status === 429) {
+          setErrorMessage('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.')
+          setIsLoadingMessages(false)
+          return
         }
         throw new Error(`메시지 목록을 불러오지 못했습니다. (${res.status})`)
       }
@@ -436,7 +450,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const fetchEmoticons = async () => {
     try {
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/emoticons/available',
+        'http://localhost/api/emoticons/available',
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -511,7 +525,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
         try {
           const response = await fetchWithRefresh(
-            `https://mindmate.shop/api/custom-forms/chat-room/${chatId}`,
+            `http://localhost/api/custom-forms/chat-room/${chatId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -608,7 +622,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       const loadSingleFormData = async () => {
         try {
           const response = await fetchWithRefresh(
-            `https://mindmate.shop/api/custom-forms/${formId}`,
+            `http://localhost/api/custom-forms/${formId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -735,7 +749,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const onEmoticon = (msg: any) => {
     try {
       const data = JSON.parse(msg.body)
-      console.log('emo data : ', data)
+      //console.log('emo data : ', data)
       setMessages((prev) => [...prev, parseMessage(data)])
       markAsRead()
     } catch (error) {
@@ -779,7 +793,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   // REST API를 사용한 읽음 처리 대체 함수
   // const markAsReadFallback = async () => {
   //   try {
-  //     await fetchWithRefresh(`https://mindmate.shop/api/chat/rooms/${chatId}/read`, {
+  //     await fetchWithRefresh(`http://localhost/api/chat/rooms/${chatId}/read`, {
   //       method: 'POST',
   //       headers: { 'Content-Type': 'application/json' },
   //     })
@@ -857,14 +871,11 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   // REST API를 사용한 메시지 전송 대체 함수
   const sendMessageFallback = async (content: string) => {
     try {
-      const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/messages`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roomId: chatId, content, type: 'TEXT' }),
-        }
-      )
+      const res = await fetchWithRefresh(`http://localhost/api/chat/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomId: chatId, content, type: 'TEXT' }),
+      })
 
       if (res.ok) {
         const data = await res.json()
@@ -980,7 +991,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     }
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/messages/before/${oldestId}?size=30`,
+        `http://localhost/api/chat/rooms/${chatId}/messages/before/${oldestId}?size=30`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -1021,7 +1032,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const handleCloseRequest = async () => {
     try {
       await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/close`,
+        `http://localhost/api/chat/rooms/${chatId}/close`,
         { method: 'POST' }
       )
       setCloseModalType('REQUEST')
@@ -1054,7 +1065,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   // 종료 수락
   const handleCloseAccept = async () => {
     await fetchWithRefresh(
-      `https://mindmate.shop/api/chat/rooms/${chatId}/close/accept`,
+      `http://localhost/api/chat/rooms/${chatId}/close/accept`,
       { method: 'POST' }
     )
     setCloseModalType('NONE')
@@ -1067,7 +1078,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   // 종료 거절
   const handleCloseReject = async () => {
     await fetchWithRefresh(
-      `https://mindmate.shop/api/chat/rooms/${chatId}/close/reject`,
+      `http://localhost/api/chat/rooms/${chatId}/close/reject`,
       { method: 'POST' }
     )
     setCloseModalType('NONE')
@@ -1076,6 +1087,57 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         destination: `/topic/chat.room.${chatId}.close.reject`,
         body: JSON.stringify({ roomId: chatId }),
       })
+  }
+
+  // 채팅 삭제
+  const handleDeleteChatRoom = async () => {
+    if (!chatId) {
+      showToast('채팅방 정보가 없습니다.', 'error')
+      return
+    }
+
+    try {
+      console.log('채팅방 삭제 API 호출 시작:', chatId) // 디버깅용
+
+      showToast('채팅방을 삭제하는 중입니다...', 'info')
+
+      const res = await fetchWithRefresh(
+        `http://localhost/api/chat/rooms/${chatId}/delete`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+
+      if (res.ok) {
+        // 성공 토스트
+        navigate('/chat')
+        showToast('채팅방이 삭제되었습니다.', 'success')
+      } else {
+        const errorText = await res.text()
+        console.error('삭제 실패 응답:', errorText) // 디버깅용
+
+        if (res.status === 404) {
+          showToast('이미 삭제된 채팅방입니다.', 'error')
+        } else if (res.status === 403) {
+          showToast('채팅방을 삭제할 권한이 없습니다.', 'error')
+        } else {
+          showToast('채팅방 삭제에 실패했습니다.', 'error')
+        }
+      }
+    } catch (error) {
+      console.error('채팅방 삭제 실패:', error)
+      showToast('채팅방 삭제 중 오류가 발생했습니다.', 'error')
+    } finally {
+      // BottomSheet 닫기
+      setIsBottomSheetOpen(false)
+      setShowDeleteModal(false)
+    }
+  }
+
+  const handleDeleteButtonClick = () => {
+    setIsBottomSheetOpen(false) // BottomSheet 먼저 닫기
+    setShowDeleteModal(true)
   }
 
   // 소켓 구독 추가
@@ -1140,8 +1202,18 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           },
           // 조건부 렌더링: CLOSED 상태이면 채팅 제거, 아니면 종료 요청
           ...(roomStatus === 'CLOSED'
-            ? [{ text: '채팅 제거', onClick: () => {} }]
-            : [{ text: '종료 요청', onClick: handleCloseRequest }]),
+            ? [
+                {
+                  text: '채팅 제거',
+                  onClick: handleDeleteButtonClick,
+                },
+              ]
+            : [
+                {
+                  text: '종료 요청',
+                  onClick: handleCloseRequest,
+                },
+              ]),
         ]}
       />
       <ChatContainer ref={chatContainerRef}>
@@ -1191,7 +1263,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                       <EmoticonWrapper>
                         <EmoticonComponent
                           emoticonURL={
-                            'https://mindmate.shop/api' + message.emoticonUrl
+                            'http://localhost/api' + message.emoticonUrl
                           }
                           type={message.emoticonType}
                           size="large"
@@ -1220,7 +1292,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                       // 채팅방의 모든 폼 데이터 조회
                       if (chatId) {
                         const response = await fetchWithRefresh(
-                          `https://mindmate.shop/api/custom-forms/chat-room/${chatId}`,
+                          `http://localhost/api/custom-forms/chat-room/${chatId}`,
                           {
                             method: 'GET',
                             headers: { 'Content-Type': 'application/json' },
@@ -1344,7 +1416,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
                   try {
                     const response = await fetchWithRefresh(
-                      `https://mindmate.shop/api/custom-forms/${formId}`,
+                      `http://localhost/api/custom-forms/${formId}`,
                       {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },
@@ -1667,6 +1739,17 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           onReject={handleCloseReject}
           buttonText=""
           buttonClick={() => {}}
+        />
+      )}
+      {showDeleteModal && (
+        <ModalComponent
+          modalType="채팅방삭제"
+          isOpen={true}
+          onClose={() => setShowDeleteModal(false)}
+          onAccept={handleDeleteChatRoom}
+          onReject={() => setShowDeleteModal(false)}
+          buttonText="삭제"
+          buttonClick={() => {}} // 사용하지 않음
         />
       )}
     </RootContainer>
