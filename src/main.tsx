@@ -36,6 +36,20 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 
     // 릴리즈 버전 (선택사항)
     release: import.meta.env.VITE_APP_VERSION,
+    beforeSend(event, hint) {
+      // 이 함수가 event 객체를 반환하지 않고 null을 반환하면 이벤트는 전송되지 않음
+      console.log('[Sentry] beforeSend called. Event:', event) // 이벤트 내용을 콘솔에 출력
+      console.log('[Sentry] beforeSend hint:', hint) // 힌트 내용도 콘솔에 출력
+
+      // 특정 조건에 따라 이벤트를 필터링하는 로직
+      if (event.message && event.message.includes('특정 메시지')) {
+        console.log('[Sentry] Filtering out event with specific message.')
+        return null // 이 이벤트를 전송하지 않음
+      }
+
+      // 항상 이벤트를 전송하려면 event 객체를 그대로 반환
+      return event
+    },
   })
 } else {
   console.warn(
