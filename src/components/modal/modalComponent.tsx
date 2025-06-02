@@ -858,6 +858,60 @@ const ModalComponent = ({
         </div>
       </div>
     )
+  } else if (modalType === '채팅방삭제') {
+    return (
+      <div
+        className="container"
+        css={modalStyles.container}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose()
+          }
+        }}
+      >
+        <div
+          className="modal-content"
+          css={modalStyles.modalContent}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            className="close-btn"
+            css={modalStyles.closeBtn}
+            onClick={() => onClose()}
+            role="button"
+            aria-label="닫기"
+          >
+            <CloseIcon color="#000000" width={24} height={24} />
+          </div>
+          <div className="modal-header">
+            <p css={modalStyles.modalHeaderText}>
+              이 채팅방을 삭제하시겠습니까?
+            </p>
+          </div>
+
+          <div className="modal-body" css={modalStyles.deleteModalBody}>
+            <p style={{ fontSize: '14px', color: '#666', margin: '0' }}>
+              삭제된 채팅방은 복구할 수 없습니다.
+            </p>
+          </div>
+
+          <div className="modal-footer" css={modalStyles.deleteModalFooter}>
+            <div className="cancel-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText="취소"
+                onActiveChange={onReject || onClose}
+              />
+            </div>
+            <div className="confirm-btn" css={modalStyles.confirmBtn}>
+              <BrownRectButton
+                buttonText={buttonText}
+                onActiveChange={onAccept || buttonClick}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 }
 

@@ -14,6 +14,7 @@ import { useAuthStore } from '../../stores/userStore'
 import { useUserQuery } from '../../hooks/useUserQuery'
 import { useMessageStore } from '../../store/messageStore'
 import { useSocketMessage } from '../../hooks/useSocketMessage'
+import { useToast } from '../../components/toast/ToastProvider'
 
 interface ChatHomeProps {
   matchId?: string
@@ -35,6 +36,7 @@ interface ChatItemType {
   matchingId: number
   oppositeId: number
   chatRoomStatus: string
+  lastMessageTime?: string // 정렬을 위한 원본 시간 추가
 }
 
 const ChatHome = ({ matchId }: ChatHomeProps) => {
@@ -48,6 +50,9 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
 
   // 채팅방별 읽지 않은 메시지 수 가져오기
   const { roomUnreadCounts } = useMessageStore()
+
+  // 토스트 훅 추가
+  const { showToast } = useToast()
 
   // 채팅방 목록 상태
   const [chatItems, setChatItems] = useState<ChatItemType[]>([])
@@ -64,31 +69,96 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
     완료: false,
   })
 
-  // 필터링된 채팅 아이템 계산 (웹소켓으로부터 업데이트된 읽지 않은 메시지 수 적용)
-  const filteredChatItems = chatItems
-    .map((item) => {
-      // 웹소켓으로부터 업데이트된 읽지 않은 메시지 수 적용
-      const socketUnreadCount = roomUnreadCounts[item.id]
-      return {
-        ...item,
-        // 새로운 읽지 않은 메시지 수가 있으면 적용, 없으면 기존 값 유지
-        unreadCount:
-          socketUnreadCount !== undefined
-            ? socketUnreadCount
-            : item.unreadCount,
-        isRead:
-          socketUnreadCount !== undefined
-            ? socketUnreadCount === 0
-            : item.isRead,
+  // 채팅방 정렬 함수 - 우선순위별 정렬
+  const sortChatItems = (items: ChatItemType[]) => {
+    return items.sort((a, b) => {
+      // PENDING 채팅방과 ACTIVE/CLOSED 채팅방 구분
+      const aIsPending = a.chatRoomStatus === 'PENDING'
+      const bIsPending = b.chatRoomStatus === 'PENDING'
+
+      // PENDING 채팅방은 항상 하단에 위치
+      if (!aIsPending && bIsPending) return -1
+      if (aIsPending && !bIsPending) return 1
+
+      // 둘 다 PENDING인 경우: roomId 기준 내림차순 (높은 번호순)
+      if (aIsPending && bIsPending) {
+        const aRoomId = parseInt(a.id)
+        const bRoomId = parseInt(b.id)
+        return bRoomId - aRoomId
       }
+
+      // 둘 다 ACTIVE/CLOSED인 경우: 우선순위별 정렬
+      if (!aIsPending && !bIsPending) {
+        // 1순위: 읽지 않은 알림이 있는 채팅방
+        const aHasUnread = a.unreadCount > 0
+        const bHasUnread = b.unreadCount > 0
+
+        if (aHasUnread && !bHasUnread) return -1
+        if (!aHasUnread && bHasUnread) return 1
+
+        // 둘 다 읽지 않은 메시지가 있는 경우: lastMessageTime 비교
+        if (aHasUnread && bHasUnread) {
+          const aTime = a.lastMessageTime
+            ? new Date(a.lastMessageTime).getTime()
+            : 0
+          const bTime = b.lastMessageTime
+            ? new Date(b.lastMessageTime).getTime()
+            : 0
+          return bTime - aTime
+        }
+
+        // 2순위: 방금 만들어진 채팅방 (새 채팅방이 생성되었습니다)
+        const aIsNewRoom =
+          a.chatRoomStatus === 'ACTIVE' &&
+          a.message === '새 채팅방이 생성되었습니다'
+        const bIsNewRoom =
+          b.chatRoomStatus === 'ACTIVE' &&
+          b.message === '새 채팅방이 생성되었습니다'
+
+        if (aIsNewRoom && !bIsNewRoom) return -1
+        if (!aIsNewRoom && bIsNewRoom) return 1
+
+        // 3순위: 가장 최근에 대화한 채팅방 (lastMessageTime 기준)
+        const aTime = a.lastMessageTime
+          ? new Date(a.lastMessageTime).getTime()
+          : 0
+        const bTime = b.lastMessageTime
+          ? new Date(b.lastMessageTime).getTime()
+          : 0
+        return bTime - aTime
+      }
+
+      return 0
     })
-    .filter((item) => {
-      if (activeFilter === '전체') return item.userType !== '완료'
-      if (activeFilter === '리스너') return item.userType === '리스너'
-      if (activeFilter === '스피커') return item.userType === '스피커'
-      if (activeFilter === '완료') return item.userType === '완료'
-      return true
-    })
+  }
+
+  // 필터링된 채팅 아이템 계산 (웹소켓으로부터 업데이트된 읽지 않은 메시지 수 적용 + 정렬)
+  const filteredChatItems = sortChatItems(
+    chatItems
+      .map((item) => {
+        // 웹소켓으로부터 업데이트된 읽지 않은 메시지 수 적용
+        const socketUnreadCount = roomUnreadCounts[item.id]
+        return {
+          ...item,
+          // 새로운 읽지 않은 메시지 수가 있으면 적용, 없으면 기존 값 유지
+          unreadCount:
+            socketUnreadCount !== undefined
+              ? socketUnreadCount
+              : item.unreadCount,
+          isRead:
+            socketUnreadCount !== undefined
+              ? socketUnreadCount === 0
+              : item.isRead,
+        }
+      })
+      .filter((item) => {
+        if (activeFilter === '전체') return item.userType !== '완료'
+        if (activeFilter === '리스너') return item.userType === '리스너'
+        if (activeFilter === '스피커') return item.userType === '스피커'
+        if (activeFilter === '완료') return item.userType === '완료'
+        return true
+      })
+  )
 
   // 필터 버튼 클릭 핸들러
   const handleFilterChange = (filter: string, isActive: boolean) => {
@@ -114,8 +184,15 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
     profileImage: string,
     userName: string,
     matchingId: number,
-    oppositeId: number
+    oppositeId: number,
+    chatRoomStatus: string
   ) => {
+    if (chatRoomStatus === 'PENDING') {
+      showToast('아직 매칭 상대가 정해지지 않았습니다.', 'info')
+      return // 클릭 이벤트 중단
+    }
+
+    // ACTIVE나 CLOSED 상태만 채팅방 진입 허용
     navigate(`/chat/${itemId}`, {
       state: { profileImage, userName, matchingId, oppositeId },
     })
@@ -179,6 +256,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
                 minute: '2-digit',
               })
             : '',
+          lastMessageTime: item.lastMessageTime, // 정렬을 위한 원본 시간 저장
           category: '', // 필요시 matchingTitle 등에서 추출
           userType:
             item.chatRoomStatus === 'CLOSED'
@@ -296,7 +374,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         />
       </CategoryFilterContainer>
 
-      <ChatContainer style={{ paddingTop: '56px' }}>
+      <ChatContainer style={{ paddingTop: '35px' }}>
         {isLoading ? (
           <div
             style={{
@@ -336,8 +414,18 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
             const uniqueKey = `${item.id}-${item.profileImage}`
             const imageUrl = 'https://mindmate.shop/api' + item.profileImage
 
+            const isPending = item.chatRoomStatus === 'PENDING'
+
             return (
-              <div key={uniqueKey} style={{ position: 'relative' }}>
+              <div
+                key={uniqueKey}
+                style={{
+                  position: 'relative',
+                  opacity: isPending ? 0.5 : 1,
+                  cursor: isPending ? 'not-allowed' : 'pointer',
+                  transition: 'opacity 0.2s ease',
+                }}
+              >
                 {!imageLoadedMap[item.id] && (
                   <img
                     src={imageUrl}
@@ -361,7 +449,12 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
                   category={item.category}
                   userType={item.userType}
                   subject={item.subject}
-                  message={item.message}
+                  message={
+                    item.chatRoomStatus === 'ACTIVE' &&
+                    item.message === '새 채팅방이 생성되었습니다'
+                      ? '매칭된 상대와 지금 대화를 나눠보세요!'
+                      : item.message
+                  }
                   isRead={item.isRead}
                   unreadCount={item.unreadCount}
                   borderBottom={index < filteredChatItems.length - 1}
@@ -371,10 +464,31 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
                       imageUrl,
                       item.userName,
                       item.matchingId,
-                      item.oppositeId
+                      item.oppositeId,
+                      item.chatRoomStatus
                     )
                   }}
                 />
+                {isPending && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '25px',
+                      right: '8px',
+                      background:
+                        'linear-gradient(45deg, #feecc4 0%, #fff3d8 50%, #f0daa9 100%)',
+                      color: '#333',
+                      borderRadius: '15px',
+                      padding: '4px 10px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      zIndex: 10,
+                      border: '1px solid rgba(255, 255, 255, 0.8)',
+                    }}
+                  >
+                    ⏳ 대기중
+                  </div>
+                )}
               </div>
             )
           })

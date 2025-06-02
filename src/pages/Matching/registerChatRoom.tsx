@@ -159,8 +159,7 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
         throw new Error(errorData.message || res.statusText)
       }
       showToast('매칭방이 성공적으로 생성되었습니다!', 'success')
-      navigate('/matching')
-      // TODO: 성공 시 이동 처리 (예: 홈/매칭방 목록 등)
+      navigate('/chat')
     } catch (e: any) {
       showToast(e.message, 'error')
     }

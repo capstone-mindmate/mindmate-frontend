@@ -5,11 +5,12 @@ export const CategoryFilterContainer = styled.div`
   position: fixed;
   width: 884px;
   display: flex;
-  padding: 0 24px;
+  padding: 5px 24px;
   box-sizing: border-box;
   gap: 6px;
-  top: calc(56px + 16px);
+  top: 56px;
   z-index: 100;
+  background-color: white;
 
   ${media.tablet} {
     width: 100%;

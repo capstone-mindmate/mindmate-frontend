@@ -31,8 +31,8 @@ if (import.meta.env.VITE_SENTRY_DSN) {
     // PII 데이터 전송 (IP 주소 등)
     sendDefaultPii: true,
 
-    // 개발 환경에서 디버그 모드
-    debug: import.meta.env.DEV,
+    // 디버그 모드 켬
+    debug: true,
 
     // 릴리즈 버전 (선택사항)
     release: import.meta.env.VITE_APP_VERSION,
