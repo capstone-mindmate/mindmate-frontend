@@ -42,7 +42,7 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
     const fetchFormData = async () => {
       try {
         const res = await fetchWithRefresh(
-          `http://localhost/api/custom-forms/${formId}`
+          `https://mindmate.shop/api/custom-forms/${formId}`
         )
         if (!res.ok) {
           throw new Error('설문지 정보를 불러오지 못했습니다.')
@@ -120,7 +120,7 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
 
       // 웹소켓 연결이 안되었을 경우 REST API 호출로 대체
       const res = await fetchWithRefresh(
-        `http://localhost/api/custom-forms/${formId}/respond`,
+        `https://mindmate.shop/api/custom-forms/${formId}/respond`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -162,15 +162,18 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
   // 시스템 메시지 REST API 전송 함수 (웹소켓 실패 시 대체용)
   const sendSystemMessageREST = async (roomId: string | number) => {
     try {
-      const res = await fetchWithRefresh(`http://localhost/api/chat/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roomId,
-          content: '상대방이 설문에 응답했습니다.',
-          type: 'SYSTEM',
-        }),
-      })
+      const res = await fetchWithRefresh(
+        `https://mindmate.shop/api/chat/messages`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomId,
+            content: '상대방이 설문에 응답했습니다.',
+            type: 'SYSTEM',
+          }),
+        }
+      )
 
       if (!res.ok) {
         console.error('시스템 메시지 전송 실패')
