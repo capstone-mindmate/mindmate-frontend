@@ -1,16 +1,16 @@
-import axios from 'axios'
+import { fetchWithRefresh } from '../utils/fetchWithRefresh'
 
-export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+export async function createOrder(productId: number) {
+  const res = await fetchWithRefresh(
+    'https://mindmate.shop/api/payments/orders',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productId }),
+    }
+  )
+  if (!res.ok) throw new Error('주문 생성 실패')
+  return res.json()
+}

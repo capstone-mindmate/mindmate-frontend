@@ -36,6 +36,8 @@ interface ModalComponentProps {
     type: string
     size: string
     price: number
+    imageUrl: string
+    id: number
   }
   onProfileClick?: () => void // 프로필 클릭 핸들러
   onAccept?: () => void
@@ -66,6 +68,8 @@ const ModalComponent = ({
     type: 'normal',
     size: 'xlarge',
     price: 10,
+    imageUrl: '',
+    id: 0,
   },
   onProfileClick, // 프로필 클릭 핸들러 받기
   onAccept,
@@ -795,6 +799,7 @@ const ModalComponent = ({
           </div>
           <div className="modal-body" css={modalStyles.emoticonContainer}>
             <Emoticon
+              emoticonURL={emoticon.imageUrl}
               type={emoticon.type as EmoticonType}
               size={emoticon.size as 'xlarge'}
             />

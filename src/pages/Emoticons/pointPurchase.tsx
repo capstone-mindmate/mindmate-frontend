@@ -15,21 +15,65 @@ import {
   PurchaseCoinText,
   PurchaseCoinList,
 } from './style'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 import TopBar from '../../components/topbar/Topbar'
 import CoinBox from '../../components/coin/CoinBox'
 import EventCoinPurchase from '../../components/coin/EventCoinPurchase'
 import CoinPurchase from '../../components/coin/CoinPurchase'
 
+interface Coin {
+  productId: number
+  points: number
+  amount: number
+  isPromotion: boolean
+  promotionPeriod: string
+}
+
+interface User {
+  nickname: string
+  email: string
+}
+
 const PointPurchase = () => {
   const navigate = useNavigate()
+  const [coinList, setCoinList] = useState<Coin[]>([])
+  const [coin, setCoin] = useState<number>(0)
+  const [user, setUser] = useState<User>({ nickname: '', email: '' })
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const res = await fetchWithRefresh(
+        'https://mindmate.shop/api/admin/products',
+        {
+          method: 'GET',
+        }
+      )
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error)
+      }
+      const productData = await res.json()
+      setCoinList(productData)
+    }
+
+    const fetchCoin = async () => {
+      const res = await fetchWithRefresh('https://mindmate.shop/api/profiles', {
+        method: 'GET',
+      })
+      const profileData = await res.json()
+      setUser(profileData)
+      setCoin(profileData.points ?? 0)
+    }
+    fetchProfile()
+    fetchCoin()
+  }, [])
 
   return (
     <RootContainer>
       <TopBar title="코인 구매" showBackButton={true} />
       <EmoticonsContainer>
         <TopItemContainer>
-          <CoinBox coinCount={500} />
+          <CoinBox coinCount={coin} />
         </TopItemContainer>
 
         <EventCoinWrapper>
@@ -37,7 +81,16 @@ const PointPurchase = () => {
             <EventCointText>런칭 기념, 한정 이벤트!</EventCointText>
             <EventTermText>4/30 ~ 6/30</EventTermText>
           </EventCoinTextWrapper>
-          <EventCoinPurchase coinCount={40} coinPrice={3000} />
+          {coinList
+            .filter((coin) => coin.isPromotion)
+            .map((coin) => (
+              <EventCoinPurchase
+                key={coin.productId}
+                productId={coin.productId}
+                coinCount={coin.amount}
+                coinPrice={coin.points}
+              />
+            ))}
         </EventCoinWrapper>
 
         <PurchaseCoinWrapper>
@@ -46,11 +99,17 @@ const PointPurchase = () => {
           </PurchaseCoinTextWrapper>
 
           <PurchaseCoinList>
-            <CoinPurchase coinCount={10} coinPrice={1000} />
-            <CoinPurchase coinCount={30} coinPrice={2500} />
-            <CoinPurchase coinCount={50} coinPrice={4000} />
-            <CoinPurchase coinCount={100} coinPrice={7500} />
-            <CoinPurchase coinCount={200} coinPrice={10000} />
+            {coinList
+              .filter((coin) => !coin.isPromotion)
+              .map((coin) => (
+                <CoinPurchase
+                  key={coin.productId}
+                  productId={coin.productId}
+                  coinCount={coin.amount}
+                  coinPrice={coin.points}
+                  user={user}
+                />
+              ))}
           </PurchaseCoinList>
         </PurchaseCoinWrapper>
       </EmoticonsContainer>

@@ -18,6 +18,7 @@ import RegisterChatRoom from '../pages/Matching/registerChatRoom'
 import MatchedInfo from '../pages/Matching/matchedInfo'
 import MatchedApplication from '../pages/Matching/application'
 import EmoticonHome from '../pages/Emoticons/emoticonHome'
+import EmotionPurchase from '../pages/Emoticons/emotionPurchase'
 import PointPurchase from '../pages/Emoticons/pointPurchase'
 import PointHistory from '../pages/Emoticons/pointHistory'
 import PurchaseSuccess from '../pages/Emoticons/purchaseSuccess'
@@ -309,6 +310,22 @@ export const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <EmoticonHome />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/emoticons/purchase/:id',
+    element: (
+      <RequireAuth>
+        <EmotionPurchase />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/emoticons/purchase/fail',
+    element: (
+      <RequireAuth>
+        <PurchaseFail />
       </RequireAuth>
     ),
   },

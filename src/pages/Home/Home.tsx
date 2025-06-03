@@ -367,7 +367,10 @@ const HomePage = () => {
           <PlainSectionContainer>
             <SectionTitleContainer>
               <SectionTitle>지금 필요한 학생소식</SectionTitle>
-              <SeeMoreButton onClick={() => console.log('더보기 clicked')}>
+              <SeeMoreButton
+                onClick={() => console.log('더보기 clicked')}
+                style={{ display: 'none' }}
+              >
                 더보기
               </SeeMoreButton>
             </SectionTitleContainer>

@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { css } from '@emotion/react'
 
 import {
@@ -13,13 +13,18 @@ import Emoticon from '../../components/emoticon/Emoticon'
 const PurchaseFail = () => {
   const navigate = useNavigate()
   const [leaveCount, setLeaveCount] = useState(5)
+  const location = useLocation()
 
   useEffect(() => {
     const timer = setInterval(() => {
       setLeaveCount((prevCount) => {
         if (prevCount <= 1) {
           clearInterval(timer)
-          navigate(-1)
+          if (location.pathname === '/emoticons/purchase/fail') {
+            navigate('/emoticons')
+          } else {
+            navigate('/coin')
+          }
           return 0
         }
         return prevCount - 1
@@ -30,7 +35,11 @@ const PurchaseFail = () => {
   }, [navigate])
 
   const handleExit = () => {
-    navigate(-1)
+    if (location.pathname === '/emoticons/purchase/fail') {
+      navigate('/emoticons')
+    } else {
+      navigate('/coin')
+    }
   }
 
   return (

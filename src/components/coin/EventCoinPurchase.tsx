@@ -8,6 +8,7 @@ import {
   ANONYMOUS,
 } from '@tosspayments/payment-widget-sdk'
 import { nanoid } from 'nanoid'
+import { createOrder } from '../../services/api'
 
 import { EventCoinBoxContainer, PriceInfo } from '../../styles/CoinBoxStyles'
 
@@ -25,6 +26,7 @@ import {
 interface EventCoinPurchaseProps {
   coinCount: number
   coinPrice: number
+  productId: number
 }
 
 const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm'
@@ -39,6 +41,7 @@ function usePaymentWidget(clientKey: string, customerKey: string) {
 }
 
 const EventCoinPurchase = ({
+  productId,
   coinCount,
   coinPrice,
 }: EventCoinPurchaseProps) => {
@@ -101,8 +104,13 @@ const EventCoinPurchase = ({
     }
 
     try {
+      // 1. 결제 주문 생성
+      const orderRes = await createOrder(productId)
+      const { orderId, amount } = orderRes
+
+      // 2. toss 결제창 실행
       await paymentWidget.requestPayment({
-        orderId: nanoid(),
+        orderId: orderId,
         orderName: `코인 ${coinCount}개`,
         customerName: '유저닉네임',
         customerEmail: '유저이메일',

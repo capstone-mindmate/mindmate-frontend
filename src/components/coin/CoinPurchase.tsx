@@ -8,6 +8,7 @@ import {
   ANONYMOUS,
 } from '@tosspayments/payment-widget-sdk'
 import { nanoid } from 'nanoid'
+import { createOrder } from '../../services/api'
 
 import { CoinBoxContainer, PriceInfo } from '../../styles/CoinBoxStyles'
 
@@ -22,9 +23,16 @@ import {
   Title,
 } from './paymentWidgetStyle'
 
+interface User {
+  nickname: string
+  email: string
+}
+
 interface CoinPurchaseProps {
   coinCount: number
   coinPrice: number
+  user: User
+  productId: number
 }
 
 const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm'
@@ -38,7 +46,12 @@ function usePaymentWidget(clientKey: string, customerKey: string) {
   })
 }
 
-const CoinPurchase = ({ coinCount, coinPrice }: CoinPurchaseProps) => {
+const CoinPurchase = ({
+  coinCount,
+  coinPrice,
+  productId,
+  user,
+}: CoinPurchaseProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [customerKey] = useState(() => nanoid())
   const { data: paymentWidget } = usePaymentWidget(clientKey, customerKey)
@@ -98,11 +111,17 @@ const CoinPurchase = ({ coinCount, coinPrice }: CoinPurchaseProps) => {
     }
 
     try {
+      // 1. 결제 주문 생성
+      const orderRes = await createOrder(productId)
+      const { orderId } = orderRes
+
+      // 2. toss 결제창 실행
+
       await paymentWidget.requestPayment({
-        orderId: nanoid(),
+        orderId,
         orderName: `코인 ${coinCount}개`,
-        customerName: '유저닉네임',
-        customerEmail: '유저이메일',
+        customerName: user?.nickname,
+        customerEmail: user?.email,
         successUrl: `${window.location.origin}/coin/success`,
         failUrl: `${window.location.origin}/coin/fail`,
       })
