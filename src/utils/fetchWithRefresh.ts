@@ -88,3 +88,14 @@ export async function fetchWithRefresh(input: RequestInfo, init?: RequestInit) {
   }
   return res
 }
+
+// JWT 디코드 함수 (exp 등 payload 추출)
+export function decodeJWT(token: string): any {
+  try {
+    const payload = token.split('.')[1]
+    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+    return JSON.parse(decoded)
+  } catch (e) {
+    return null
+  }
+}
