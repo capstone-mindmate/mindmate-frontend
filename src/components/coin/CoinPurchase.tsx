@@ -4,6 +4,7 @@ import PurchaseButton from '../buttons/purchaseButton'
 import { createOrder } from '../../services/api'
 import { nanoid } from 'nanoid'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+import { loadTossPayments } from '@tosspayments/tosspayments-sdk'
 
 import { CoinBoxContainer, PriceInfo } from '../../styles/CoinBoxStyles'
 import {
@@ -77,11 +78,12 @@ const CoinPurchase = ({
       const orderRes = await createOrder(productId)
       const { orderId, amount } = orderRes
 
-      // 3. TossPayments 인스턴스 생성 및 결제창 호출
-      // @ts-ignore
-      const tossPayments = window.TossPayments(clientKey)
-      await tossPayments.requestPayment('카드', {
-        amount,
+      // 3. TossPayments 인스턴스 생성 및 결제창 호출 (npm import 방식)
+      const tossPayments = await loadTossPayments(clientKey)
+      const payment = tossPayments.payment({ customerKey })
+      await payment.requestPayment({
+        method: 'CARD',
+        amount: { value: amount, currency: 'KRW' },
         orderId,
         orderName: `코인 ${coinCount}개`,
         customerName: user.nickname,
