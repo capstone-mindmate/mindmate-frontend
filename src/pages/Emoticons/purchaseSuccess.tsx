@@ -9,17 +9,46 @@ import {
   PurchaseResultHeaderText,
 } from './style'
 import Emoticon from '../../components/emoticon/Emoticon'
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
-const PurchaseSuccess = () => {
+const PurchaseSuccess = ({}) => {
   const navigate = useNavigate()
   const [leaveCount, setLeaveCount] = useState(5)
+
+  // URL 파라미터 추출
+  const searchParams = new URLSearchParams(window.location.search)
+  const orderId = searchParams.get('orderId')
+  const paymentKey = searchParams.get('paymentKey')
+  const amount = searchParams.get('amount')
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      const res = await fetchWithRefresh(
+        `https://mindmate.shop/api/payments/success?paymentKey=${paymentKey}&orderId=${orderId}&amount=${amount}`,
+        {
+          method: 'GET',
+        }
+      )
+      if (!res.ok) {
+        navigate('/coin')
+      }
+      const data = await res.json()
+
+      console.log(data)
+    }
+    fetchOrder()
+  }, [orderId, paymentKey, amount])
 
   useEffect(() => {
     const timer = setInterval(() => {
       setLeaveCount((prevCount) => {
         if (prevCount <= 1) {
           clearInterval(timer)
-          navigate(-1)
+          if (location.pathname === '/emoticons/purchase/fail') {
+            navigate('/emoticons')
+          } else {
+            navigate('/coin')
+          }
           return 0
         }
         return prevCount - 1
@@ -30,7 +59,11 @@ const PurchaseSuccess = () => {
   }, [navigate])
 
   const handleExit = () => {
-    navigate(-1)
+    if (location.pathname === '/emoticons/purchase/fail') {
+      navigate('/emoticons')
+    } else {
+      navigate('/coin')
+    }
   }
 
   return (

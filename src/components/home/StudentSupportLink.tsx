@@ -31,12 +31,12 @@ const defaultLinks: SupportLink[] = [
   },
   {
     id: '3',
-    imageUrl: 'public/support/innovation_center.png',
+    imageUrl: '/support/innovation_center.png',
     linkUrl: 'https://ajou.ac.kr/ace/index.do',
   },
   {
     id: '4',
-    imageUrl: 'public/support/global_center.png',
+    imageUrl: '/support/global_center.png',
     linkUrl: 'https://cll.ajou.ac.kr/cll/index.do',
   },
 ]

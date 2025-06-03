@@ -31,6 +31,15 @@ const EmoticonHome = () => {
   const [selectedEmoticonType, setSelectedEmoticonType] = useState<
     string | null
   >(null)
+  const [selectedEmoticonImageUrl, setSelectedEmoticonImageUrl] = useState<
+    string | null
+  >(null)
+  const [selectedEmoticonPrice, setSelectedEmoticonPrice] = useState<
+    number | 0
+  >(0)
+  const [selectedEmoticonId, setSelectedEmoticonId] = useState<number | null>(
+    null
+  )
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const [profile, setProfile] = useState<any>(null)
   const [pointBalance, setPointBalance] = useState<number | null>(null)
@@ -60,8 +69,16 @@ const EmoticonHome = () => {
     },
   ]
 
-  const handleEmoticonClick = (type: string) => {
+  const handleEmoticonClick = (
+    type: string,
+    imageUrl: string,
+    price: number,
+    id: number
+  ) => {
     setSelectedEmoticonType(type)
+    setSelectedEmoticonImageUrl(imageUrl)
+    setSelectedEmoticonPrice(price)
+    setSelectedEmoticonId(id)
     setIsModalOpen(true)
   }
 
@@ -72,7 +89,7 @@ const EmoticonHome = () => {
 
   const handlePurchase = () => {
     setIsModalOpen(false)
-    navigate('/emoticons/success')
+    navigate(`/emoticons/purchase/${selectedEmoticonId}`)
   }
 
   useEffect(() => {
@@ -137,7 +154,13 @@ const EmoticonHome = () => {
   }, [])
 
   const renderModal = () => {
-    if (!isModalOpen || !selectedEmoticonType) return null
+    if (
+      !isModalOpen ||
+      !selectedEmoticonType ||
+      !selectedEmoticonImageUrl ||
+      selectedEmoticonPrice === undefined
+    )
+      return null
 
     return (
       <ModalComponent
@@ -147,9 +170,11 @@ const EmoticonHome = () => {
         onClose={handleCloseModal}
         isOpen={isModalOpen}
         emoticon={{
+          imageUrl: 'https://mindmate.shop/api' + selectedEmoticonImageUrl,
           type: selectedEmoticonType,
+          id: selectedEmoticonId ?? 0,
           size: 'xlarge',
-          price: 10,
+          price: selectedEmoticonPrice,
         }}
       />
     )
@@ -207,10 +232,18 @@ const EmoticonHome = () => {
             {shopEmoticons.map((emoticon) => (
               <EmotionWrapper key={emoticon.id}>
                 <Emoticon
+                  key={emoticon.id}
                   emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
                   type={emoticon.name as any}
                   size="large"
-                  onClick={() => handleEmoticonClick(emoticon.name)}
+                  onClick={() =>
+                    handleEmoticonClick(
+                      emoticon.name,
+                      emoticon.imageUrl,
+                      emoticon.price,
+                      emoticon.id
+                    )
+                  }
                 />
               </EmotionWrapper>
             ))}
