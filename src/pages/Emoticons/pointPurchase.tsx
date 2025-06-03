@@ -70,7 +70,13 @@ const PointPurchase = () => {
 
   return (
     <RootContainer>
-      <TopBar title="코인 구매" showBackButton={true} />
+      <TopBar
+        title="코인 구매"
+        showBackButton={true}
+        onBackClick={() => {
+          navigate('/emoticons')
+        }}
+      />
       <EmoticonsContainer>
         <TopItemContainer>
           <CoinBox coinCount={coin} />
@@ -87,8 +93,8 @@ const PointPurchase = () => {
               <EventCoinPurchase
                 key={coin.productId}
                 productId={coin.productId}
-                coinCount={coin.amount}
-                coinPrice={coin.points}
+                coinCount={coin.points}
+                coinPrice={coin.amount}
               />
             ))}
         </EventCoinWrapper>
@@ -105,8 +111,8 @@ const PointPurchase = () => {
                 <CoinPurchase
                   key={coin.productId}
                   productId={coin.productId}
-                  coinCount={coin.amount}
-                  coinPrice={coin.points}
+                  coinCount={coin.points}
+                  coinPrice={coin.amount}
                   user={user}
                 />
               ))}
