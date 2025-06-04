@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
 import React, { useState, useRef, useEffect } from 'react'
+import { useToast } from '../toast/ToastProvider'
 
 interface YellowInputBoxProps {
   activeState: boolean
@@ -9,6 +10,7 @@ interface YellowInputBoxProps {
   value: string
   onChange?: (value: string) => void
   isTitle?: boolean
+  maxLength?: number
 }
 
 const getTextareaStyle = (isTitle: boolean, height: number) => css`
@@ -50,9 +52,11 @@ const YellowInputBox: React.FC<YellowInputBoxProps> = ({
   activeState = true,
   height = 42,
   isTitle = false,
+  maxLength = 20,
 }) => {
   const [value, setValue] = useState(externalValue)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const { showToast } = useToast()
 
   const adjustHeight = () => {
     const textarea = textareaRef.current
@@ -72,7 +76,11 @@ const YellowInputBox: React.FC<YellowInputBoxProps> = ({
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value
+    let newValue = e.target.value
+    if (newValue.length > maxLength) {
+      showToast(`최대 ${maxLength}자까지 입력 가능합니다.`, 'warning')
+      newValue = newValue.slice(0, maxLength)
+    }
     adjustHeight()
     setValue(newValue)
     onChange?.(newValue)
@@ -88,6 +96,7 @@ const YellowInputBox: React.FC<YellowInputBoxProps> = ({
         css={getTextareaStyle(isTitle, height)}
         disabled={!activeState}
         rows={1}
+        maxLength={maxLength}
       />
     </div>
   )
