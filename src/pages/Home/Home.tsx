@@ -367,9 +367,6 @@ const HomePage = () => {
           <PlainSectionContainer>
             <SectionTitleContainer>
               <SectionTitle>지금 필요한 학생소식</SectionTitle>
-              <SeeMoreButton onClick={() => console.log('더보기 clicked')}>
-                더보기
-              </SeeMoreButton>
             </SectionTitleContainer>
 
             {/* 카드 뉴스 컴포넌트 영역 */}
