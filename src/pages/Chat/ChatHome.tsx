@@ -470,7 +470,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
                   <div
                     style={{
                       position: 'absolute',
-                      bottom: '20px',
+                      bottom: '25px',
                       right: '8px',
                       background:
                         'linear-gradient(45deg, #feecc4 0%, #fff3d8 50%, #f0daa9 100%)',

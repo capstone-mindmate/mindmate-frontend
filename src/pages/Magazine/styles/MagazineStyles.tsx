@@ -141,6 +141,129 @@ export const MagazineContent = styled.div`
     font-size: 2em !important;
   }
 
+  /* 텍스트 색상 - 모든 가능한 선택자로 지원 */
+  .ql-color-red,
+  [style*='color: red'],
+  span[style*='color: red'] {
+    color: red !important;
+  }
+
+  .ql-color-orange,
+  [style*='color: orange'],
+  span[style*='color: orange'] {
+    color: orange !important;
+  }
+
+  .ql-color-yellow,
+  [style*='color: yellow'],
+  span[style*='color: yellow'] {
+    color: yellow !important;
+  }
+
+  .ql-color-green,
+  [style*='color: green'],
+  span[style*='color: green'] {
+    color: green !important;
+  }
+
+  .ql-color-blue,
+  [style*='color: blue'],
+  span[style*='color: blue'] {
+    color: blue !important;
+  }
+
+  .ql-color-purple,
+  [style*='color: purple'],
+  span[style*='color: purple'] {
+    color: purple !important;
+  }
+
+  /* 일반적인 색상 값들도 지원 */
+  [style*='color: #'] {
+    /* 이미 인라인 스타일로 적용된 색상 유지 */
+  }
+
+  [style*='color: rgb'] {
+    /* RGB 색상 값 유지 */
+  }
+
+  /* === 핵심: 배경색 스타일 완전 지원 === */
+
+  /* Quill 배경색 클래스 */
+  .ql-bg-red,
+  .ql-background-red,
+  [style*='background-color: red'],
+  span[style*='background-color: red'] {
+    background-color: red !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+  }
+
+  .ql-bg-orange,
+  .ql-background-orange,
+  [style*='background-color: orange'],
+  span[style*='background-color: orange'] {
+    background-color: orange !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+  }
+
+  .ql-bg-yellow,
+  .ql-background-yellow,
+  [style*='background-color: yellow'],
+  span[style*='background-color: yellow'] {
+    background-color: yellow !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+  }
+
+  .ql-bg-green,
+  .ql-background-green,
+  [style*='background-color: green'],
+  span[style*='background-color: green'] {
+    background-color: green !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+  }
+
+  .ql-bg-blue,
+  .ql-background-blue,
+  [style*='background-color: blue'],
+  span[style*='background-color: blue'] {
+    background-color: blue !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+  }
+
+  .ql-bg-purple,
+  .ql-background-purple,
+  [style*='background-color: purple'],
+  span[style*='background-color: purple'] {
+    background-color: purple !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+  }
+
+  /* 모든 배경색 인라인 스타일 지원 */
+  [style*='background-color: #'] {
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+    /* 인라인 스타일 배경색 유지 */
+  }
+
+  [style*='background-color: rgb'] {
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+    /* RGB 배경색 유지 */
+  }
+
+  /* 추가 배경색 선택자들 */
+  span[style*='background:'],
+  span[style*='background-color:'] {
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+  }
+
   /* 정렬 스타일 */
   .ql-align-center {
     text-align: center;
@@ -152,6 +275,18 @@ export const MagazineContent = styled.div`
 
   .ql-align-justify {
     text-align: justify;
+  }
+
+  /* 모든 span 태그의 스타일 속성 보존 */
+  span {
+    /* 인라인 스타일 우선순위 보장 */
+  }
+
+  /* 중첩된 스타일 조합 지원 */
+  span[style*='color:'][style*='background-color:'] {
+    /* 색상과 배경색이 함께 적용된 경우 */
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
   }
 
   /* 이모티콘 스타일 */
