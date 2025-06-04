@@ -52,6 +52,7 @@ export const NotificationContent = styled.div`
   flex-direction: column;
   justify-content: center;
   flex: 1;
+  cursor: pointer;
 `
 
 // 알림 제목

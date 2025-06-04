@@ -201,6 +201,7 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
             onChange={handleTitleChange}
             activeState={true}
             isTitle={false}
+            maxLength={18}
           />
           <YellowInputBox
             placeholder="간단한 소개글을 작성해보세요"
@@ -209,6 +210,7 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
             onChange={handleDescriptionChange}
             activeState={true}
             isTitle={false}
+            maxLength={50}
           />
         </div>
 
