@@ -32,7 +32,7 @@ if (import.meta.env.VITE_SENTRY_DSN) {
     sendDefaultPii: true,
 
     // 디버그 모드 켬
-    debug: true,
+    debug: false,
 
     // 릴리즈 버전 (선택사항)
     release: import.meta.env.VITE_APP_VERSION,

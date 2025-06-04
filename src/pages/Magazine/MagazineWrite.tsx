@@ -49,7 +49,7 @@ const EmoticonButton = ({ onClick }: { onClick: () => void }) => {
       css={emoticonButtonStyles}
       title="이모티콘 삽입"
     >
-      <SmileIcon color="#484848" width={20} height={20} />
+      <SmileIcon width={20} height={20} />
     </button>
   )
 }
@@ -622,10 +622,10 @@ const MagazineWrite: React.FC = () => {
                 ${emoticonPickerOverlayStyles}
                 position: absolute;
                 z-index: 1000;
-                bottom: 40px;
+                bottom: 0px;
                 left: 0;
+                width: 100%;
                 border-radius: 12px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
                 background-color: white;
               `}
             >

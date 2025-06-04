@@ -1,0 +1,485 @@
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useAuthStore } from '../stores/userStore'
+import { useSocketMessage } from './useSocketMessage'
+import { useToast } from '../components/toast/ToastProvider'
+import { useMessageProcessor } from './useMessageProcessor'
+import { useCustomForm } from './useCustomForm'
+import { Message } from '../types/message'
+import { fetchWithRefresh } from '../utils/fetchWithRefresh'
+
+interface UseChatRoomProps {
+  chatId: string
+  chatBarRef: React.RefObject<any>
+}
+
+export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
+  const { user } = useAuthStore()
+  const myUserId = user?.userId
+  const { stompClient, isConnected } = useSocketMessage()
+  const { showToast } = useToast()
+
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isLoadingMessages, setIsLoadingMessages] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [toastBoxes, setToastBoxes] = useState<any[]>([])
+  const [availableEmoticons, setAvailableEmoticons] = useState<any[]>([])
+
+  const subscriptionsRef = useRef<any[]>([])
+  const loadAttemptRef = useRef(0)
+  const processingCustomFormRef = useRef<Set<string>>(new Set()) // 처리 중인 커스텀폼 ID 추적
+
+  // 메시지 처리 훅 - 성능 최적화
+  const messageProcessor = useMessageProcessor({
+    myUserId: myUserId || '',
+    showToast,
+    chatBarRef,
+  })
+
+  // 커스텀폼 처리 훅 - 성능 최적화
+  const customFormHandler = useCustomForm({
+    chatId,
+    myUserId: myUserId || '',
+    parseMessage: messageProcessor.parseMessage,
+    addMessage: messageProcessor.addMessage,
+  })
+
+  // 읽음 처리 - 메모이제이션 최적화
+  const markAsRead = useCallback(() => {
+    if (stompClient && stompClient.connected && chatId) {
+      try {
+        stompClient.publish({
+          destination: '/app/chat.read',
+          body: JSON.stringify({ roomId: chatId }),
+        })
+      } catch (error) {
+        console.error('읽음 처리 오류:', error)
+      }
+    }
+  }, [stompClient, chatId])
+
+  // 메시지 구독 핸들러들 - 의존성 최소화
+  const onMessage = useCallback(
+    (msg: any) => {
+      //console.log('웹소켓 일반 메시지 원본:', msg)
+      try {
+        const data = JSON.parse(msg.body)
+        //console.log('파싱된 일반 메시지 데이터:', data)
+
+        // 커스텀폼 관련 메시지인지 확인 - 여기서 처리하지 말고 전용 채널에서만 처리
+        if (data.type === 'CUSTOM_FORM' || data.messageType === 'CUSTOM_FORM') {
+          //console.log('일반 메시지 채널에서 커스텀폼 메시지 감지 - 전용 채널에서 처리하므로 무시')
+          return // ← 이 부분이 핵심! 커스텀폼은 전용 채널에서만 처리
+        }
+
+        // 일반 메시지만 처리
+        messageProcessor.processTextMessage(data, setMessages, markAsRead)
+      } catch (error) {
+        console.error('메시지 수신 오류:', error)
+      }
+    },
+    [messageProcessor.processTextMessage, markAsRead]
+  )
+
+  // onCustomForm은 그대로 유지
+  const onCustomForm = useCallback(
+    (msg: any) => {
+      //console.log('웹소켓 커스텀폼 메시지 원본:', msg)
+      try {
+        const data = JSON.parse(msg.body)
+        //console.log('파싱된 커스텀폼 데이터:', data)
+
+        // 커스텀폼 핸들러로 전달
+        customFormHandler.processCustomFormMessage(
+          data,
+          setMessages,
+          markAsRead
+        )
+      } catch (error) {
+        console.error('커스텀 폼 수신 오류:', error)
+      }
+    },
+    [customFormHandler.processCustomFormMessage, markAsRead]
+  )
+
+  const onRead = useCallback(
+    (msg: any) => {
+      try {
+        const data = JSON.parse(msg.body)
+        if (String(data.userId) !== String(myUserId)) {
+          setMessages((prev) => prev.map((m) => ({ ...m, isRead: true })))
+        }
+      } catch (error) {
+        console.error('읽음 처리 알림 오류:', error)
+      }
+    },
+    [myUserId]
+  )
+
+  const onEmoticon = useCallback(
+    (msg: any) => {
+      try {
+        const data = JSON.parse(msg.body)
+        const newMessage = messageProcessor.parseMessage(data)
+        messageProcessor.addMessage(newMessage, setMessages, markAsRead)
+      } catch (error) {
+        console.error('이모티콘 메시지 수신 오류:', error)
+      }
+    },
+    [messageProcessor.parseMessage, messageProcessor.addMessage, markAsRead]
+  )
+
+  // 토스트박스 구독 핸들러
+  const onToastBox = useCallback((msg: any) => {
+    try {
+      const data = JSON.parse(msg.body)
+      setToastBoxes((prev) => [...prev, data])
+    } catch (error) {
+      console.error('토스트박스 수신 오류:', error)
+    }
+  }, [])
+
+  // 초기 메시지 로드 - 성능 최적화
+  const fetchMessages = useCallback(
+    async (isInitialLoad = false) => {
+      if (!chatId) return
+
+      if (isInitialLoad && messages.length === 0) {
+        setIsLoadingMessages(true)
+      }
+
+      loadAttemptRef.current += 1
+
+      try {
+        if (loadAttemptRef.current > 1) {
+          const backoffDelay = Math.min(
+            1000 * Math.pow(1.5, loadAttemptRef.current - 1),
+            10000
+          )
+          await new Promise((resolve) => setTimeout(resolve, backoffDelay))
+        }
+
+        const res = await fetchWithRefresh(
+          `https://mindmate.shop/api/chat/rooms/${chatId}/messages`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+
+        if (!res.ok) {
+          if (res.status === 500) {
+            setErrorMessage(
+              '서버에서 채팅방 정보를 처리하는 중 오류가 발생했습니다.'
+            )
+            setIsLoadingMessages(false)
+            return
+          }
+
+          if (res.status === 401) {
+            setErrorMessage('인증이 필요합니다. 다시 로그인해주세요.')
+            setIsLoadingMessages(false)
+            return
+          }
+
+          if (res.status === 429) {
+            setErrorMessage('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.')
+            setIsLoadingMessages(false)
+            return
+          }
+
+          throw new Error(`메시지 목록을 불러오지 못했습니다. (${res.status})`)
+        }
+
+        const contentType = res.headers.get('content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('서버가 JSON이 아닌 응답을 반환했습니다:', contentType)
+          throw new Error('인증이 필요하거나 서버 오류가 발생했습니다.')
+        }
+
+        const data = await res.json()
+        const newMessages = Array.isArray(data.messages)
+          ? data.messages.map(messageProcessor.parseMessage)
+          : []
+
+        // 메시지 설정 - 중복 제거 및 정렬
+        setMessages((prev) => {
+          if (prev.length === 0) {
+            return newMessages.sort(
+              (a: Message, b: Message) =>
+                new Date(a.timestamp).getTime() -
+                new Date(b.timestamp).getTime()
+            )
+          } else {
+            const existingIds = new Set(prev.map((m: Message) => m.id))
+            const uniqueNewMessages = newMessages.filter(
+              (m: Message) => !existingIds.has(m.id)
+            )
+
+            const combined = [...prev, ...uniqueNewMessages]
+            return combined.sort(
+              (a: Message, b: Message) =>
+                new Date(a.timestamp).getTime() -
+                new Date(b.timestamp).getTime()
+            )
+          }
+        })
+
+        loadAttemptRef.current = 0
+        setErrorMessage(null)
+      } catch (e) {
+        console.error('메시지 조회 실패:', e)
+        if (loadAttemptRef.current < 8) {
+          setTimeout(() => fetchMessages(false), 2000 * loadAttemptRef.current)
+        } else {
+          loadAttemptRef.current = 0
+          setErrorMessage(
+            '메시지를 불러오는데 실패했습니다. 다시 시도해주세요.'
+          )
+        }
+      } finally {
+        if (isInitialLoad) {
+          setIsLoadingMessages(false)
+        }
+      }
+    },
+    [chatId, messageProcessor.parseMessage]
+  )
+
+  // 이모티콘 목록 로드
+  const fetchEmoticons = useCallback(async () => {
+    try {
+      const res = await fetchWithRefresh(
+        'https://mindmate.shop/api/emoticons/available',
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+      if (res.ok) {
+        const data = await res.json()
+        setAvailableEmoticons(data)
+      }
+    } catch (e) {
+      console.error('이모티콘 조회 실패:', e)
+      setAvailableEmoticons([])
+    }
+  }, [])
+
+  // 웹소켓 구독 설정 - 성능 최적화
+  useEffect(() => {
+    if (!chatId || !stompClient || !isConnected) {
+      if (chatId) {
+        fetchMessages(true)
+      }
+      return
+    }
+
+    //console.log('채팅방 구독 시작:', chatId)
+
+    // 이전 구독 해제
+    subscriptionsRef.current.forEach((sub) => {
+      if (sub && sub.unsubscribe) {
+        sub.unsubscribe()
+      }
+    })
+    subscriptionsRef.current = []
+
+    try {
+      const subscriptions = [
+        stompClient.subscribe(`/topic/chat.room.${chatId}`, onMessage),
+        stompClient.subscribe(`/topic/chat.room.${chatId}.read`, onRead),
+        stompClient.subscribe(
+          `/topic/chat.room.${chatId}.customform`,
+          onCustomForm
+        ),
+        stompClient.subscribe(
+          `/topic/chat.room.${chatId}.toastbox`,
+          onToastBox
+        ),
+        stompClient.subscribe(
+          `/topic/chat.room.${chatId}.emoticon`,
+          onEmoticon
+        ),
+      ]
+      subscriptionsRef.current = subscriptions
+
+      // 채팅방 입장 알림
+      stompClient.publish({
+        destination: '/app/presence',
+        body: JSON.stringify({ status: 'ONLINE', activeRoomId: chatId }),
+      })
+
+      markAsRead()
+      fetchMessages(true)
+      fetchEmoticons()
+    } catch (error) {
+      console.error('채팅방 구독 오류:', error)
+      setErrorMessage('채팅방 구독 중 오류가 발생했습니다.')
+      fetchMessages(true)
+      fetchEmoticons()
+    }
+
+    return () => {
+      if (stompClient && stompClient.connected) {
+        try {
+          stompClient.publish({
+            destination: '/app/presence',
+            body: JSON.stringify({ status: 'ONLINE', activeRoomId: null }),
+          })
+        } catch (error) {
+          console.error('채팅방 퇴장 알림 실패:', error)
+        }
+      }
+
+      subscriptionsRef.current.forEach((sub) => {
+        if (sub && sub.unsubscribe) {
+          try {
+            sub.unsubscribe()
+          } catch (error) {
+            console.error('구독 해제 실패:', error)
+          }
+        }
+      })
+      subscriptionsRef.current = []
+
+      // 처리 중인 커스텀폼 추적 초기화
+      processingCustomFormRef.current.clear()
+    }
+  }, [
+    chatId,
+    stompClient,
+    isConnected,
+    myUserId,
+    onMessage,
+    onRead,
+    onCustomForm,
+    onToastBox,
+    onEmoticon,
+    markAsRead,
+    fetchMessages,
+    fetchEmoticons,
+  ])
+
+  // 클린업 - 성능 최적화
+  useEffect(() => {
+    return () => {
+      messageProcessor.cleanup()
+      processingCustomFormRef.current.clear()
+    }
+  }, [messageProcessor])
+
+  // 메시지 전송 - 성능 최적화
+  const sendMessage = useCallback(
+    (content: string, onError?: () => void) => {
+      if (content.trim() === '') return
+
+      const currentMessage = content.trim()
+
+      if (stompClient && stompClient.connected && chatId) {
+        try {
+          stompClient.publish({
+            destination: '/app/chat.send',
+            body: JSON.stringify({
+              roomId: chatId,
+              content: currentMessage,
+              type: 'TEXT',
+            }),
+          })
+        } catch (error) {
+          console.error('메시지 전송 오류:', error)
+          if (onError) onError()
+          sendMessageFallback(currentMessage, onError)
+        }
+      } else if (chatId) {
+        sendMessageFallback(currentMessage, onError)
+      }
+    },
+    [stompClient, chatId]
+  )
+
+  // REST API 메시지 전송 - 성능 최적화
+  const sendMessageFallback = useCallback(
+    async (content: string, onError?: () => void) => {
+      try {
+        const res = await fetchWithRefresh(
+          `https://mindmate.shop/api/chat/messages`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ roomId: chatId, content, type: 'TEXT' }),
+          }
+        )
+
+        if (res.ok) {
+          const data = await res.json()
+
+          if (data.content === '[부적절한 내용이 감지되었습니다]') {
+            showToast(
+              '부적절한 내용이 감지되었습니다. 다른 표현을 사용해주세요.',
+              'error'
+            )
+            if (onError) onError()
+            return
+          }
+
+          const newMessage = messageProcessor.parseMessage(data)
+          messageProcessor.addMessage(newMessage, setMessages, markAsRead)
+        } else {
+          showToast('메시지 전송에 실패했습니다. 다시 시도해주세요.', 'error')
+          if (onError) onError()
+        }
+      } catch (error) {
+        console.error('REST API 메시지 전송 실패:', error)
+        showToast('메시지 전송에 실패했습니다. 다시 시도해주세요.', 'error')
+        if (onError) onError()
+      }
+    },
+    [chatId, messageProcessor, markAsRead, showToast]
+  )
+
+  // 이모티콘 전송 - 성능 최적화
+  const sendEmoticon = useCallback(
+    (emoticonId: string | number) => {
+      if (stompClient && stompClient.connected && chatId) {
+        try {
+          stompClient.publish({
+            destination: '/app/chat.emoticon',
+            body: JSON.stringify({ roomId: chatId, emoticonId }),
+          })
+        } catch (error) {
+          console.error('이모티콘 전송 오류:', error)
+        }
+      }
+    },
+    [stompClient, chatId]
+  )
+
+  // 메모이제이션된 반환값 - 성능 최적화
+  return useMemo(
+    () => ({
+      messages,
+      isLoadingMessages,
+      errorMessage,
+      customForms: customFormHandler.customForms,
+      toastBoxes,
+      availableEmoticons,
+      sendMessage,
+      sendEmoticon,
+      markAsRead,
+      fetchMessages,
+      setErrorMessage, // 에러 메시지 수동 설정을 위해 추가
+    }),
+    [
+      messages,
+      isLoadingMessages,
+      errorMessage,
+      customFormHandler.customForms,
+      toastBoxes,
+      availableEmoticons,
+      sendMessage,
+      sendEmoticon,
+      markAsRead,
+      fetchMessages,
+    ]
+  )
+}

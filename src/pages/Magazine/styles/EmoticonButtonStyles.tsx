@@ -21,7 +21,6 @@ export const emoticonButtonStyles = css`
   svg {
     width: 18px;
     height: 18px;
-    fill: #000;
   }
 `
 
@@ -31,6 +30,5 @@ export const emoticonPickerOverlayStyles = css`
   z-index: 100;
   left: 0;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   background-color: white;
 `
