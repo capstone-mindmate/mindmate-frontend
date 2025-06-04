@@ -211,9 +211,6 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         10000
       )
       if (loadAttemptRef.current > 1) {
-        console.log(
-          `채팅방 목록 로드 ${loadAttemptRef.current}번째 시도, ${backoffDelay}ms 대기 후 재시도...`
-        )
         await new Promise((resolve) => setTimeout(resolve, backoffDelay))
       }
 
@@ -232,7 +229,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
       if (!res.ok) {
         if (res.status === 429) {
           const retryAfter = res.headers.get('Retry-After') || '5'
-          console.log(`요청 제한 (429): ${retryAfter}초 후 재시도`)
+          //console.log(`요청 제한 (429): ${retryAfter}초 후 재시도`)
           throw new Error(
             `요청 제한에 도달했습니다. ${retryAfter}초 후 재시도합니다.`
           )
@@ -285,7 +282,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
 
       // 최대 3번까지 재시도
       if (loadAttemptRef.current < 3) {
-        console.log(`채팅방 목록 로드 실패, ${loadAttemptRef.current}/3회 시도`)
+        //console.log(`채팅방 목록 로드 실패, ${loadAttemptRef.current}/3회 시도`)
       }
     } finally {
       setIsLoading(false)
@@ -313,7 +310,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
     const intervalId = setInterval(() => {
       // 웹소켓이 연결되어 있으면 굳이 API 호출 안함
       if (!isConnected) {
-        console.log('웹소켓 연결 안됨, REST API로 채팅방 목록 갱신')
+        //console.log('웹소켓 연결 안됨, REST API로 채팅방 목록 갱신')
         fetchChatRooms(tokenToUse)
       }
     }, 60000)

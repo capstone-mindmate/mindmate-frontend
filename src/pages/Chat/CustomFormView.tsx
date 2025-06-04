@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { useSocketMessage } from '../../hooks/useSocketMessage'
 import { useToast } from '../../components/toast/ToastProvider'
+import { useAuthStore } from '../../stores/userStore'
 
 import { RootContainer, CustomFormContainer } from './styles/RootStyles'
 import {
@@ -28,6 +29,7 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
 
   const location = useLocation()
   const navigate = useNavigate()
+  const { user } = useAuthStore()
   const chatRoomId = matchId
   const { stompClient, isConnected } = useSocketMessage()
   const { showToast } = useToast()
@@ -50,6 +52,8 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
         const data = await res.json()
         setFormData(data)
         setAskList(data.items?.map((item: any) => item.question) || [])
+        // 답변 배열을 질문 수만큼 빈 문자열로 초기화
+        setAnswers(new Array(data.items?.length || 0).fill(''))
       } catch (e) {
         console.error('폼 데이터 조회 실패:', e)
         showToast('설문지 정보를 불러오지 못했습니다.', 'error')
@@ -72,13 +76,27 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
       return false
     }
 
+    // 답변 길이 검증 (예: 각 답변 최대 500자)
+    const tooLongAnswers = answers.filter(
+      (answer) => answer.trim().length > 500
+    )
+    if (tooLongAnswers.length > 0) {
+      showToast('답변은 500자 이하로 입력해주세요.', 'error')
+      return false
+    }
+
     return true
   }
 
-  // 답변 제출
+  // 답변 제출 - 연속 제출 방지 로직 강화
   const handleSubmit = async () => {
     if (!formId || !chatRoomId) {
       showToast('폼 정보가 유효하지 않습니다.', 'error')
+      return
+    }
+
+    if (isSubmitting) {
+      showToast('답변을 제출 중입니다. 잠시만 기다려주세요.', 'info')
       return
     }
 
@@ -87,26 +105,29 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
     setIsSubmitting(true)
 
     try {
+      // 유효한 답변만 필터링 (앞뒤 공백 제거)
+      const trimmedAnswers = answers.map((answer) => answer.trim())
+
       // 웹소켓으로 전송 시도
       if (stompClient && stompClient.connected) {
+        const myUserId = user?.userId
+
+        // 커스텀폼 채널로만 전송
         stompClient.publish({
           destination: '/app/chat.customform.respond',
           body: JSON.stringify({
             formId: Number(formId),
             chatRoomId: Number(chatRoomId),
-            answers,
+            answers: trimmedAnswers,
+            type: 'CUSTOM_FORM',
+            answered: true,
+            responderId: myUserId,
           }),
         })
 
-        // 시스템 메시지 전송 (응답 완료 알림)
-        stompClient.publish({
-          destination: '/app/chat.send',
-          body: JSON.stringify({
-            roomId: chatRoomId,
-            content: '상대방이 설문에 응답했습니다.',
-            type: 'SYSTEM',
-          }),
-        })
+        //console.log('커스텀폼 답변 웹소켓 전송 완료')
+
+        showToast('답변이 제출되었습니다.', 'success')
 
         // 채팅방으로 이동
         navigate(`/chat/${chatRoomId}`, {
@@ -119,6 +140,8 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
       }
 
       // 웹소켓 연결이 안되었을 경우 REST API 호출로 대체
+      //console.log('REST API로 커스텀폼 답변 제출')
+
       const res = await fetchWithRefresh(
         `https://mindmate.shop/api/custom-forms/${formId}/respond`,
         {
@@ -127,20 +150,31 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
           body: JSON.stringify({
             formId: Number(formId),
             chatRoomId: Number(chatRoomId),
-            answers,
+            answers: trimmedAnswers,
           }),
         }
       )
 
       if (res.ok) {
-        // 시스템 메시지도 REST API로 전송
-        await sendSystemMessageREST(chatRoomId)
+        //console.log('REST API 커스텀폼 답변 제출 성공')
+
+        showToast('답변이 제출되었습니다.', 'success')
+
         navigate(`/chat/${chatRoomId}`, {
           state: {
             profileImage: otherProfileImageFromNav,
             userName: otherUserNameFromNav,
           },
         })
+      } else if (res.status === 429) {
+        showToast('요청이 너무 빠릅니다. 잠시 후 다시 시도해주세요.', 'error')
+      } else if (res.status >= 500) {
+        showToast(
+          '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          'error'
+        )
+      } else if (res.status === 409) {
+        showToast('이미 답변이 완료된 설문지입니다.', 'error')
       } else {
         throw new Error('설문지 응답에 실패했습니다.')
       }
@@ -148,7 +182,10 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
       console.error('설문지 응답 제출 오류:', e)
       showToast('설문지 응답 제출에 실패했습니다. 다시 시도해주세요.', 'error')
     } finally {
-      setIsSubmitting(false)
+      // 연속 제출 방지를 위해 1초 후에 상태 리셋
+      setTimeout(() => {
+        setIsSubmitting(false)
+      }, 1000)
     }
   }
 
@@ -159,28 +196,19 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
     setAnswers(newAnswers)
   }
 
-  // 시스템 메시지 REST API 전송 함수 (웹소켓 실패 시 대체용)
-  const sendSystemMessageREST = async (roomId: string | number) => {
-    try {
-      const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/messages`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            roomId,
-            content: '상대방이 설문에 응답했습니다.',
-            type: 'SYSTEM',
-          }),
-        }
-      )
-
-      if (!res.ok) {
-        console.error('시스템 메시지 전송 실패')
-      }
-    } catch (e) {
-      console.error('시스템 메시지 전송 오류:', e)
+  // 뒤로가기 처리
+  const handleBackClick = () => {
+    if (isSubmitting) {
+      showToast('답변 제출 중입니다. 잠시만 기다려주세요.', 'info')
+      return
     }
+
+    navigate(`/chat/${chatRoomId}`, {
+      state: {
+        profileImage: otherProfileImageFromNav,
+        userName: otherUserNameFromNav,
+      },
+    })
   }
 
   // 모든 질문에 답변이 있는지 확인
@@ -191,21 +219,19 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
     )
   }
 
+  // 완료 버튼 활성화 조건
+  const isFormComplete = () => {
+    return hasAllAnswers() && !isSubmitting
+  }
+
   return (
     <RootContainer>
       <TopBar
         title="답변 작성"
         showBackButton={true}
-        onBackClick={() =>
-          navigate(`/chat/${chatRoomId}`, {
-            state: {
-              profileImage: otherProfileImageFromNav,
-              userName: otherUserNameFromNav,
-            },
-          })
-        }
-        isActionDisabled={!hasAllAnswers() || isSubmitting}
-        actionText="완료"
+        onBackClick={handleBackClick}
+        isActionDisabled={!isFormComplete()}
+        actionText={isSubmitting ? '제출 중...' : '완료'}
         onActionClick={handleSubmit}
       />
       <CustomFormContainer>
@@ -218,7 +244,12 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
             <AskInput
               key={index}
               title={ask}
-              onAnswerChange={(value) => handleAnswerChange(index, value)}
+              onAnswerChange={(value) => {
+                if (!isSubmitting) {
+                  // 제출 중이 아닐 때만 변경 허용
+                  handleAnswerChange(index, value)
+                }
+              }}
             />
           ))}
         </CustomFormInputContainer>

@@ -13,7 +13,7 @@ export const ChatBarContainer = styled.div`
   background-color: #ffffff;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end; /* center에서 flex-end로 변경 */
   z-index: 3000;
   width: 100%;
   border-top: 1px solid #eee;
@@ -26,7 +26,7 @@ export const ChatBarContainer = styled.div`
 
 export const ControlsContainer = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-end; /* center에서 flex-end로 변경 */
   width: 100%;
   max-width: 767px;
   margin: 0 auto;
@@ -38,7 +38,7 @@ export const InputContainer = styled.div`
   display: flex;
   width: 100%;
   position: relative;
-  align-items: center;
+  align-items: flex-end; /* center에서 flex-end로 변경 */
   box-sizing: border-box;
 
   @media all and (max-width: 767px) {
@@ -67,6 +67,7 @@ export const StyledInput = styled.input<{ disabled?: boolean }>`
 
 export const IconWrapper = styled.div`
   cursor: pointer;
+  margin-bottom: 8px; /* 아이콘들을 약간 위로 올림 */
 `
 
 interface IconButtonProps {
@@ -77,6 +78,7 @@ interface IconButtonProps {
 export const IconButton = styled.button<IconButtonProps>`
   position: absolute;
   ${(props) => (props.position === 'left' ? 'left: 10px;' : 'right: 10px;')}
+  bottom: 8px; /* 버튼을 아래쪽에 고정 */
   width: 32px;
   height: 32px;
   border: none;

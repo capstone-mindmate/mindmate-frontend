@@ -51,12 +51,18 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       message: string,
       type: ToastType,
       autoClose = true,
-      duration = 3000
+      duration?: number
     ): string => {
       const id = Math.random().toString(36).substring(2, 9)
 
+      // duration이 명시적으로 전달되지 않은 경우 타입별 기본값 설정
+      let defaultDuration = duration
+      if (duration === undefined) {
+        defaultDuration = type === 'info' ? 7000 : 3000
+      }
+
       // 기존 토스트를 모두 대체하여 하나의 토스트만 표시
-      setToasts([{ id, message, type, autoClose, duration }])
+      setToasts([{ id, message, type, autoClose, duration: defaultDuration }])
 
       return id // ID 반환(나중에 특정 토스트를 제거할 수 있도록)
     },
