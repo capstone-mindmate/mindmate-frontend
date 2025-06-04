@@ -1,11 +1,7 @@
-/**
- * 매거진 콘텐츠 파서 - 에디터 내용을 API 형식에 맞게 변환
- *
- * 이미지 처리 개선 버전
- */
+// 매거진 콘텐츠 파서 - 에디터 내용을 API 형식에 맞게 변환
 import { EmoticonType } from '../../components/emoticon/Emoticon'
 import { mapEmoticonTypeToId } from './EmoticonService'
-import { getTokenCookie } from '../../utils/fetchWithRefresh'
+import { getTokenCookie, fetchWithRefresh } from '../../utils/fetchWithRefresh'
 
 /**
  * 매거진 게시 함수
@@ -47,7 +43,7 @@ export const postMagazine = async (
     if (imagesToUpload.length > 0) {
       try {
         console.log(`이미지 업로드 시작: ${imagesToUpload.length}개`)
-        // 이미지 업로드 API 엔드포인트
+
         const apiUrl = 'https://mindmate.shop/api/magazines/image'
         const formData = new FormData()
 
@@ -57,15 +53,12 @@ export const postMagazine = async (
           formData.append('files', blob, `image_${index}.jpg`)
         })
 
-        // 직접 fetch 호출
         console.log('이미지 업로드 요청 시작...')
-        const response = await fetch(apiUrl, {
+
+        // fetchWithRefresh 사용
+        const response = await fetchWithRefresh(apiUrl, {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials: 'include',
-          body: formData,
+          body: formData, // FormData는 Content-Type 헤더를 자동으로 설정함
         })
 
         // 응답 상태 로깅
@@ -184,15 +177,20 @@ export const postMagazine = async (
     )
 
     // 5. 매거진 게시 API 호출
-    const response = await fetch('https://mindmate.shop/api/magazines', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      credentials: 'include',
-      body: JSON.stringify(magazineRequest),
-    })
+    console.log('=== 매거진 게시 시작 ===')
+
+    // fetchWithRefresh 사용 (토큰 관리 자동화)
+    const response = await fetchWithRefresh(
+      'https://mindmate.shop/api/magazines',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Authorization 헤더는 fetchWithRefresh가 자동으로 추가
+        },
+        body: JSON.stringify(magazineRequest),
+      }
+    )
 
     // 응답 로깅
     console.log(
@@ -253,7 +251,7 @@ export const convertCategoryToApiFormat = (category: string): string => {
     취업: 'EMPLOYMENT',
     학업: 'ACADEMIC',
     인간관계: 'RELATIONSHIP',
-    경제: 'ECONOMIC',
+    경제: 'FINANCIAL',
     기타: 'OTHER',
   }
 
