@@ -12,25 +12,36 @@ import {
 } from './NotificationStyles.tsx'
 
 interface NotificationItemProps {
+  id: number
   type: 'match' | 'comment'
   title: string
   time: string
   isRead: boolean
+  description: string
+  onClick: () => void
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
+  id,
   type,
   title,
   time,
   isRead,
+  description,
+  onClick,
 }) => {
   const iconColor = isRead ? '#D9D9D9' : '#392111'
 
-  let description = ''
-  if (type === 'match') {
-    description = `${title} 님의 매칭이 도착했습니다.`
-  } else {
-    description = `${title} 매거진에 댓글이 달렸습니다.`
+  const formatDateTime = (input: string) => {
+    const date = new Date(input)
+
+    const yy = String(date.getFullYear()).slice(2) // '25'
+    const mm = String(date.getMonth() + 1).padStart(2, '0') // '06'
+    const dd = String(date.getDate()).padStart(2, '0') // '03'
+    const hh = String(date.getHours()).padStart(2, '0') // '02'
+    const min = String(date.getMinutes()).padStart(2, '0') // '27'
+
+    return `${yy}-${mm}-${dd} ${hh}:${min}`
   }
 
   return (
@@ -53,12 +64,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             />
           )}
         </IconContainer>
-        <NotificationContent>
-          <NotificationTitle>
-            {type === 'match' ? '매칭 도착!' : '댓글 알림'}
-          </NotificationTitle>
+        <NotificationContent onClick={onClick}>
+          <NotificationTitle>{title}</NotificationTitle>
           <NotificationDescription>{description}</NotificationDescription>
-          <NotificationTime>{time}</NotificationTime>
+          <NotificationTime>{formatDateTime(time)}</NotificationTime>
         </NotificationContent>
       </ItemInnerContainer>
     </NotificationItemContainer>
