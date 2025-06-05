@@ -133,7 +133,7 @@ const MagazineList: React.FC = () => {
       params.append('size', pageSize.toString())
 
       // API URL
-      const apiUrl = `http://lohttps://mindmate.shopcalhost/api/magazines?${params.toString()}`
+      const apiUrl = `https://mindmate.shop/api/magazines?${params.toString()}`
 
       // 인증 토큰 가져오기
       const accessToken = getTokenCookie('accessToken')
@@ -189,7 +189,7 @@ const MagazineList: React.FC = () => {
             // 이미지 URL이 상대 경로인 경우 기본 URL 추가
             thumbnailUrl = smallestIdImage.imageUrl.startsWith('http')
               ? smallestIdImage.imageUrl
-              : `http://lohttps://mindmate.shopcalhost/api${smallestIdImage.imageUrl}`
+              : `https://mindmate.shop/api${smallestIdImage.imageUrl}`
           }
         }
 

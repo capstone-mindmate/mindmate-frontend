@@ -117,7 +117,7 @@ const CustomFormMake = ({ matchId }: CustomFormMakeProps) => {
       //console.log('REST API로 커스텀폼 생성 요청')
 
       const res = await fetchWithRefresh(
-        'http://lohttps://mindmate.shopcalhost/api/custom-forms',
+        'https://mindmate.shop/api/custom-forms',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

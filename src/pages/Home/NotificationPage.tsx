@@ -22,7 +22,7 @@ const NotificationPage = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       const res = await fetchWithRefresh(
-        'http://lohttps://mindmate.shopcalhost/api/notifications',
+        'https://mindmate.shop/api/notifications',
         {
           method: 'GET',
         }
@@ -41,7 +41,7 @@ const NotificationPage = () => {
   const handleNotificationClick = async (id: number) => {
     try {
       const res = await fetchWithRefresh(
-        `http://lohttps://mindmate.shopcalhost/api/notifications/${id}`,
+        `https://mindmate.shop/api/notifications/${id}`,
         {
           method: 'PUT',
         }
@@ -64,7 +64,7 @@ const NotificationPage = () => {
   const handleAllReadClick = async () => {
     try {
       const res = await fetchWithRefresh(
-        `http://lohttps://mindmate.shopcalhost/api/notifications/all`,
+        `https://mindmate.shop/api/notifications/all`,
         {
           method: 'PUT',
         }

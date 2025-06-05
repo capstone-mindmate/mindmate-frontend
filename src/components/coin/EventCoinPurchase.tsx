@@ -27,7 +27,7 @@ interface EventCoinPurchaseProps {
 // 결제 설정 정보를 받아오는 함수 (이 파일 내에 직접 구현)
 async function getPaymentConfig() {
   const res = await fetchWithRefresh(
-    'http://lohttps://mindmate.shopcalhost/api/payments/config',
+    'https://mindmate.shop/api/payments/config',
     {
       method: 'GET',
       headers: {

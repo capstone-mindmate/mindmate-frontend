@@ -138,7 +138,7 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
     }
     try {
       const res = await fetchWithRefresh(
-        'http://lohttps://mindmate.shopcalhost/api/matchings',
+        'https://mindmate.shop/api/matchings',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

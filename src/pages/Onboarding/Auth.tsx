@@ -21,7 +21,7 @@ const Auth = () => {
 
         try {
           const res = await fetchWithRefresh(
-            'http://lohttps://mindmate.shopcalhost/api/profiles',
+            'https://mindmate.shop/api/profiles',
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },

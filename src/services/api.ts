@@ -2,7 +2,7 @@ import { fetchWithRefresh } from '../utils/fetchWithRefresh'
 
 export async function createOrder(productId: number) {
   const res = await fetchWithRefresh(
-    'http://lohttps://mindmate.shopcalhost/api/payments/orders',
+    'https://mindmate.shop/api/payments/orders',
     {
       method: 'POST',
       headers: {

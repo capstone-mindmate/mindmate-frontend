@@ -116,17 +116,14 @@ function OnboardingContent() {
   // 사용자 정보 가져오기
   const fetchUserInfo = async (accessToken: string) => {
     try {
-      const response = await fetch(
-        'http://lohttps://mindmate.shopcalhost/api/user/me',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        }
-      )
+      const response = await fetch('https://mindmate.shop/api/user/me', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
 
       if (response.ok) {
         const userData = await response.json()
@@ -146,8 +143,7 @@ function OnboardingContent() {
   const handleGoogleLogin = () => {
     // 직접 OAuth URL로 이동
     // 백엔드에서 인증 완료 후 프론트엔드로 토큰과 함께 리디렉션해야 함
-    window.location.href =
-      'http://lohttps://mindmate.shopcalhost/api/oauth2/authorize/google'
+    window.location.href = 'https://mindmate.shop/api/oauth2/authorize/google'
   }
 
   // ProgressBar 관련 기능 구현

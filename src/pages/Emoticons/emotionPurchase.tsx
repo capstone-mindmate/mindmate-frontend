@@ -12,7 +12,7 @@ const EmotionPurchase = () => {
   useEffect(() => {
     const fetchEmoticon = async () => {
       const res = await fetchWithRefresh(
-        `http://lohttps://mindmate.shopcalhost/api/emoticons/purchase/${id}`,
+        `https://mindmate.shop/api/emoticons/purchase/${id}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -93,7 +93,7 @@ const HomePage = () => {
         const accessToken = getTokenCookie('accessToken')
 
         // API URL
-        const apiUrl = `http://lohttps://mindmate.shopcalhost/api/magazines/popular?limit=5`
+        const apiUrl = `https://mindmate.shop/api/magazines/popular?limit=5`
 
         // API 호출
         const response = await fetchWithRefresh(apiUrl, {
@@ -148,7 +148,7 @@ const HomePage = () => {
     const fetchRecommendedEmoticons = async () => {
       try {
         const res = await fetchWithRefresh(
-          'http://lohttps://mindmate.shopcalhost/api/emoticons/popular/used',
+          'https://mindmate.shop/api/emoticons/popular/used',
           {
             method: 'GET',
           }
@@ -177,12 +177,9 @@ const HomePage = () => {
   // 학생 소식 가져오기
   useEffect(() => {
     const fetchRecommendedEmoticons = async () => {
-      const res = await fetchWithRefresh(
-        'http://lohttps://mindmate.shopcalhost/forstudent',
-        {
-          method: 'GET',
-        }
-      )
+      const res = await fetchWithRefresh('https://mindmate.shop/forstudent', {
+        method: 'GET',
+      })
 
       if (!res.ok) {
         throw new Error(`API 호출 실패: ${res.status} ${res.statusText}`)
@@ -246,7 +243,7 @@ const HomePage = () => {
     if (imageContent && imageContent.imageUrl) {
       return imageContent.imageUrl.startsWith('http')
         ? imageContent.imageUrl
-        : `http://lohttps://mindmate.shopcalhost/api${imageContent.imageUrl}`
+        : `https://mindmate.shop/api${imageContent.imageUrl}`
     }
 
     return '/default-profile-image.png' // 기본 이미지 경로
@@ -358,10 +355,7 @@ const HomePage = () => {
           <EmoticonGrid>
             {popularEmoticons.map((emoticon) => (
               <Emoticon
-                emoticonURL={
-                  'http://lohttps://mindmate.shopcalhost/api' +
-                  emoticon.imageUrl
-                }
+                emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
                 type={emoticon.name as any}
                 size="medium"
                 onClick={() => handleEmoticonClick(emoticon.name as any)}

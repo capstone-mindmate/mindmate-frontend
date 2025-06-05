@@ -29,14 +29,11 @@ const ProfileSetting = ({}: ProfileSettingProps) => {
   // 로그아웃 API 연동
   const handleLogout = async () => {
     try {
-      await fetchWithRefresh(
-        'http://lohttps://mindmate.shopcalhost/api/auth/logout',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        }
-      )
+      await fetchWithRefresh('https://mindmate.shop/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      })
       clearUser()
       localStorage.removeItem('auth-store')
       localStorage.removeItem('userId')

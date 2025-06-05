@@ -10,7 +10,7 @@ export function useUserStatus() {
     setIsLoading(true)
     try {
       const res = await fetchWithRefresh(
-        'http://lohttps://mindmate.shopcalhost/api/chat/unread/total',
+        'https://mindmate.shop/api/chat/unread/total',
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
