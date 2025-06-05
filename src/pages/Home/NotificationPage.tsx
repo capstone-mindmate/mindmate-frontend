@@ -23,7 +23,9 @@ const NotificationPage = () => {
     const fetchNotifications = async () => {
       const res = await fetchWithRefresh(
         'https://mindmate.shop/api/notifications',
-        { method: 'GET' }
+        {
+          method: 'GET',
+        }
       )
       const data = await res.json()
       setNotifications(data.content)

@@ -187,7 +187,7 @@ const EmoticonHome = () => {
       <TopBar
         title="이모티콘 샵"
         showBackButton={true}
-        onBackClick={() => navigate('/')}
+        onBackClick={() => navigate(-1)}
         rightContent={
           <button onClick={() => setBottomSheetOpen(true)}>
             <KebabIcon color="#392111" />
