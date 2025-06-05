@@ -31,7 +31,7 @@ export const useCustomForm = ({
 
       try {
         const response = await fetchWithRefresh(
-          `http://localhost/api/custom-forms/chat-room/${chatId}`,
+          `https://mindmate.shop/api/custom-forms/chat-room/${chatId}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -88,7 +88,7 @@ export const useCustomForm = ({
     async (formId: string): Promise<FormDataResult> => {
       try {
         const response = await fetchWithRefresh(
-          `http://localhost/api/custom-forms/${formId}`,
+          `https://mindmate.shop/api/custom-forms/${formId}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
