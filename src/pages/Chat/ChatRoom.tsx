@@ -70,6 +70,12 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
+  // 실시간 종료 추적
+  const [isRealTimeClose, setIsRealTimeClose] = useState(false)
+  const [prevRoomStatus, setPrevRoomStatus] = useState<
+    'ACTIVE' | 'CLOSED' | 'CLOSE_REQUEST'
+  >('ACTIVE')
+
   // 이전 메시지 로드 관련 상태
   const [isLoadingPrev, setIsLoadingPrev] = useState(false)
   const [hasMorePrev, setHasMorePrev] = useState(true)
@@ -155,7 +161,14 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
   // 종료 수락 시 리뷰 페이지로 이동 처리
   useEffect(() => {
-    if (roomStatus === 'CLOSED' && closeModalType === 'NONE') {
+    // roomStatus가 변경되어 CLOSED가 되었고, 초기 로딩이 완료된 경우에만
+    if (
+      prevRoomStatus === 'CLOSE_REQUEST' &&
+      roomStatus === 'CLOSED' &&
+      !isLoadingMessages &&
+      closeModalType === 'NONE'
+    ) {
+      // 웹소켓으로 받은 종료 알림인 경우 리뷰 페이지로 이동
       const timer = setTimeout(() => {
         navigate(`/review/${chatId}`, {
           state: { opponentName: otherUserName },
@@ -164,7 +177,18 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
       return () => clearTimeout(timer)
     }
-  }, [roomStatus, closeModalType, chatId, otherUserName, navigate])
+
+    // 이전 상태 업데이트
+    setPrevRoomStatus(roomStatus)
+  }, [
+    roomStatus,
+    prevRoomStatus,
+    isLoadingMessages,
+    closeModalType,
+    chatId,
+    otherUserName,
+    navigate,
+  ])
 
   // 이모티콘 피커가 열릴 때 채팅을 맨 아래로 스크롤 (핸들러에서 처리하므로 제거)
   // useEffect(() => {
@@ -368,6 +392,13 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
   const handleCloseAccept = async () => {
     const success = await acceptClose()
+    if (success) {
+      setTimeout(() => {
+        navigate(`/review/${chatId}`, {
+          state: { opponentName: otherUserName },
+        })
+      }, 500)
+    }
   }
 
   const handleCloseReject = async () => {
