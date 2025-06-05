@@ -20,13 +20,10 @@ const Auth = () => {
         setTokenCookie(refreshToken, 'refreshToken')
 
         try {
-          const res = await fetchWithRefresh(
-            'https://mindmate.shop/api/profiles',
-            {
-              method: 'GET',
-              headers: { 'Content-Type': 'application/json' },
-            }
-          )
+          const res = await fetchWithRefresh('https://mindmate.shop/api/profiles', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          })
           if (!res.ok) {
             const errorData = await res.json()
             throw new Error(errorData.error)
