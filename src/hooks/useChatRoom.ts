@@ -6,13 +6,20 @@ import { useMessageProcessor } from './useMessageProcessor'
 import { useCustomForm } from './useCustomForm'
 import { Message } from '../types/message'
 import { fetchWithRefresh } from '../utils/fetchWithRefresh'
+import { useNavigate } from 'react-router-dom'
 
 interface UseChatRoomProps {
   chatId: string
   chatBarRef: React.RefObject<any>
+  otherUserName: string
 }
 
-export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
+export const useChatRoom = ({
+  chatId,
+  chatBarRef,
+  otherUserName,
+}: UseChatRoomProps) => {
+  const navigate = useNavigate()
   const { user } = useAuthStore()
   const myUserId = user?.userId
   const { stompClient, isConnected } = useSocketMessage()
@@ -23,6 +30,17 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [toastBoxes, setToastBoxes] = useState<any[]>([])
   const [availableEmoticons, setAvailableEmoticons] = useState<any[]>([])
+
+  const [closeModalType, setCloseModalType] = useState<
+    'NONE' | 'REQUEST' | 'RECEIVE'
+  >('NONE')
+  const [roomStatus, setRoomStatus] = useState<
+    'ACTIVE' | 'CLOSED' | 'CLOSE_REQUEST'
+  >('ACTIVE')
+  const [closeRequestRoleType, setCloseRequestRoleType] = useState<
+    'LISTENER' | 'SPEAKER'
+  >('LISTENER')
+  const [listener, setListener] = useState(false)
 
   const subscriptionsRef = useRef<any[]>([])
   const loadAttemptRef = useRef(0)
@@ -65,10 +83,10 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
         const data = JSON.parse(msg.body)
         //console.log('파싱된 일반 메시지 데이터:', data)
 
-        // 커스텀폼 관련 메시지인지 확인 - 여기서 처리하지 말고 전용 채널에서만 처리
+        // 커스텀폼 관련 메시지인지 확인
         if (data.type === 'CUSTOM_FORM' || data.messageType === 'CUSTOM_FORM') {
           //console.log('일반 메시지 채널에서 커스텀폼 메시지 감지 - 전용 채널에서 처리하므로 무시')
-          return // ← 이 부분이 핵심! 커스텀폼은 전용 채널에서만 처리
+          return
         }
 
         // 일반 메시지만 처리
@@ -80,7 +98,6 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
     [messageProcessor.processTextMessage, markAsRead]
   )
 
-  // onCustomForm은 그대로 유지
   const onCustomForm = useCallback(
     (msg: any) => {
       //console.log('웹소켓 커스텀폼 메시지 원본:', msg)
@@ -137,6 +154,53 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
       console.error('토스트박스 수신 오류:', error)
     }
   }, [])
+
+  // 채팅 종료 요청 수신 핸들러
+  const onCloseRequest = useCallback(
+    (msg: any) => {
+      // 상대방이 종료 요청을 보냈을 때
+      const data = JSON.parse(msg.body)
+      console.log('Close request received:', data)
+      setCloseModalType('RECEIVE') // '채팅종료수락' 모달을 띄움
+      setRoomStatus('CLOSE_REQUEST')
+      showToast('상대방이 채팅 종료를 요청했습니다.', 'info')
+    },
+    [showToast]
+  )
+
+  // 채팅 종료 거절 수신 핸들러
+  const onCloseReject = useCallback(
+    (msg: any) => {
+      // 상대방이 종료 요청을 거절했을 때 (내가 요청했고 상대가 거절한 경우)
+      // 또는 상대방에게 내가 종료 요청을 보냈는데 상대방이 거절했다고 나에게 알려주는 경우
+      const data = JSON.parse(msg.body)
+      console.log('Close reject received:', data)
+      showToast('상대방이 채팅 종료 요청을 거절했습니다.', 'info')
+      setCloseModalType('NONE') // 모달이 떠있다면 닫음
+      setRoomStatus('ACTIVE') // 채팅 상태를 다시 활성화
+    },
+    [showToast]
+  )
+
+  // 채팅 종료 수락 수신 핸들러 (수정: 모달 대신 리뷰 페이지로 이동) ⭐️⭐️⭐️
+  const onCloseAccept = useCallback(
+    (msg: any) => {
+      // 상대방이 종료 요청을 수락했을 때
+      const data = JSON.parse(msg.body)
+      console.log('Close accept received:', data)
+      showToast('채팅이 종료되고 리뷰 페이지로 이동합니다.', 'success')
+      setCloseModalType('NONE') // 모달 닫기
+      setRoomStatus('CLOSED') // 채팅방 상태를 'CLOSED'로 변경
+
+      // 리뷰 페이지로 이동
+      navigate(`/review/${chatId}`, {
+        state: {
+          opponentName: otherUserName,
+        },
+      })
+    },
+    [navigate, chatId, otherUserName, showToast]
+  )
 
   // 초기 메시지 로드 - 성능 최적화
   const fetchMessages = useCallback(
@@ -300,6 +364,18 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
           `/topic/chat.room.${chatId}.emoticon`,
           onEmoticon
         ),
+        stompClient.subscribe(
+          `/topic/chat.room.${chatId}.close.request`,
+          onCloseRequest
+        ),
+        stompClient.subscribe(
+          `/topic/chat.room.${chatId}.close.accept`,
+          onCloseAccept
+        ),
+        stompClient.subscribe(
+          `/topic/chat.room.${chatId}.close.reject`,
+          onCloseReject
+        ),
       ]
       subscriptionsRef.current = subscriptions
 
@@ -355,9 +431,13 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
     onCustomForm,
     onToastBox,
     onEmoticon,
+    onCloseRequest,
+    onCloseAccept,
+    onCloseReject,
     markAsRead,
     fetchMessages,
     fetchEmoticons,
+    isLoadingMessages,
   ])
 
   // 클린업 - 성능 최적화
@@ -468,6 +548,13 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
       markAsRead,
       fetchMessages,
       setErrorMessage, // 에러 메시지 수동 설정을 위해 추가
+      stompClient,
+      isConnected,
+      closeModalType,
+      setCloseModalType,
+      roomStatus,
+      setRoomStatus,
+      myUserId,
     }),
     [
       messages,
@@ -480,6 +567,13 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
       sendEmoticon,
       markAsRead,
       fetchMessages,
+      stompClient,
+      isConnected,
+      closeModalType,
+      setCloseModalType,
+      roomStatus,
+      setRoomStatus,
+      myUserId,
     ]
   )
 }
