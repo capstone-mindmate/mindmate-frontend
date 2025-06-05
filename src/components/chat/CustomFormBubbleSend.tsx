@@ -20,6 +20,7 @@ interface BubbleProps {
   isRead?: boolean
   isContinuous?: boolean
   isCustomFormMake?: boolean
+  onProfileClick?: () => void
   onClick?: () => void
 }
 
@@ -71,6 +72,7 @@ const Bubble = ({
   isRead = false,
   isContinuous = false,
   isCustomFormMake = false,
+  onProfileClick,
   onClick,
 }: BubbleProps) => {
   const handleButtonClick = (e: React.MouseEvent) => {
@@ -86,7 +88,11 @@ const Bubble = ({
     >
       {!isMe &&
         (profileImage && !isContinuous ? (
-          <ProfileImage src={profileImage} alt="프로필" />
+          <ProfileImage
+            src={profileImage}
+            alt="프로필"
+            onClick={onProfileClick}
+          />
         ) : (
           <ProfileContainer />
         ))}
