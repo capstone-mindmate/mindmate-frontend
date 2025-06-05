@@ -148,7 +148,7 @@ const HomePage = () => {
     const fetchRecommendedEmoticons = async () => {
       try {
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/popular/used',
+          'https://mindmate.shop/api/emoticons/popular/viewed',
           {
             method: 'GET',
           }
