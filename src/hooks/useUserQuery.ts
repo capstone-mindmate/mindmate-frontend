@@ -4,11 +4,14 @@ import { useEffect } from 'react'
 import { fetchWithRefresh } from '../utils/fetchWithRefresh'
 
 async function fetchMe() {
-  const res = await fetchWithRefresh(`http://localhost/api/profiles`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  })
+  const res = await fetchWithRefresh(
+    `http://lohttps://mindmate.shopcalhost/api/profiles`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    }
+  )
 
   try {
     if (!res.ok) throw new Error(res.statusText)

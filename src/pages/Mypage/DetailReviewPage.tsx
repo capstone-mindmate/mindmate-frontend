@@ -43,7 +43,7 @@ const DetailReviewPage: React.FC = () => {
             profileId = user.profileId
           } else {
             const myProfileRes = await fetchWithRefresh(
-              `http://localhost/api/profiles/users/${user?.id}`,
+              `http://lohttps://mindmate.shopcalhost/api/profiles/users/${user?.id}`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -55,7 +55,7 @@ const DetailReviewPage: React.FC = () => {
         } else {
           // 타인 프로필
           const otherRes = await fetchWithRefresh(
-            `http://localhost/api/profiles/users/${userId}`,
+            `http://lohttps://mindmate.shopcalhost/api/profiles/users/${userId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -66,7 +66,7 @@ const DetailReviewPage: React.FC = () => {
         }
         // 리뷰 목록
         const reviewRes = await fetchWithRefresh(
-          `http://localhost/api/reviews/profile/${profileId}`,
+          `http://lohttps://mindmate.shopcalhost/api/reviews/profile/${profileId}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -77,7 +77,9 @@ const DetailReviewPage: React.FC = () => {
           (reviewData.content || [])
             .filter((r: any) => r.comment !== '')
             .map((r: any) => ({
-              profileImage: 'http://localhost/api' + r.reviewerProfileImage,
+              profileImage:
+                'http://lohttps://mindmate.shopcalhost/api' +
+                r.reviewerProfileImage,
               username: r.reviewerNickname,
               rating: r.rating,
               date: r.createdAt

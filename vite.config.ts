@@ -41,7 +41,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost',
+        target: 'http://lohttps://mindmate.shopcalhost',
         changeOrigin: true,
         secure: false,
       },

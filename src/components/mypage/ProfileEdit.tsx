@@ -30,7 +30,9 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({
       {/* 이미지가 로드되기 전에는 기본 이미지 보여주기 */}
       {!isImageLoaded && (
         <ProfileImage
-          src={'http://localhost/api/profileImages/default-profile-image.png'}
+          src={
+            'http://lohttps://mindmate.shopcalhost/api/profileImages/default-profile-image.png'
+          }
           alt="기본 프로필 이미지"
           style={{ position: 'absolute' }}
         />

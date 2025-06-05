@@ -281,7 +281,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
     try {
       const res = await fetchWithRefresh(
-        `http://localhost/api/chat/rooms/${chatId}/messages/before/${oldestId}?size=30`,
+        `http://lohttps://mindmate.shopcalhost/api/chat/rooms/${chatId}/messages/before/${oldestId}?size=30`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -390,7 +390,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       showToast('채팅방을 삭제하는 중입니다...', 'info')
 
       const res = await fetchWithRefresh(
-        `http://localhost/api/chat/rooms/${chatId}/delete`,
+        `http://lohttps://mindmate.shopcalhost/api/chat/rooms/${chatId}/delete`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -430,7 +430,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
     try {
       const response = await fetchWithRefresh(
-        `http://localhost/api/custom-forms/${formId}`,
+        `http://lohttps://mindmate.shopcalhost/api/custom-forms/${formId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -579,7 +579,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                       <EmoticonWrapper>
                         <EmoticonComponent
                           emoticonURL={
-                            'http://localhost/api' +
+                            'http://lohttps://mindmate.shopcalhost/api' +
                             (message as any).emoticonUrl
                           }
                           type={(message as any).emoticonType}

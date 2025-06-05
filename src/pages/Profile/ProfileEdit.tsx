@@ -84,7 +84,7 @@ const ProfileEdit = ({}: ProfileEditProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false)
 
   const defaultProfileImageUrl =
-    'http://localhost/api/profileImages/default-profile-image.png'
+    'http://lohttps://mindmate.shopcalhost/api/profileImages/default-profile-image.png'
   const realProfileImageUrl = profileImagePreview
 
   // 내 프로필 정보 불러오기
@@ -92,16 +92,20 @@ const ProfileEdit = ({}: ProfileEditProps) => {
     const fetchProfile = async () => {
       setLoading(true)
       try {
-        const res = await fetchWithRefresh('http://localhost/api/profiles', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        })
+        const res = await fetchWithRefresh(
+          'http://lohttps://mindmate.shopcalhost/api/profiles',
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
         const data = await res.json()
         setUserNickName(data.nickname || '')
         setSelectedDepartment(data.department || '')
         setSelectedYear(data.entranceTime ? String(data.entranceTime) : '')
         setProfileImagePreview(
-          'http://localhost/api' + data.profileImage || undefined
+          'http://lohttps://mindmate.shopcalhost/api' + data.profileImage ||
+            undefined
         )
         setProfileImageUrl(data.profileImage || undefined)
         setProfileImageId(data.profileImageId)
@@ -142,14 +146,14 @@ const ProfileEdit = ({}: ProfileEditProps) => {
     if (profileImageFile) {
       try {
         // 1. 현재 프로필 이미지 id 조회
-        // const currentImgRes = await fetchWithRefresh('http://localhost/api/profiles/image/current', {
+        // const currentImgRes = await fetchWithRefresh('http://lohttps://mindmate.shopcalhost/api/profiles/image/current', {
         //   method: 'GET',
         //   headers: { 'Content-Type': 'application/json' },
         // })
         // const currentImgData = await currentImgRes.json()
         // if (currentImgRes.ok && currentImgData.id) {
         //   // 2. 기존 이미지 삭제
-        //   await fetchWithRefresh(`http://localhost/api/profiles/image/${currentImgData.id}`, {
+        //   await fetchWithRefresh(`http://lohttps://mindmate.shopcalhost/api/profiles/image/${currentImgData.id}`, {
         //     method: 'DELETE',
         //     headers: { 'Content-Type': 'application/json' },
         //   })
@@ -158,7 +162,7 @@ const ProfileEdit = ({}: ProfileEditProps) => {
         const formData = new FormData()
         formData.append('file', profileImageFile)
         const imageRes = await fetchWithRefresh(
-          'http://localhost/api/profiles/image',
+          'http://lohttps://mindmate.shopcalhost/api/profiles/image',
           {
             method: 'POST',
             body: formData,
@@ -185,11 +189,14 @@ const ProfileEdit = ({}: ProfileEditProps) => {
     if (newProfileImageId !== undefined) {
       payload.profileImageId = newProfileImageId
     }
-    const res = await fetchWithRefresh('http://localhost/api/profiles', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
+    const res = await fetchWithRefresh(
+      'http://lohttps://mindmate.shopcalhost/api/profiles',
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }
+    )
     if (res.ok) {
       navigate('/mypage')
     } else {

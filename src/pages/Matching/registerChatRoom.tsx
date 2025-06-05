@@ -137,19 +137,22 @@ const RegisterChatRoom = ({}: RegisterChatRoomProps) => {
       return
     }
     try {
-      const res = await fetchWithRefresh('http://localhost/api/matchings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          description,
-          category: categoryMap[category] || 'ETC',
-          creatorRole: getCreatorRole(),
-          showDepartment: !isDepartmentHidden,
-          allowRandom: isRandomMatchingAllowed,
-          anonymous: isAnonymous,
-        }),
-      })
+      const res = await fetchWithRefresh(
+        'http://lohttps://mindmate.shopcalhost/api/matchings',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title,
+            description,
+            category: categoryMap[category] || 'ETC',
+            creatorRole: getCreatorRole(),
+            showDepartment: !isDepartmentHidden,
+            allowRandom: isRandomMatchingAllowed,
+            anonymous: isAnonymous,
+          }),
+        }
+      )
 
       if (!res.ok) {
         const errorData = await res.json()

@@ -37,7 +37,7 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
     const fetchFormData = async () => {
       try {
         const res = await fetchWithRefresh(
-          `http://localhost/api/custom-forms/${formId}`,
+          `http://lohttps://mindmate.shopcalhost/api/custom-forms/${formId}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },

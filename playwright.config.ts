@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://lohttps://mindmate.shopcalhost:5173',
     trace: 'on-first-retry',
     timeout: 30000,
     screenshot: 'only-on-failure',

@@ -44,7 +44,8 @@ export const postMagazine = async (
       try {
         console.log(`이미지 업로드 시작: ${imagesToUpload.length}개`)
 
-        const apiUrl = 'http://localhost/api/magazines/image'
+        const apiUrl =
+          'http://lohttps://mindmate.shopcalhost/api/magazines/image'
         const formData = new FormData()
 
         // 이미지 파일 추가 - 'files' 키로 파일 추가
@@ -180,14 +181,17 @@ export const postMagazine = async (
     console.log('=== 매거진 게시 시작 ===')
 
     // fetchWithRefresh 사용 (토큰 관리 자동화)
-    const response = await fetchWithRefresh('http://localhost/api/magazines', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Authorization 헤더는 fetchWithRefresh가 자동으로 추가
-      },
-      body: JSON.stringify(magazineRequest),
-    })
+    const response = await fetchWithRefresh(
+      'http://lohttps://mindmate.shopcalhost/api/magazines',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Authorization 헤더는 fetchWithRefresh가 자동으로 추가
+        },
+        body: JSON.stringify(magazineRequest),
+      }
+    )
 
     // 응답 로깅
     console.log(
