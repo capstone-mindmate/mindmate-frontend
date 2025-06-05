@@ -11,6 +11,16 @@ export const RootContainer = styled.div`
   position: relative;
 `
 
+export const ChatRoomContainer = styled.div`
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+`
+
 // 05.13 채팅 내역이 짤려서 수정합니다.
 export const ChatContainer = styled.div`
   width: 884px;

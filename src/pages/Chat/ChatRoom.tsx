@@ -6,7 +6,7 @@ import { useAuthStore } from '../../stores/userStore'
 import { useUserQuery } from '../../hooks/useUserQuery'
 import { useSocketMessage } from '../../hooks/useSocketMessage'
 
-import { RootContainer } from './styles/RootStyles'
+import { ChatRoomContainer } from './styles/RootStyles'
 import { KebabIcon } from '../../components/icon/iconComponents'
 import TopBar from '../../components/topbar/Topbar'
 import ChatBar from '../../components/chat/ChatBar'
@@ -386,7 +386,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           // 기존 메시지가 있으면 중복 제거하고 병합
           const existingIds = new Set(prev.map((m) => m.id))
           const uniqueNewMessages = newMessages.filter(
-            (m) => !existingIds.has(m.id)
+            (m: Message) => !existingIds.has(m.id)
           )
 
           // 시간 순으로 정렬하여 반환
@@ -1181,7 +1181,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
   }
 
   return (
-    <RootContainer>
+    <ChatRoomContainer>
       <TopBar
         title={otherUserName}
         showBackButton={true}
@@ -1755,7 +1755,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
           buttonClick={() => {}} // 사용하지 않음
         />
       )}
-    </RootContainer>
+    </ChatRoomContainer>
   )
 }
 
