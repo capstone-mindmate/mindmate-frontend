@@ -44,66 +44,6 @@ const categoryEngMap: Record<string, string> = {
   기타: 'OTHER',
 }
 
-const myCreatedMatchingRooms = [
-  {
-    id: 1,
-    department: '소프트웨어학과',
-    title: '소프트웨어학과 소개',
-    description: '소프트웨어학과는 소프트웨어 개발과 관련된 학과입니다.',
-    matchType: '리스너',
-    category: '진로',
-    borderSet: true,
-    username: '행복한 돌멩이',
-    profileImage: '/default-profile-image.png',
-    makeDate: '04월 19일 15:30',
-    applicationCount: 3,
-  },
-  {
-    id: 2,
-    department: '미디어학과',
-    title: '미디어학과 관련 질문',
-    description: '미디어학과에 관한 궁금한 점이 있습니다.',
-    matchType: '스피커',
-    category: '경제',
-    borderSet: true,
-    username: '건들면 짖는댕',
-    profileImage: '/default-profile-image.png',
-    makeDate: '04월 19일 14:20',
-    applicationCount: 1,
-  },
-]
-
-const appliedMatchingRooms = [
-  {
-    id: 3,
-    department: '소프트웨어학과',
-    title: '취업 준비 방법',
-    description: '소프트웨어 분야 취업 준비는 어떻게 하면 좋을까요?',
-    matchType: '리스너',
-    category: '취업',
-    borderSet: true,
-    username: '말하고 싶어라',
-    profileImage: '/default-profile-image.png',
-    makeDate: '04월 18일 22:15',
-    applicationCount: 0,
-    applicationStatus: '대기중',
-  },
-  {
-    id: 4,
-    department: '컴퓨터공학과',
-    title: '인턴 경험 공유',
-    description: '인턴 경험에 대해 공유하고 싶습니다.',
-    matchType: '스피커',
-    category: '취업',
-    borderSet: true,
-    username: '코딩마스터',
-    profileImage: '/default-profile-image.png',
-    makeDate: '04월 17일 18:45',
-    applicationCount: 0,
-    applicationStatus: '수락됨',
-  },
-]
-
 // 매칭 상세 정보 인터페이스
 interface MatchingDetail {
   id: number
