@@ -20,7 +20,7 @@ const Auth = () => {
         setTokenCookie(refreshToken, 'refreshToken')
 
         try {
-          const res = await fetchWithRefresh('http://localhost/api/profiles', {
+          const res = await fetchWithRefresh('https://mindmate.shop/api/profiles', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           })
