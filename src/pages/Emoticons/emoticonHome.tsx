@@ -49,10 +49,10 @@ const EmoticonHome = () => {
   const { user } = useAuthStore()
   const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
   const realProfileImageUrl = profile?.profileImage
-    ? 'https://mindmate.shop/api' + profile.profileImage
+    ? 'http://localhost/api' + profile.profileImage
     : ''
   const defaultProfileImageUrl =
-    'https://mindmate.shop/api/profileImages/default-profile-image.png'
+    'http://localhost/api/profileImages/default-profile-image.png'
 
   const bottomSheetMenuItems = [
     {
@@ -98,7 +98,7 @@ const EmoticonHome = () => {
       try {
         // 프로필 정보
         let profileRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/profiles',
+          'http://localhost/api/profiles',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -109,7 +109,7 @@ const EmoticonHome = () => {
 
         // 포인트 잔액
         let pointRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/points/balance',
+          'http://localhost/api/points/balance',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -121,7 +121,7 @@ const EmoticonHome = () => {
 
         // 상점 이모티콘
         let shopRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/shop',
+          'http://localhost/api/emoticons/shop',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -132,7 +132,7 @@ const EmoticonHome = () => {
 
         // 내 이모티콘
         let myRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/my',
+          'http://localhost/api/emoticons/my',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -170,7 +170,7 @@ const EmoticonHome = () => {
         onClose={handleCloseModal}
         isOpen={isModalOpen}
         emoticon={{
-          imageUrl: 'https://mindmate.shop/api' + selectedEmoticonImageUrl,
+          imageUrl: 'http://localhost/api' + selectedEmoticonImageUrl,
           type: selectedEmoticonType,
           id: selectedEmoticonId ?? 0,
           size: 'xlarge',
@@ -187,7 +187,7 @@ const EmoticonHome = () => {
       <TopBar
         title="이모티콘 샵"
         showBackButton={true}
-        onBackClick={() => navigate('/')}
+        onBackClick={() => navigate(-1)}
         rightContent={
           <button onClick={() => setBottomSheetOpen(true)}>
             <KebabIcon color="#392111" />
@@ -233,7 +233,7 @@ const EmoticonHome = () => {
               <EmotionWrapper key={emoticon.id}>
                 <Emoticon
                   key={emoticon.id}
-                  emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+                  emoticonURL={'http://localhost/api' + emoticon.imageUrl}
                   type={emoticon.name as any}
                   size="large"
                   onClick={() =>
@@ -258,7 +258,7 @@ const EmoticonHome = () => {
             {ownedEmoticons.map((emoticon) => (
               <EmotionWrapper key={emoticon.id}>
                 <Emoticon
-                  emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+                  emoticonURL={'http://localhost/api' + emoticon.imageUrl}
                   type={emoticon.name as any}
                   size="large"
                 />

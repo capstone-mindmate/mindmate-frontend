@@ -62,6 +62,8 @@ interface ChatBarProps {
   onSendMessage: (message: string, onError?: () => void) => void
   onSendEmoticon?: (emoticonType: EmoticonType) => void
   onTyping?: (isTyping: boolean) => void
+  onEmoticonPickerToggle?: (isOpen: boolean) => void
+  onInputFocus?: () => void // 새로 추가
   disabled?: boolean
   chatId?: string | undefined
 }
@@ -69,12 +71,22 @@ interface ChatBarProps {
 export interface ChatBarRef {
   restoreMessage: (message: string) => void
   focusInput: () => void
-  handleFilteredMessage: () => void // 새로 추가
-  handleMessageSent: () => void // 새로 추가
+  handleFilteredMessage: () => void
+  handleMessageSent: () => void
 }
 
 const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
-  ({ onSendMessage, onSendEmoticon, disabled, chatId }, ref) => {
+  (
+    {
+      onSendMessage,
+      onSendEmoticon,
+      onEmoticonPickerToggle,
+      onInputFocus,
+      disabled,
+      chatId,
+    },
+    ref
+  ) => {
     const [message, setMessage] = useState<string>('')
     const [showEmoticonPicker, setShowEmoticonPicker] = useState<boolean>(false)
     const [lastSentMessage, setLastSentMessage] = useState<string>('') // 마지막 전송 메시지
@@ -94,6 +106,13 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
         textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`
       }
     }
+
+    // 이모티콘 피커 상태 변경 시 부모에게 알림
+    useEffect(() => {
+      if (onEmoticonPickerToggle) {
+        onEmoticonPickerToggle(showEmoticonPicker)
+      }
+    }, [showEmoticonPicker, onEmoticonPickerToggle])
 
     // 메시지 변경 시 높이 조절
     useEffect(() => {
@@ -215,16 +234,25 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
       setShowEmoticonPicker(false)
     }
 
+    // 텍스트 입력 포커스 핸들러
+    const handleTextareaFocus = () => {
+      if (onInputFocus) {
+        onInputFocus() // 부모에게 포커스 알림 (이모티콘 피커 닫기)
+      }
+    }
+
     const handleEmoticonShopClick = () => {
       navigate('/emoticons')
       setShowEmoticonPicker(false)
     }
 
+    const handleEmoticonPickerClose = () => {
+      setShowEmoticonPicker(false) // 피커 닫기
+    }
+
     return (
       <>
-        {showEmoticonPicker && (
-          <div onClick={() => setShowEmoticonPicker(false)} />
-        )}
+        {showEmoticonPicker && <div onClick={handleEmoticonPickerClose} />}
         <WrapperStyle>
           <ChatBarContainer>
             <ControlsContainer style={{ alignItems: 'flex-end' }}>
@@ -244,6 +272,7 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
                   disabled={disabled || isWaitingResponse}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
+                  onFocus={handleTextareaFocus} // 포커스 이벤트 추가
                   rows={1}
                 />
 
