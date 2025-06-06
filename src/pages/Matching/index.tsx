@@ -31,6 +31,24 @@ import ModalComponent from '../../components/modal/modalComponent'
 import { css } from '@emotion/react'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { useToast } from '../../components/toast/ToastProvider'
+import { MatchingListSkeleton } from './SkeletonComponents' // 스켈레톤 컴포넌트 import 추가
+
+// 카테고리 배열 정의
+const categories = ['전체', '진로', '취업', '학업', '인간관계', '경제', '기타']
+
+// 카테고리 스와이프 컨테이너 스타일
+const categorySwipeStyles = css`
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+`
+
+const categoryListStyles = css`
+  display: flex;
+  flex-direction: row;
+  transition: transform 0.3s ease;
+  width: 100%;
+`
 
 // 매칭방 아이템 타입 정의 (API 응답 구조 기반)
 interface MatchItemType {
@@ -125,6 +143,7 @@ const categoryEngMap: Record<string, string> = {
 const Matching = () => {
   const navigate = useNavigate()
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const categoryContainerRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
 
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
@@ -155,6 +174,14 @@ const Matching = () => {
 
   const loaderRef = useRef<HTMLDivElement | null>(null)
 
+  // 스와이프 관련 상태
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const [isSwipeInProgress, setIsSwipeInProgress] = useState(false) // 스와이프 진행 중 상태
+
+  // 스와이프 감지를 위한 최소 거리 (더 작게 조정)
+  const minSwipeDistance = 30
+
   const fetchMatchings = async (pageNum = 0, append = false) => {
     setLoading(true)
     const params = new URLSearchParams()
@@ -167,7 +194,7 @@ const Matching = () => {
     if (!isListenerActive && isSpeakerActive)
       params.append('requiredRole', 'LISTENER')
     if (searchQuery.trim() !== '') params.append('keyword', searchQuery.trim())
-    // 검색어가 있으면 /search, 없으면 /matchings
+
     const endpoint =
       searchQuery.trim() !== ''
         ? `https://mindmate.shop/api/matchings/search?${params.toString()}`
@@ -283,6 +310,44 @@ const Matching = () => {
     }
   }, [location.state])
 
+  // 전역 키보드 이벤트 리스너만 사용 (React 이벤트 핸들러 제거)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // 검색이 활성화되어 있거나 모달이 열려있거나 스와이프 진행 중이면 비활성화
+      if (isSearchActive || isModalOpen || isSwipeInProgress) return
+
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        // preventDefault 제거
+        if (e.key === 'ArrowLeft') {
+          handleCategorySwipe('right')
+        } else {
+          handleCategorySwipe('left')
+        }
+      }
+    }
+
+    // 휠 이벤트도 전역으로 처리
+    const handleGlobalWheel = (e: WheelEvent) => {
+      if (isSearchActive || isModalOpen || isSwipeInProgress) return
+
+      if (Math.abs(e.deltaX) > 10) {
+        if (e.deltaX > 0) {
+          handleCategorySwipe('left')
+        } else {
+          handleCategorySwipe('right')
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleGlobalKeyDown)
+    document.addEventListener('wheel', handleGlobalWheel, { passive: true })
+
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown)
+      document.removeEventListener('wheel', handleGlobalWheel)
+    }
+  }, [selectedCategory, isSearchActive, isModalOpen, isSwipeInProgress])
+
   const toggleSearch = () => {
     setIsSearchActive(!isSearchActive)
     if (!isSearchActive) {
@@ -301,6 +366,77 @@ const Matching = () => {
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category)
   }
+
+  // 스와이프로 카테고리 전환하는 함수
+  const handleCategorySwipe = (direction: 'left' | 'right') => {
+    // 이미 스와이프가 진행 중이면 무시
+    if (isSwipeInProgress) return
+
+    const currentIndex = categories.indexOf(selectedCategory)
+    let newIndex = currentIndex
+
+    // 무조건 한 카테고리씩만 이동
+    if (direction === 'left' && currentIndex < categories.length - 1) {
+      newIndex = currentIndex + 1
+    } else if (direction === 'right' && currentIndex > 0) {
+      newIndex = currentIndex - 1
+    }
+
+    if (newIndex !== currentIndex) {
+      setIsSwipeInProgress(true) // 스와이프 진행 중으로 설정
+      setSelectedCategory(categories[newIndex])
+
+      // 더 긴 쿨다운 시간으로 변경 (연속 스와이프 방지)
+      setTimeout(() => {
+        setIsSwipeInProgress(false)
+      }, 500) // 500ms 쿨다운으로 증가
+    }
+  }
+
+  // 터치 이벤트 핸들러
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null) // 이전 터치 종료 지점 초기화
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe) {
+      handleCategorySwipe('left')
+    } else if (isRightSwipe) {
+      handleCategorySwipe('right')
+    }
+  }
+
+  // 카테고리 컨테이너가 포커스를 받을 수 있도록 하는 useEffect
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        if (categoryContainerRef.current) {
+          e.preventDefault()
+          if (e.key === 'ArrowLeft') {
+            handleCategorySwipe('right')
+          } else {
+            handleCategorySwipe('left')
+          }
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleGlobalKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown)
+    }
+  }, [selectedCategory])
 
   const handleDepartmentChange = (value: string, isActive: boolean) => {
     setSelectedDepartment(isActive ? value : null)
@@ -324,7 +460,7 @@ const Matching = () => {
           body: JSON.stringify({
             userRole: 'LISTENER',
             anonymous: true,
-            showDepartment: true, // 필요시 상태로 관리
+            showDepartment: true,
           }),
         }
       )
@@ -347,8 +483,8 @@ const Matching = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userRole: 'SPEAKER',
-            anonymous: true, // 필요시 상태로 관리
-            showDepartment: true, // 필요시 상태로 관리
+            anonymous: true,
+            showDepartment: true,
           }),
         }
       )
@@ -435,7 +571,7 @@ const Matching = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               message: messageToSend,
-              anonymous: false, // 익명 신청 여부, 필요시 상태로 관리
+              anonymous: false,
             }),
           }
         )
@@ -536,6 +672,7 @@ const Matching = () => {
           matchingInfoProps={{
             title: '',
             description: '로딩 중...',
+            creatorRole: '',
           }}
           messageProps={{
             onMessageChange: handleMessageChange,
@@ -546,7 +683,6 @@ const Matching = () => {
       )
     }
     const handleProfileClick = () => {
-      // userId 우선, 없으면 creatorId 사용
       const userId = selectedItem?.userId ?? selectedItem?.creatorId
       if (userId && !selectedItem?.anonymous) {
         navigate(`/mypage/${userId}`)
@@ -571,6 +707,7 @@ const Matching = () => {
         matchingInfoProps={{
           title: selectedItem.title ?? '',
           description: selectedItem.description ?? '',
+          creatorRole: selectedItem.creatorRole ?? '',
         }}
         messageProps={{
           onMessageChange: handleMessageChange,
@@ -610,7 +747,13 @@ const Matching = () => {
   }
 
   return (
-    <RootContainer>
+    <RootContainer
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      tabIndex={0}
+      style={{ outline: 'none', touchAction: 'pan-y' }}
+    >
       <MatchingContainer>
         <TopFixedContent fixedType="normal">
           {renderSearchBar()}
@@ -636,49 +779,16 @@ const Matching = () => {
             </IconList>
           </MatchingTopBar>
 
-          <CategoryContainer>
-            <CategoryItem
-              className={selectedCategory === '전체' ? 'selected' : ''}
-              onClick={() => handleCategorySelect('전체')}
-            >
-              <CategoryItemText>전체</CategoryItemText>
-            </CategoryItem>
-            <CategoryItem
-              className={selectedCategory === '진로' ? 'selected' : ''}
-              onClick={() => handleCategorySelect('진로')}
-            >
-              <CategoryItemText>진로</CategoryItemText>
-            </CategoryItem>
-            <CategoryItem
-              className={selectedCategory === '취업' ? 'selected' : ''}
-              onClick={() => handleCategorySelect('취업')}
-            >
-              <CategoryItemText>취업</CategoryItemText>
-            </CategoryItem>
-            <CategoryItem
-              className={selectedCategory === '학업' ? 'selected' : ''}
-              onClick={() => handleCategorySelect('학업')}
-            >
-              <CategoryItemText>학업</CategoryItemText>
-            </CategoryItem>
-            <CategoryItem
-              className={selectedCategory === '인간관계' ? 'selected' : ''}
-              onClick={() => handleCategorySelect('인간관계')}
-            >
-              <CategoryItemText>인간관계</CategoryItemText>
-            </CategoryItem>
-            <CategoryItem
-              className={selectedCategory === '경제' ? 'selected' : ''}
-              onClick={() => handleCategorySelect('경제')}
-            >
-              <CategoryItemText>경제</CategoryItemText>
-            </CategoryItem>
-            <CategoryItem
-              className={selectedCategory === '기타' ? 'selected' : ''}
-              onClick={() => handleCategorySelect('기타')}
-            >
-              <CategoryItemText>기타</CategoryItemText>
-            </CategoryItem>
+          <CategoryContainer ref={categoryContainerRef}>
+            {categories.map((category) => (
+              <CategoryItem
+                key={category}
+                className={selectedCategory === category ? 'selected' : ''}
+                onClick={() => handleCategorySelect(category)}
+              >
+                <CategoryItemText>{category}</CategoryItemText>
+              </CategoryItem>
+            ))}
           </CategoryContainer>
 
           <CategoryDetailContainer>
@@ -700,7 +810,9 @@ const Matching = () => {
         </TopFixedContent>
 
         <MatchItemsContainer pageType="normal">
-          {matchItems.length > 0 ? (
+          {loading ? (
+            <MatchingListSkeleton count={6} />
+          ) : matchItems.length > 0 ? (
             matchItems.map((item: MatchItemType, index: number) => (
               <MatchItem
                 key={item.id}

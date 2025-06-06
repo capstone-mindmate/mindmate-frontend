@@ -355,6 +355,7 @@ const HomePage = () => {
           <EmoticonGrid>
             {popularEmoticons.map((emoticon) => (
               <Emoticon
+                key={emoticon.id}
                 emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
                 type={emoticon.name as any}
                 size="medium"
@@ -373,8 +374,9 @@ const HomePage = () => {
             <CardNewsScrollContainer>
               {cardNews
                 .filter((news) => news.title.trim() !== '')
-                .map((news) => (
+                .map((news, index) => (
                   <ClickableCard
+                    key={`${news.article_url}-${index}`}
                     onClick={() => handleCardNewsClick(news.article_url)}
                   >
                     <CardNewsComponent

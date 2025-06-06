@@ -60,6 +60,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     requestClose,
     acceptClose,
     rejectClose,
+    setMessages,
   } = useChatRoom({
     chatId: chatId || '',
     chatBarRef,
