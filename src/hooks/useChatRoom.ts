@@ -658,6 +658,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
       requestClose,
       acceptClose,
       rejectClose,
+      setMessages,
     }),
     [
       messages,
@@ -677,6 +678,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
       requestClose,
       acceptClose,
       rejectClose,
+      setMessages,
     ]
   )
 }

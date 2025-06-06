@@ -27,6 +27,7 @@ interface ModalComponentProps {
   matchingInfoProps?: {
     title: string
     description: string
+    creatorRole?: string
   }
   messageProps?: {
     onMessageChange: (value: string) => void
@@ -59,6 +60,7 @@ const ModalComponent = ({
   matchingInfoProps = {
     title: '',
     description: '',
+    creatorRole: '',
   },
   messageProps = {
     onMessageChange: () => {},
@@ -78,6 +80,7 @@ const ModalComponent = ({
   const [showDetails, setShowDetails] = useState(false)
   const matchedInfoRef = useRef<HTMLDivElement>(null)
   const [matchedInfoHeight, setMatchedInfoHeight] = useState(0)
+  const isSpeakerRole = matchingInfoProps.creatorRole === 'SPEAKER'
 
   useEffect(() => {
     if (isOpen) {
@@ -372,12 +375,16 @@ const ModalComponent = ({
             />
           </div>
           <div className="modal-footer">
-            <div className="coin-box" css={modalStyles.coinBox}>
-              <div className="coin" css={modalStyles.coinWrapper}>
-                <CoinIcon color="#392111" width={18} height={18} />
+            {!isSpeakerRole && (
+              <div className="coin-box" css={modalStyles.coinBox}>
+                <div className="coin" css={modalStyles.coinWrapper}>
+                  <CoinIcon color="#392111" width={18} height={18} />
+                </div>
+                <p css={modalStyles.coinText}>
+                  매칭 신청 시 50코인이 차감됩니다
+                </p>
               </div>
-              <p css={modalStyles.coinText}>매칭 신청 시 50코인이 차감됩니다</p>
-            </div>
+            )}
             <div className="confirm-btn" css={modalStyles.confirmBtn}>
               <BrownRectButton
                 buttonText={buttonText}
