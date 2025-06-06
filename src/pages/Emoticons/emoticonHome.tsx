@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { useAuthStore } from '../../stores/userStore'
+import { useNavigationStore } from '../../stores/navigationStore'
 
 import {
   RootContainer,
@@ -26,6 +27,7 @@ import { KebabIcon } from '../../components/icon/iconComponents'
 
 const EmoticonHome = () => {
   const navigate = useNavigate()
+  const { previousPath, clearPreviousPath } = useNavigationStore()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedEmoticonType, setSelectedEmoticonType] = useState<
@@ -80,6 +82,18 @@ const EmoticonHome = () => {
     setSelectedEmoticonPrice(price)
     setSelectedEmoticonId(id)
     setIsModalOpen(true)
+  }
+
+  const handleBackClick = () => {
+    // 이전 페이지가 /coin인지 확인
+    if (previousPath === '/coin' || previousPath === '/coin/history') {
+      navigate('/home')
+    } else {
+      navigate(-1)
+    }
+
+    // 이전 페이지 정보 초기화
+    clearPreviousPath()
   }
 
   const handleCloseModal = () => {
@@ -187,7 +201,7 @@ const EmoticonHome = () => {
       <TopBar
         title="이모티콘 샵"
         showBackButton={true}
-        onBackClick={() => navigate(-1)}
+        onBackClick={handleBackClick}
         rightContent={
           <button onClick={() => setBottomSheetOpen(true)}>
             <KebabIcon color="#392111" />

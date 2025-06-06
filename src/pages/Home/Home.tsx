@@ -3,11 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import TopBar from '../../components/topbar/Topbar'
 import { AlarmIcon, NormalPlusIcon } from '../../components/icon/iconComponents'
 import FrameSlider from './FrameSlider'
+import SkeletonFrameSlider from '../../components/skeleton/SkeletonFrameSlider' // 스켈레톤 컴포넌트 import
+import SkeletonEmoticonGrid from '../../components/skeleton/SkeletonEmoticonGrid' // 이모티콘 스켈레톤 import
+import SkeletonCardNews from '../../components/skeleton/SkeletonCardNews' // 카드뉴스 스켈레톤 import
 import HomeCategoryButton from '../../components/home/homeCategoryButton'
 import NavigationComponent from '../../components/navigation/navigationComponent'
 import Emoticon, { EmoticonType } from '../../components/emoticon/Emoticon'
 import CardNewsComponent from '../../components/home/cardNewsComponent'
 import StudentSupportLink from '../../components/home/StudentSupportLink'
+import { useToast } from '../../components/toast/ToastProvider'
 import {
   HomeContainer,
   ContentContainer,
@@ -28,7 +32,8 @@ import FloatingButton from '../../components/buttons/floatingButton'
 import { getTokenCookie } from '../../utils/fetchWithRefresh'
 import { FrameData } from './FrameSlider'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
-
+import { usePageAnimation, smoothNavigate } from '../../hooks/usePageAnimation'
+import { getKoreanErrorMessage } from '../../utils/errorMessageUtils'
 // 매거진 데이터 인터페이스 정의
 interface MagazineContent {
   id: number
@@ -71,6 +76,7 @@ interface PopularEmoticon {
 
 const HomePage = () => {
   const navigate = useNavigate()
+  const { fadeInUp } = usePageAnimation() // 애니메이션 훅 사용
   const [popularMagazines, setPopularMagazines] = useState<PopularMagazine[]>(
     []
   )
@@ -80,7 +86,12 @@ const HomePage = () => {
   const [popularEmoticons, setPopularEmoticons] = useState<PopularEmoticon[]>(
     []
   )
+  const [isEmoticonLoading, setIsEmoticonLoading] = useState<boolean>(false)
+  const [emoticonError, setEmoticonError] = useState<string | null>(null)
   const [cardNews, setCardNews] = useState<CardNews[]>([])
+  const [isCardNewsLoading, setIsCardNewsLoading] = useState<boolean>(false)
+  const [cardNewsError, setCardNewsError] = useState<string | null>(null)
+  const { showToast } = useToast()
 
   // 인기 매거진 데이터 가져오기
   useEffect(() => {
@@ -130,11 +141,9 @@ const HomePage = () => {
         setMagazineFrames(frames)
       } catch (error) {
         console.error('인기 매거진 조회 오류:', error)
-        setError(
-          error instanceof Error
-            ? error.message
-            : '매거진 목록을 불러오는 중 오류가 발생했습니다'
-        )
+        const koreanMessage = getKoreanErrorMessage(error, 'magazine')
+        setError(koreanMessage)
+        showToast(koreanMessage, 'error')
       } finally {
         setIsLoading(false)
       }
@@ -146,6 +155,9 @@ const HomePage = () => {
   // 현재 이모티콘 목록 가져오기
   useEffect(() => {
     const fetchRecommendedEmoticons = async () => {
+      setIsEmoticonLoading(true)
+      setEmoticonError(null)
+
       try {
         const res = await fetchWithRefresh(
           'https://mindmate.shop/api/emoticons/popular/used',
@@ -159,15 +171,14 @@ const HomePage = () => {
         }
 
         const data = await res.json()
-
         setPopularEmoticons(data)
       } catch (error) {
         console.error('인기 이모티콘 조회 오류:', error)
-        setError(
-          error instanceof Error
-            ? error.message
-            : '인기 이모티콘 목록을 불러오는 중 오류가 발생했습니다'
-        )
+        const koreanMessage = getKoreanErrorMessage(error, 'emoticon')
+        setEmoticonError(koreanMessage)
+        showToast(koreanMessage, 'error')
+      } finally {
+        setIsEmoticonLoading(false)
       }
     }
 
@@ -176,62 +187,66 @@ const HomePage = () => {
 
   // 학생 소식 가져오기
   useEffect(() => {
-    const fetchRecommendedEmoticons = async () => {
-      const res = await fetchWithRefresh('https://mindmate.shop/forstudent', {
-        method: 'GET',
-      })
+    const fetchCardNews = async () => {
+      setIsCardNewsLoading(true)
+      setCardNewsError(null)
 
-      if (!res.ok) {
-        throw new Error(`API 호출 실패: ${res.status} ${res.statusText}`)
+      try {
+        const res = await fetchWithRefresh('https://mindmate.shop/forstudent', {
+          method: 'GET',
+        })
+
+        if (!res.ok) {
+          throw new Error(`API 호출 실패: ${res.status} ${res.statusText}`)
+        }
+
+        const data = await res.json()
+        setCardNews(data)
+        console.log(data)
+      } catch (error) {
+        console.error('학생소식 조회 오류:', error)
+        const koreanMessage = getKoreanErrorMessage(error, 'news')
+        setCardNewsError(koreanMessage)
+        showToast(koreanMessage, 'error')
+      } finally {
+        setIsCardNewsLoading(false)
       }
-
-      const data = await res.json()
-
-      setCardNews(data)
-
-      console.log(cardNews)
     }
 
-    fetchRecommendedEmoticons()
+    fetchCardNews()
   }, [])
 
   // 알람 아이콘 클릭 핸들러
   const handleAlarmClick = () => {
-    navigate('/notification') // 알림 페이지로 이동
+    smoothNavigate(navigate, '/notification')
   }
 
   // 플로팅 버튼 활성화 핸들러
   const handleFloatingButtonActive = (isActive: boolean) => {
     if (isActive) {
-      navigate('/magazine/write') // 글쓰기 페이지로 이동
+      smoothNavigate(navigate, '/magazine/write')
     }
   }
 
   // 프레임 클릭 핸들러 - 매거진 상세 페이지로 이동
   const handleFrameClick = (frameId: number) => {
     console.log(`Frame ${frameId} clicked, navigate to magazine detail page`)
-    navigate(`/magazine/${frameId}`)
+    smoothNavigate(navigate, `/magazine/${frameId}`)
   }
 
   // 더보기 버튼 클릭 핸들러
   const handleSeeMoreClick = () => {
-    navigate('/emoticons')
+    smoothNavigate(navigate, '/emoticons')
   }
 
   // 이모티콘 클릭 핸들러
   const handleEmoticonClick = (type: EmoticonType) => {
-    navigate('/emoticons')
-  }
-
-  // 카드뉴스 클릭 핸들러
-  const handleCardNewsClick = (url: string) => {
-    console.log(`Opening URL: ${url}`)
-    window.open(url, '_blank', 'noopener,noreferrer')
+    smoothNavigate(navigate, '/emoticons')
   }
 
   // 카테고리별 필터링 이동 핸들러
   const handleCategoryClick = (category: string) => {
-    navigate('/matching', { state: { category } })
+    smoothNavigate(navigate, '/matching', { state: { category } })
   }
 
   // 매거진의 썸네일 이미지 URL 추출 함수
@@ -249,8 +264,100 @@ const HomePage = () => {
     return '/default-profile-image.png' // 기본 이미지 경로
   }
 
+  // 카드뉴스 클릭 핸들러
+  const handleCardNewsClick = (url: string) => {
+    console.log(`Opening URL: ${url}`)
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
+  // 매거진 슬라이더 렌더링 함수
+  const renderMagazineSlider = () => {
+    if (isLoading) {
+      // 로딩 중일 때 스켈레톤 UI 표시
+      return <SkeletonFrameSlider />
+    }
+
+    if (error) {
+      // 에러가 발생한 경우에도 스켈레톤 UI 표시 (토스트로 에러 메시지는 별도 표시)
+      return <SkeletonFrameSlider />
+    }
+
+    if (magazineFrames.length > 0) {
+      return (
+        <FrameSlider frames={magazineFrames} onFrameClick={handleFrameClick} />
+      )
+    }
+
+    // 매거진이 없는 경우에도 스켈레톤 표시
+    return <SkeletonFrameSlider />
+  }
+
+  // 이모티콘 그리드 렌더링 함수
+  const renderEmoticonGrid = () => {
+    if (isEmoticonLoading) {
+      return <SkeletonEmoticonGrid />
+    }
+
+    if (emoticonError) {
+      return <SkeletonEmoticonGrid />
+    }
+
+    if (popularEmoticons.length > 0) {
+      return (
+        <EmoticonGrid>
+          {popularEmoticons.map((emoticon) => (
+            <Emoticon
+              key={emoticon.id}
+              emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+              type={emoticon.name as any}
+              size="medium"
+              onClick={() => handleEmoticonClick(emoticon.name as any)}
+            />
+          ))}
+        </EmoticonGrid>
+      )
+    }
+
+    return <SkeletonEmoticonGrid />
+  }
+
+  // 카드뉴스 렌더링 함수
+  const renderCardNews = () => {
+    if (isCardNewsLoading) {
+      return <SkeletonCardNews />
+    }
+
+    if (cardNewsError) {
+      return <SkeletonCardNews />
+    }
+
+    const validCardNews = cardNews.filter((news) => news.title.trim() !== '')
+
+    if (validCardNews.length > 0) {
+      return (
+        <CardNewsScrollContainer>
+          {validCardNews.map((news, index) => (
+            <ClickableCard
+              key={`${news.article_url}-${index}`}
+              onClick={() => handleCardNewsClick(news.article_url)}
+            >
+              <CardNewsComponent
+                imgUrl={news.image_urls[0]}
+                title={news.title}
+                organization="인권센터 학생상담소"
+                date={news.upload_date}
+              />
+            </ClickableCard>
+          ))}
+        </CardNewsScrollContainer>
+      )
+    }
+
+    return <SkeletonCardNews />
+  }
+
   return (
-    <HomeContainer>
+    <HomeContainer css={fadeInUp}>
       <ContentContainer>
         <TopBar
           leftContent={<LogoText>Mindmate</LogoText>}
@@ -263,45 +370,10 @@ const HomePage = () => {
           isFixed={true}
           title={''}
         />
-        {isLoading ? (
-          <div
-            style={{
-              height: '330px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <div>매거진 로딩 중...</div>
-          </div>
-        ) : error ? (
-          <div
-            style={{
-              height: '330px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ color: '#888' }}>{error}</div>
-          </div>
-        ) : magazineFrames.length > 0 ? (
-          <FrameSlider
-            frames={magazineFrames}
-            onFrameClick={handleFrameClick}
-          />
-        ) : (
-          <div
-            style={{
-              height: '330px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ color: '#888' }}>표시할 매거진이 없습니다</div>
-          </div>
-        )}
+
+        {/* 매거진 슬라이더 영역 - 스켈레톤 UI 적용 */}
+        {renderMagazineSlider()}
+
         <div>
           <CategoryTitle>메이트들과 고민을 나눠보세요!</CategoryTitle>
           <HomeCategoryContainer>
@@ -351,18 +423,8 @@ const HomePage = () => {
             <SeeMoreButton onClick={handleSeeMoreClick}>더보기</SeeMoreButton>
           </SectionTitleContainer>
 
-          {/* 이모티콘 그리드 */}
-          <EmoticonGrid>
-            {popularEmoticons.map((emoticon) => (
-              <Emoticon
-                key={emoticon.id}
-                emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
-                type={emoticon.name as any}
-                size="medium"
-                onClick={() => handleEmoticonClick(emoticon.name as any)}
-              />
-            ))}
-          </EmoticonGrid>
+          {/* 이모티콘 그리드 - 스켈레톤 UI 적용 */}
+          {renderEmoticonGrid()}
 
           {/* 지금 필요한 학생소식 섹션 */}
           <PlainSectionContainer>
@@ -370,24 +432,8 @@ const HomePage = () => {
               <SectionTitle>지금 필요한 학생소식</SectionTitle>
             </SectionTitleContainer>
 
-            {/* 카드 뉴스 컴포넌트 영역 */}
-            <CardNewsScrollContainer>
-              {cardNews
-                .filter((news) => news.title.trim() !== '')
-                .map((news, index) => (
-                  <ClickableCard
-                    key={`${news.article_url}-${index}`}
-                    onClick={() => handleCardNewsClick(news.article_url)}
-                  >
-                    <CardNewsComponent
-                      imgUrl={news.image_urls[0]}
-                      title={news.title}
-                      organization="인권센터 학생상담소"
-                      date={news.upload_date}
-                    />
-                  </ClickableCard>
-                ))}
-            </CardNewsScrollContainer>
+            {/* 카드 뉴스 컴포넌트 영역 - 스켈레톤 UI 적용 */}
+            {renderCardNews()}
           </PlainSectionContainer>
 
           <StudentSupportContainer>

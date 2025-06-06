@@ -16,6 +16,7 @@ import {
   PurchaseCoinList,
 } from './style'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+import { useNavigationStore } from '../../stores/navigationStore'
 
 import TopBar from '../../components/topbar/Topbar'
 import CoinBox from '../../components/coin/CoinBox'
@@ -37,9 +38,11 @@ interface User {
 
 const PointPurchase = () => {
   const navigate = useNavigate()
+  const { setPreviousPath } = useNavigationStore()
   const [coinList, setCoinList] = useState<Coin[]>([])
   const [coin, setCoin] = useState<number>(0)
   const [user, setUser] = useState<User>({ nickname: '', email: '' })
+
   useEffect(() => {
     const fetchProfile = async () => {
       const res = await fetchWithRefresh(
@@ -68,14 +71,22 @@ const PointPurchase = () => {
     fetchCoin()
   }, [])
 
+  const goToEmoticonHome = () => {
+    // 현재 페이지를 이전 페이지로 설정
+    setPreviousPath('/coin')
+  }
+
+  const handleBackClick = () => {
+    goToEmoticonHome()
+    navigate(-1)
+  }
+
   return (
     <RootContainer>
       <TopBar
         title="코인 구매"
         showBackButton={true}
-        onBackClick={() => {
-          navigate('/emoticons')
-        }}
+        onBackClick={handleBackClick} // 함수 호출로 수정
       />
       <EmoticonsContainer>
         <TopItemContainer>

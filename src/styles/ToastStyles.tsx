@@ -9,7 +9,7 @@ export const ToastsContainer = styled.div`
   bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: 1100;
 `
 
 // 토스트 컴포넌트 스타일

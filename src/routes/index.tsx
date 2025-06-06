@@ -1,5 +1,5 @@
+/** @jsxImportSource @emotion/react */
 import Register from '../pages/Register'
-import Devtools from '../pages/Devtools'
 import OnboardingPage from '../pages/Onboarding/Onboarding'
 import PersonalInformationDocument from '../pages/Register/steps/PersonalInformationDocument'
 import Matching from '../pages/Matching'
@@ -46,6 +46,15 @@ import {
 import { useSocketMessage } from '../hooks/useSocketMessage'
 import CustomFormDone from '../pages/Chat/CustomFormDone'
 import ReviewPage from '../pages/Review/ReviewPage'
+import {
+  notFoundStyle,
+  notFoundContentStyle,
+  notFoundNumberStyle,
+  notFoundTitleStyle,
+  notFoundDescriptionStyle,
+  notFoundButtonStyle,
+  notFoundIconStyle,
+} from './routerStyles.ts'
 
 // 경로별 컴포넌트 렌더링을 위한 헬퍼 함수
 const ChatRoomRoute = () => {
@@ -76,12 +85,35 @@ const CustomFormViewRoute = () => {
 
 const NotFound = () => {
   const location = useLocation()
+  const navigate = useNavigate()
 
   if (location.pathname.startsWith('/api')) {
     return null
   }
 
-  return <div>404 Not Found</div>
+  const handleGoHome = () => {
+    navigate('/home')
+  }
+
+  return (
+    <div css={notFoundStyle}>
+      <div css={notFoundContentStyle}>
+        <h1 css={notFoundNumberStyle}>404</h1>
+        <h2 css={notFoundTitleStyle}>페이지를 찾을 수 없습니다</h2>
+        <p css={notFoundDescriptionStyle}>
+          요청하신 페이지가 존재하지 않거나
+          <br />
+          이동되었을 수 있습니다.
+          <br />
+          홈으로 돌아가서 다시 시도해보세요.
+        </p>
+        <button css={notFoundButtonStyle} onClick={handleGoHome}>
+          <span css={notFoundIconStyle}>🏠</span>
+          홈으로 돌아가기
+        </button>
+      </div>
+    </div>
+  )
 }
 
 const ReportRoute = () => {
@@ -190,14 +222,6 @@ export const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <WithdrawMindMate />
-      </RequireAuth>
-    ),
-  },
-  {
-    path: '/devdev',
-    element: (
-      <RequireAuth>
-        <Devtools />
       </RequireAuth>
     ),
   },

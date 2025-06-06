@@ -67,7 +67,7 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({
     position: fixed;
     bottom: 100px;
     right: ${rightPosition}px;
-    z-index: 5000;
+    z-index: 1003;
     width: auto;
     height: 44px;
     background-color: #392111;

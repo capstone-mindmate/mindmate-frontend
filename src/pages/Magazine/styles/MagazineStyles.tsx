@@ -65,7 +65,7 @@ export const ContentContainer = styled.div`
   padding: 24px;
   display: flex;
   flex-direction: column;
-  padding-bottom: 100px;
+  padding-bottom: 60px;
 `
 
 export const MagazineContent = styled.div`
