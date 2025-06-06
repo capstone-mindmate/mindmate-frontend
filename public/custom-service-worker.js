@@ -8,5 +8,8 @@ self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('/api/')) {
     return;
   }
+  if (event.request.url.includes('/admin/')) {
+    return;
+  }
   // 나머지 요청은 Workbox가 처리 (별도 respondWith 불필요)
 });
