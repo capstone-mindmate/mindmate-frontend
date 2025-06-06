@@ -107,6 +107,13 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
       }
     }
 
+    // 4. disabled 상태 변경 시 이모티콘 피커 닫기
+    useEffect(() => {
+      if (disabled && showEmoticonPicker) {
+        setShowEmoticonPicker(false)
+      }
+    }, [disabled, showEmoticonPicker])
+
     // 이모티콘 피커 상태 변경 시 부모에게 알림
     useEffect(() => {
       if (onEmoticonPickerToggle) {
@@ -215,6 +222,8 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
     }
 
     const handlePlusClick = () => {
+      if (disabled) return
+
       navigate(`/chat/custom-form/make/${chatId}`, {
         state: {
           profileImage: otherProfileImage,
@@ -224,10 +233,14 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
     }
 
     const handleEmojiClick = () => {
+      if (disabled) return
+
       setShowEmoticonPicker(!showEmoticonPicker)
     }
 
     const handleSelectEmoticon = (type: EmoticonType) => {
+      if (disabled) return
+
       if (onSendEmoticon) {
         onSendEmoticon(type)
       }
@@ -256,12 +269,28 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
         <WrapperStyle>
           <ChatBarContainer>
             <ControlsContainer style={{ alignItems: 'flex-end' }}>
-              <IconWrapper onClick={handlePlusClick}>
-                <IconComponents.PlusIcon color="#392111" />
+              <IconWrapper
+                onClick={handlePlusClick}
+                style={{
+                  opacity: disabled ? 0.5 : 1,
+                  cursor: disabled ? 'not-allowed' : 'pointer',
+                }}
+              >
+                <IconComponents.PlusIcon
+                  color={disabled ? '#a3a3a3' : '#392111'}
+                />
               </IconWrapper>
 
-              <IconWrapper onClick={handleEmojiClick}>
-                <IconComponents.SmileIcon color="#392111" />
+              <IconWrapper
+                onClick={handleEmojiClick}
+                style={{
+                  opacity: disabled ? 0.5 : 1,
+                  cursor: disabled ? 'not-allowed' : 'pointer',
+                }}
+              >
+                <IconComponents.SmileIcon
+                  color={disabled ? '#a3a3a3' : '#392111'}
+                />
               </IconWrapper>
 
               <InputContainer>
