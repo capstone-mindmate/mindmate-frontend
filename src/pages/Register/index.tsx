@@ -17,6 +17,7 @@ import { BackIcon } from '../../components/icon/iconComponents'
 import { useMutation } from '@tanstack/react-query'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { useAuthStore } from '../../stores/userStore'
+import { useToast } from '../../components/toast/ToastProvider'
 
 // 회원 상태 타입 신규(NEW) 재방문(REVISITING)
 type UserStatus = 'NEW' | 'REVISITING'
@@ -30,6 +31,77 @@ type RegisterStep =
 // 로컬 스토리지 키
 const REGISTER_DATA_KEY = 'register_data'
 const REGISTER_STEP_KEY = 'register_step'
+
+// File을 base64로 변환하는 함수
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = (error) => reject(error)
+  })
+}
+
+// base64를 File로 변환하는 함수
+const base64ToFile = (base64: string, filename: string): File => {
+  const arr = base64.split(',')
+  const mime = arr[0].match(/:(.*?);/)![1]
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new File([u8arr], filename, { type: mime })
+}
+
+// 로컬 스토리지에 저장할 데이터 준비 함수
+const prepareDataForStorage = async (data: any) => {
+  const storageData = { ...data }
+
+  // File 객체가 있으면 base64로 변환
+  if (data.profileImage instanceof File) {
+    try {
+      const base64 = await fileToBase64(data.profileImage)
+      storageData.profileImage = {
+        base64,
+        name: data.profileImage.name,
+        type: data.profileImage.type,
+        isFile: true,
+      }
+    } catch (error) {
+      console.error('File to base64 conversion failed:', error)
+      delete storageData.profileImage
+    }
+  }
+
+  return storageData
+}
+
+// 로컬 스토리지에서 데이터 복원 함수
+const restoreDataFromStorage = (data: any) => {
+  const restoredData = { ...data }
+
+  // base64 데이터가 있으면 File 객체로 변환
+  if (
+    data.profileImage &&
+    data.profileImage.isFile &&
+    data.profileImage.base64
+  ) {
+    try {
+      const file = base64ToFile(
+        data.profileImage.base64,
+        data.profileImage.name
+      )
+      restoredData.profileImage = file
+    } catch (error) {
+      console.error('Base64 to file conversion failed:', error)
+      delete restoredData.profileImage
+    }
+  }
+
+  return restoredData
+}
 
 const StepIndicator = ({ currentStep }: { currentStep: RegisterStep }) => {
   const steps: RegisterStep[] = [
@@ -52,6 +124,7 @@ const Register = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { setUser, user } = useAuthStore()
+  const { showToast } = useToast()
 
   // 로컬 스토리지에서 이전 데이터 불러오기
   const getInitialStep = (): RegisterStep => {
@@ -60,7 +133,16 @@ const Register = () => {
 
   const getInitialData = () => {
     const savedData = localStorage.getItem(REGISTER_DATA_KEY)
-    return savedData ? JSON.parse(savedData) : {}
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData)
+        return restoreDataFromStorage(parsedData)
+      } catch (error) {
+        console.error('Failed to parse register data from localStorage:', error)
+        return {}
+      }
+    }
+    return {}
   }
 
   const [currentStep, setCurrentStep] = useState<RegisterStep>(getInitialStep())
@@ -70,9 +152,19 @@ const Register = () => {
   // 회원가입 데이터 상태 관리
   const [registerData, setRegisterData] = useState(getInitialData())
 
+  // 데이터를 로컬 스토리지에 저장하는 함수
+  const saveDataToStorage = async (data: any) => {
+    try {
+      const storageData = await prepareDataForStorage(data)
+      localStorage.setItem(REGISTER_DATA_KEY, JSON.stringify(storageData))
+    } catch (error) {
+      console.error('Failed to save data to localStorage:', error)
+    }
+  }
+
   // 데이터나 단계가 변경될 때 로컬 스토리지에 저장
   useEffect(() => {
-    localStorage.setItem(REGISTER_DATA_KEY, JSON.stringify(registerData))
+    saveDataToStorage(registerData)
   }, [registerData])
 
   useEffect(() => {
@@ -95,7 +187,13 @@ const Register = () => {
         body: JSON.stringify(profileData),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error('프로필 생성 실패')
+      if (!res.ok) {
+        // 415 에러 (닉네임 중복)인 경우
+        if (res.status === 415) {
+          throw new Error('NICKNAME_DUPLICATE')
+        }
+        throw new Error(data.message || '프로필 생성 실패')
+      }
       return data
     },
     onSuccess: async (data) => {
@@ -110,10 +208,19 @@ const Register = () => {
 
       setUser(ProfileData)
 
+      // 회원가입 완료 후 로컬 스토리지 데이터 정리
+      localStorage.removeItem(REGISTER_DATA_KEY)
+      localStorage.removeItem(REGISTER_STEP_KEY)
+
       navigate('/home')
     },
-    onError: (e) => {
-      console.error(e)
+    onError: (error: Error) => {
+      console.error(error)
+      if (error.message === '이미 존재하는 닉네임입니다.') {
+        showToast('중복된 닉네임입니다.', 'error')
+      } else {
+        showToast('프로필 생성 중 오류가 발생했습니다.', 'error')
+      }
     },
   })
 
@@ -130,32 +237,41 @@ const Register = () => {
     if (currentIndex < stepOrder.length - 1) {
       // 데이터가 있으면 상태 업데이트
       let updatedData = { ...registerData, ...data }
-      // File 객체는 그대로 저장, 변환 없이
       setRegisterData(updatedData)
-      localStorage.setItem(REGISTER_DATA_KEY, JSON.stringify(updatedData))
       setCurrentStep(stepOrder[currentIndex + 1])
     } else if (currentStep === 'FINAL_CONFIRMATION') {
       let profileImageId: number | undefined = undefined
-      // base64 문자열이 남아있으면 무시
+
+      // File 객체 확인 및 업로드
       const imageFile =
         registerData.profileImage instanceof File
           ? registerData.profileImage
           : undefined
+
       if (imageFile) {
-        // 1. 이미지 업로드
-        const formData = new FormData()
-        formData.append('file', imageFile)
-        const imageRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/profiles/image',
-          {
-            method: 'POST',
-            body: formData,
+        try {
+          // 1. 이미지 업로드
+          const formData = new FormData()
+          formData.append('file', imageFile)
+          const imageRes = await fetchWithRefresh(
+            'https://mindmate.shop/api/profiles/image',
+            {
+              method: 'POST',
+              body: formData,
+            }
+          )
+          const imageData = await imageRes.json()
+          if (!imageRes.ok) {
+            throw new Error('이미지 업로드 실패')
           }
-        )
-        const imageData = await imageRes.json()
-        if (!imageRes.ok) throw new Error('이미지 업로드 실패')
-        profileImageId = imageData.id
+          profileImageId = imageData.id
+        } catch (error) {
+          console.error('이미지 업로드 중 오류:', error)
+          showToast('이미지 업로드 중 오류가 발생했습니다.', 'error')
+          return // 이미지 업로드 실패 시 프로필 생성 중단
+        }
       }
+
       // 2. 프로필 생성
       const profilePayload: any = {
         nickname: registerData.nickname,

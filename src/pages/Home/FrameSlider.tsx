@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import Frame from '../../components/frame/Frame'
 import {
   FrameSlider as FrameSliderContainer,
@@ -23,196 +23,146 @@ interface FrameSliderProps {
 
 const FrameSlider: React.FC<FrameSliderProps> = ({ frames, onFrameClick }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
-  const [animationDirection, setAnimationDirection] = useState<
-    'to-left' | 'to-right'
-  >('to-left')
-  const [animatedFrames, setAnimatedFrames] = useState<string[]>([])
-  const [targetIndex, setTargetIndex] = useState<number | null>(null)
 
-  // 스와이프 감지를 위한 ref와 상태값 추가
+  // 스와이프 감지를 위한 ref와 상태값
   const wrapperRef = useRef<HTMLDivElement>(null)
   const touchStartXRef = useRef<number | null>(null)
   const touchEndXRef = useRef<number | null>(null)
 
-  // 순환 배열을 생성하되 애니메이션 상태도 함께 관리
-  const getVisibleFrames = () => {
-    const farPrev = (currentIndex - 2 + frames.length) % frames.length
-    const prev = (currentIndex - 1 + frames.length) % frames.length
-    const next = (currentIndex + 1) % frames.length
-    const farNext = (currentIndex + 2) % frames.length
+  // 모든 프레임을 항상 렌더링 - 핵심!
+  const allFrames = useMemo(() => {
+    return frames.map((frame, frameIndex) => {
+      // 현재 인덱스 기준으로 상대적 위치 계산
+      let relativePosition = frameIndex - currentIndex
 
-    return [
-      {
-        ...frames[farPrev],
-        position: 'far-prev',
-        index: farPrev,
-        animating: animatedFrames.includes('far-prev'),
-      },
-      {
-        ...frames[prev],
-        position: 'prev',
-        index: prev,
-        animating: animatedFrames.includes('prev'),
-      },
-      {
-        ...frames[currentIndex],
-        position: 'current',
-        index: currentIndex,
-        animating: animatedFrames.includes('current'),
-      },
-      {
-        ...frames[next],
-        position: 'next',
-        index: next,
-        animating: animatedFrames.includes('next'),
-      },
-      {
-        ...frames[farNext],
-        position: 'far-next',
-        index: farNext,
-        animating: animatedFrames.includes('far-next'),
-      },
-    ]
-  }
+      // 순환 처리 (-2, -1, 0, 1, 2 범위로 정규화)
+      if (relativePosition > frames.length / 2) {
+        relativePosition -= frames.length
+      } else if (relativePosition < -frames.length / 2) {
+        relativePosition += frames.length
+      }
 
-  // 다음 프레임으로 이동 (오른쪽에서 왼쪽으로 이동)
+      let position = 'hidden'
+      let transform = 'translateX(300%) scale(0)'
+      let opacity = 0
+      let zIndex = 0
+      let filter = 'brightness(0.9)'
+
+      // 위치별 스타일 설정
+      if (relativePosition === -2) {
+        position = 'far-prev'
+        transform = 'translateX(-160%) scale(0)'
+        opacity = 0
+        zIndex = 0
+      } else if (relativePosition === -1) {
+        position = 'prev'
+        transform = 'translateX(-80%) scale(0.7)'
+        opacity = 0.85
+        zIndex = 1
+        filter = 'brightness(0.9)'
+      } else if (relativePosition === 0) {
+        position = 'current'
+        transform = 'translateX(0) scale(0.8)'
+        opacity = 1
+        zIndex = 3
+        filter = 'brightness(1)'
+      } else if (relativePosition === 1) {
+        position = 'next'
+        transform = 'translateX(80%) scale(0.7)'
+        opacity = 0.85
+        zIndex = 1
+        filter = 'brightness(0.9)'
+      } else if (relativePosition === 2) {
+        position = 'far-next'
+        transform = 'translateX(160%) scale(0)'
+        opacity = 0
+        zIndex = 0
+      }
+
+      return {
+        ...frame,
+        position,
+        index: frameIndex,
+        transform,
+        opacity,
+        zIndex,
+        filter,
+        // 고정된 키 사용 - 이게 핵심!
+        key: `frame-${frame.id}`,
+      }
+    })
+  }, [frames, currentIndex])
+
+  // 다음 프레임으로 이동
   const nextFrame = () => {
-    if (isTransitioning) return
-
-    setIsTransitioning(true)
-    setAnimationDirection('to-left')
-    // 모든 프레임을 애니메이션에 포함
-    setAnimatedFrames(['far-prev', 'prev', 'current', 'next', 'far-next'])
-
-    // 애니메이션 완료 후 인덱스 변경
-    setTimeout(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % frames.length)
-      setAnimatedFrames([])
-      setIsTransitioning(false)
-    }, 500)
+    setCurrentIndex((prev) => (prev + 1) % frames.length)
   }
 
-  // 이전 프레임으로 이동 (왼쪽에서 오른쪽으로 이동)
+  // 이전 프레임으로 이동
   const prevFrame = () => {
-    if (isTransitioning) return
-
-    setIsTransitioning(true)
-    setAnimationDirection('to-right')
-    // 모든 프레임을 애니메이션에 포함
-    setAnimatedFrames(['far-prev', 'prev', 'current', 'next', 'far-next'])
-
-    // 애니메이션 완료 후 인덱스 변경
-    setTimeout(() => {
-      setCurrentIndex(
-        (prevIndex) => (prevIndex - 1 + frames.length) % frames.length
-      )
-      setAnimatedFrames([])
-      setIsTransitioning(false)
-    }, 500)
+    setCurrentIndex((prev) => (prev - 1 + frames.length) % frames.length)
   }
 
   // 프레임 클릭 핸들러
   const handleFrameClick = (position: string, frameIndex: number) => {
-    if (isTransitioning) return
-
     if (position === 'current') {
       console.log(`Current frame clicked, navigate to detail page`)
-      // 상위 컴포넌트에 클릭 이벤트 전달
       if (onFrameClick) {
         onFrameClick(frames[frameIndex].id)
       }
     } else if (position === 'next') {
-      // 다음(오른쪽) 프레임을 클릭하면 해당 프레임이 중앙으로 오도록 처리
-      setTargetIndex(frameIndex)
-      setAnimationDirection('to-left')
-      setIsTransitioning(true)
-      // 모든 프레임을 애니메이션에 포함
-      setAnimatedFrames(['far-prev', 'prev', 'current', 'next', 'far-next'])
-
-      // 애니메이션 완료 후 해당 프레임을 중앙으로 설정
-      setTimeout(() => {
-        setCurrentIndex(frameIndex)
-        setAnimatedFrames([])
-        setIsTransitioning(false)
-        setTargetIndex(null)
-      }, 500)
+      nextFrame()
     } else if (position === 'prev') {
-      // 이전(왼쪽) 프레임을 클릭하면 해당 프레임이 중앙으로 오도록 처리
-      setTargetIndex(frameIndex)
-      setAnimationDirection('to-right')
-      setIsTransitioning(true)
-      // 모든 프레임을 애니메이션에 포함
-      setAnimatedFrames(['far-prev', 'prev', 'current', 'next', 'far-next'])
-
-      // 애니메이션 완료 후 해당 프레임을 중앙으로 설정
-      setTimeout(() => {
-        setCurrentIndex(frameIndex)
-        setAnimatedFrames([])
-        setIsTransitioning(false)
-        setTargetIndex(null)
-      }, 500)
+      prevFrame()
     }
   }
 
-  // 터치 이벤트 핸들러 - 터치 시작
+  // 터치 이벤트 핸들러
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX
     touchEndXRef.current = null
   }
 
-  // 터치 이벤트 핸들러 - 터치 이동
   const handleTouchMove = (e: React.TouchEvent) => {
     touchEndXRef.current = e.touches[0].clientX
   }
 
-  // 터치 이벤트 핸들러 - 터치 종료
   const handleTouchEnd = () => {
     if (touchStartXRef.current && touchEndXRef.current) {
       const diff = touchStartXRef.current - touchEndXRef.current
-      const threshold = 50 // 스와이프로 인식할 최소 이동 거리
+      const threshold = 50
 
-      // 왼쪽에서 오른쪽으로 스와이프 (다음 프레임으로 이동, 방향 주의)
       if (diff < -threshold) {
-        prevFrame() // 왼쪽에서 오른쪽으로 스와이프하면 이전 프레임으로
-      }
-      // 오른쪽에서 왼쪽으로 스와이프 (이전 프레임으로 이동, 방향 주의)
-      else if (diff > threshold) {
-        nextFrame() // 오른쪽에서 왼쪽으로 스와이프하면 다음 프레임으로
+        prevFrame()
+      } else if (diff > threshold) {
+        nextFrame()
       }
     }
 
-    // 터치 값 초기화
     touchStartXRef.current = null
     touchEndXRef.current = null
   }
 
   // 자동 슬라이드 효과
   useEffect(() => {
-    if (isPaused || isTransitioning) return
+    if (isPaused) return
 
     const interval = setInterval(() => {
-      if (!isTransitioning) {
-        nextFrame()
-      }
-    }, 5000) // 5초마다 자동 슬라이드
+      nextFrame()
+    }, 5000)
 
     return () => clearInterval(interval)
-  }, [isTransitioning, isPaused])
+  }, [isPaused, frames.length])
 
-  // 마우스 오버 핸들러
+  // 마우스 이벤트 핸들러
   const handleMouseEnter = () => {
     setIsPaused(true)
   }
 
-  // 마우스 리브 핸들러
   const handleMouseLeave = () => {
     setIsPaused(false)
   }
-
-  // 가시적인 프레임 배열
-  const visibleFrames = getVisibleFrames()
 
   return (
     <FrameSliderContainer>
@@ -224,11 +174,27 @@ const FrameSlider: React.FC<FrameSliderProps> = ({ frames, onFrameClick }) => {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {visibleFrames.map((frame) => (
+        {allFrames.map((frame) => (
           <div
-            key={`${frame.id}-${frame.position}`}
-            className={`frame-item ${frame.position} ${frame.animating ? `animating ${animationDirection}` : ''}`}
+            key={frame.key} // 고정된 키 사용!
+            className={`frame-item ${frame.position}`}
             onClick={() => handleFrameClick(frame.position, frame.index)}
+            style={{
+              // 인라인 스타일로 부드러운 전환
+              position: 'absolute',
+              cursor: 'pointer',
+              width: '280px',
+              height: '230px',
+              backfaceVisibility: 'hidden',
+              transformStyle: 'preserve-3d',
+              transform: frame.transform,
+              opacity: frame.opacity,
+              zIndex: frame.zIndex,
+              filter: frame.filter,
+              transition: 'all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)',
+              willChange: 'transform, opacity, filter',
+              pointerEvents: frame.opacity > 0 ? 'auto' : 'none',
+            }}
           >
             <div>
               <Frame

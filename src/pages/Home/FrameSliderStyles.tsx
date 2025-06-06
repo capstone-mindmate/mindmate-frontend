@@ -235,7 +235,7 @@ export const FrameWrapper = styled.div`
       }
 
       &.animating.to-right {
-        animation: ${slideFarRightToFarther} 0.5s ease forwards;
+        animation: ${slideFarRightToFarther} 0.01s forwards;
         opacity: 0;
       }
     }

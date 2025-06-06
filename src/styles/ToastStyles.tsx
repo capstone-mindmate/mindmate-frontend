@@ -97,6 +97,7 @@ export const MessageText = styled.div`
   flex: 1;
   font-size: 14px;
   text-align: left;
+  white-space: pre-line;
 `
 
 export const CloseButton = styled.button`
