@@ -24,7 +24,7 @@ const PurchaseSuccess = ({}) => {
   useEffect(() => {
     const fetchOrder = async () => {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/payments/success?paymentKey=${paymentKey}&orderId=${orderId}&amount=${amount}`,
+        `http://localhost/api/payments/success?paymentKey=${paymentKey}&orderId=${orderId}&amount=${amount}`,
         {
           method: 'GET',
         }

@@ -34,6 +34,7 @@ import { FrameData } from './FrameSlider'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { usePageAnimation, smoothNavigate } from '../../hooks/usePageAnimation'
 import { getKoreanErrorMessage } from '../../utils/errorMessageUtils'
+import { useNavigationStore } from '../../stores/navigationStore'
 // 매거진 데이터 인터페이스 정의
 interface MagazineContent {
   id: number
@@ -92,6 +93,7 @@ const HomePage = () => {
   const [isCardNewsLoading, setIsCardNewsLoading] = useState<boolean>(false)
   const [cardNewsError, setCardNewsError] = useState<string | null>(null)
   const { showToast } = useToast()
+  const { setPreviousPath } = useNavigationStore()
 
   // 인기 매거진 데이터 가져오기
   useEffect(() => {
@@ -104,7 +106,7 @@ const HomePage = () => {
         const accessToken = getTokenCookie('accessToken')
 
         // API URL
-        const apiUrl = `https://mindmate.shop/api/magazines/popular?limit=5`
+        const apiUrl = `http://localhost/api/magazines/popular?limit=5`
 
         // API 호출
         const response = await fetchWithRefresh(apiUrl, {
@@ -160,7 +162,7 @@ const HomePage = () => {
 
       try {
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/popular/viewed',
+          'http://localhost/api/emoticons/popular/viewed',
           {
             method: 'GET',
           }
@@ -192,7 +194,7 @@ const HomePage = () => {
       setCardNewsError(null)
 
       try {
-        const res = await fetchWithRefresh('https://mindmate.shop/forstudent', {
+        const res = await fetchWithRefresh('http://localhost/forstudent', {
           method: 'GET',
         })
 
@@ -236,6 +238,7 @@ const HomePage = () => {
 
   // 더보기 버튼 클릭 핸들러
   const handleSeeMoreClick = () => {
+    setPreviousPath('/home')
     smoothNavigate(navigate, '/emoticons')
   }
 
@@ -258,7 +261,7 @@ const HomePage = () => {
     if (imageContent && imageContent.imageUrl) {
       return imageContent.imageUrl.startsWith('http')
         ? imageContent.imageUrl
-        : `https://mindmate.shop/api${imageContent.imageUrl}`
+        : `http://localhost/api${imageContent.imageUrl}`
     }
 
     return '/default-profile-image.png' // 기본 이미지 경로
@@ -308,7 +311,7 @@ const HomePage = () => {
           {popularEmoticons.map((emoticon) => (
             <Emoticon
               key={emoticon.id}
-              emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+              emoticonURL={'http://localhost/api' + emoticon.imageUrl}
               type={emoticon.name as any}
               size="medium"
               onClick={() => handleEmoticonClick(emoticon.name as any)}
