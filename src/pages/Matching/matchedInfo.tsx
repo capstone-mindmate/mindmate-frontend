@@ -137,7 +137,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
             setMatchingRooms([])
           }
         } catch (e) {
-          setMatchingRooms(myCreatedMatchingRooms)
+          //setMatchingRooms(myCreatedMatchingRooms)
         }
       }
       fetchMyCreatedRooms()
@@ -217,7 +217,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
             setMatchingRooms([])
           }
         } catch (e) {
-          setMatchingRooms(appliedMatchingRooms)
+          //setMatchingRooms(appliedMatchingRooms)
         }
       }
       fetchAppliedRooms()

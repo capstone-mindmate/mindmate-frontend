@@ -12,6 +12,7 @@ import TopBar from '../../components/topbar/Topbar'
 import CoinBox from '../../components/coin/CoinBox'
 import PointHistory from '../../components/point/pointHistory'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+import { useNavigationStore } from '../../stores/navigationStore'
 
 const reasonTypeMap: Record<string, string> = {
   COUNSELING_PROVIDED: '상담 제공',
@@ -23,6 +24,7 @@ const reasonTypeMap: Record<string, string> = {
 
 const PointHistoryPage = () => {
   const navigate = useNavigate()
+  const { setPreviousPath } = useNavigationStore()
   const [histories, setHistories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [coin, setCoin] = useState<number>(0)
@@ -61,9 +63,23 @@ const PointHistoryPage = () => {
     fetchHistory()
   }, [])
 
+  const goToEmoticonHome = () => {
+    // 현재 페이지를 이전 페이지로 설정
+    setPreviousPath('/coin/history')
+  }
+
+  const handleBackClick = () => {
+    goToEmoticonHome()
+    navigate(-1)
+  }
+
   return (
     <RootContainer>
-      <TopBar title="코인 사용내역" showBackButton={true} />
+      <TopBar
+        title="코인 사용내역"
+        showBackButton={true}
+        onBackClick={handleBackClick}
+      />
       <EmoticonsContainer>
         <TopItemContainer>
           <CoinBox coinCount={coin} />
