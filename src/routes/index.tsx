@@ -54,7 +54,7 @@ import {
   notFoundDescriptionStyle,
   notFoundButtonStyle,
   notFoundIconStyle,
-} from './routerStyles.ts'
+} from './RouterStyles.ts'
 
 // 경로별 컴포넌트 렌더링을 위한 헬퍼 함수
 const ChatRoomRoute = () => {
