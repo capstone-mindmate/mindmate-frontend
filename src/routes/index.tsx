@@ -87,7 +87,7 @@ const NotFound = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  if (location.pathname.startsWith('/api')) {
+  if (location.pathname.startsWith('https://mindmate.shop/api')) {
     return null
   }
 

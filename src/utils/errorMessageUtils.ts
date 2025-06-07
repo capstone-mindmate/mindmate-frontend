@@ -82,7 +82,7 @@ export const getKoreanErrorMessage = (
   }
 
   // HTTP 상태 코드 패턴 매칭
-  const httpStatusMatch = errorMessage.match(/API 호출 실패: (\d+)/)
+  const httpStatusMatch = errorMessage.match(/api 호출 실패: (\d+)/)
   if (httpStatusMatch) {
     const statusCode = httpStatusMatch[1]
     const statusMessage = ERROR_MESSAGE_MAP[`API 호출 실패: ${statusCode}`]

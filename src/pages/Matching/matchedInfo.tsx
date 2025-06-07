@@ -156,7 +156,7 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
           const data = await res.json()
           if (Array.isArray(data.content)) {
             // 매칭 정보와 메시지 분리, 카테고리 한글로 변환 및 matchType 변환
-            // 추가 정보가 필요하면 /api/matchings/{id}로 상세 조회
+            // 추가 정보가 필요하면 https://mindmate.shop/api/matchings/{id}로 상세 조회
             const fetchDetails = async (item: any) => {
               try {
                 const detailRes = await fetchWithRefresh(

@@ -351,7 +351,7 @@ const Magazine: React.FC = () => {
     // 작성자 프로필 페이지로 이동 전 활동 정보 전송
     sendEngagementData()
     if (magazine) {
-      navigate(`/profile/${magazine.authorId}`)
+      navigate(`/mypage/${magazine.authorId}`)
     }
   }
 

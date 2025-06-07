@@ -1,9 +1,3 @@
-/**
- * 상세 리뷰 전체보기 페이지
- *
- * 마이페이지에서 전체보기 버튼을 클릭했을 때 이동하는 페이지로,
- * TopBar와 함께 모든 리뷰를 표시합니다.
- */
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import TopBar from '../../components/topbar/Topbar'

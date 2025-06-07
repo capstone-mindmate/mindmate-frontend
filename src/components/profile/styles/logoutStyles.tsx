@@ -14,6 +14,6 @@ export const LogoutText = styled.div`
   font-size: 16px;
   font-weight: 400;
   line-height: 1.55;
-  color: #c1bfbe;
+  color: #000000;
   cursor: pointer;
 `
