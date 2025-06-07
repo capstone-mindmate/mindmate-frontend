@@ -44,7 +44,7 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
     const fetchFormData = async () => {
       try {
         const res = await fetchWithRefresh(
-          `http://localhost/api/custom-forms/${formId}`
+          `https://mindmate.shop/api/custom-forms/${formId}`
         )
         if (!res.ok) {
           throw new Error('설문지 정보를 불러오지 못했습니다.')
@@ -143,7 +143,7 @@ const CustomFormView = ({ formId, matchId }: CustomFormViewProps) => {
       //console.log('REST API로 커스텀폼 답변 제출')
 
       const res = await fetchWithRefresh(
-        `http://localhost/api/custom-forms/${formId}/respond`,
+        `https://mindmate.shop/api/custom-forms/${formId}/respond`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
