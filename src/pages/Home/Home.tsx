@@ -34,6 +34,7 @@ import { FrameData } from './FrameSlider'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { usePageAnimation, smoothNavigate } from '../../hooks/usePageAnimation'
 import { getKoreanErrorMessage } from '../../utils/errorMessageUtils'
+import { useNavigationStore } from '../../stores/navigationStore'
 // 매거진 데이터 인터페이스 정의
 interface MagazineContent {
   id: number
@@ -92,6 +93,7 @@ const HomePage = () => {
   const [isCardNewsLoading, setIsCardNewsLoading] = useState<boolean>(false)
   const [cardNewsError, setCardNewsError] = useState<string | null>(null)
   const { showToast } = useToast()
+  const { setPreviousPath } = useNavigationStore()
 
   // 인기 매거진 데이터 가져오기
   useEffect(() => {
@@ -236,6 +238,7 @@ const HomePage = () => {
 
   // 더보기 버튼 클릭 핸들러
   const handleSeeMoreClick = () => {
+    setPreviousPath('/home')
     smoothNavigate(navigate, '/emoticons')
   }
 

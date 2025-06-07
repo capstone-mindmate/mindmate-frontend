@@ -9,9 +9,11 @@ import {
   PurchaseResultHeaderText,
 } from './style'
 import Emoticon from '../../components/emoticon/Emoticon'
+import { useNavigationStore } from '../../stores/navigationStore'
 
 const PurchaseFail = () => {
   const navigate = useNavigate()
+  const { setPreviousPath } = useNavigationStore()
   const [leaveCount, setLeaveCount] = useState(5)
   const location = useLocation()
 
@@ -34,6 +36,10 @@ const PurchaseFail = () => {
     return () => clearInterval(timer)
   }, [navigate])
 
+  useEffect(() => {
+    goToEmoticonHome()
+  }, [])
+
   const handleExit = () => {
     if (location.pathname === '/emoticons/purchase/fail') {
       navigate('/emoticons')
@@ -42,13 +48,17 @@ const PurchaseFail = () => {
     }
   }
 
+  const goToEmoticonHome = () => {
+    // 현재 페이지를 이전 페이지로 설정
+    setPreviousPath('/coin/history')
+  }
+
   return (
     <RootContainer>
       <PurchaseResultContainer>
         <PurchaseResultHeaderText>
           결제에 실패했습니다.
         </PurchaseResultHeaderText>
-
         <Emoticon type="sad" size="xlarge" />
 
         <p

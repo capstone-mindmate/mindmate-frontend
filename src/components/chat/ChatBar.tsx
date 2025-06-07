@@ -19,6 +19,7 @@ import EmoticonPicker from '../emoticon/EmoticonPicker'
 import { EmoticonType } from '../emoticon/Emoticon'
 import { useNavigate, useLocation } from 'react-router-dom'
 import styled from '@emotion/styled'
+import { useNavigationStore } from '../../stores/navigationStore'
 
 // 기존 StyledInput 대신 사용할 StyledTextarea
 const StyledTextarea = styled.textarea<{ disabled?: boolean }>`
@@ -95,6 +96,7 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
     const navigate = useNavigate()
     const location = useLocation()
     const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const { setPreviousPath } = useNavigationStore()
 
     const otherProfileImage = location.state?.profileImage
     const otherUserName = location.state?.userName
@@ -257,6 +259,7 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
     const handleEmoticonShopClick = () => {
       navigate('/emoticons')
       setShowEmoticonPicker(false)
+      setPreviousPath('/chat')
     }
 
     const handleEmoticonPickerClose = () => {

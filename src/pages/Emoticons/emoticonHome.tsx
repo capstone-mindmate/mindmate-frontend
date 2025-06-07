@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { useAuthStore } from '../../stores/userStore'
 import { useNavigationStore } from '../../stores/navigationStore'
@@ -27,7 +27,7 @@ import { KebabIcon } from '../../components/icon/iconComponents'
 
 const EmoticonHome = () => {
   const navigate = useNavigate()
-  const { previousPath, clearPreviousPath } = useNavigationStore()
+  const location = useLocation()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedEmoticonType, setSelectedEmoticonType] = useState<
@@ -55,6 +55,13 @@ const EmoticonHome = () => {
     : ''
   const defaultProfileImageUrl =
     'https://mindmate.shop/api/profileImages/default-profile-image.png'
+  const {
+    previousPath,
+    originPath,
+    setOriginPath,
+    clearPreviousPath,
+    clearOriginPath,
+  } = useNavigationStore()
 
   const bottomSheetMenuItems = [
     {
@@ -85,15 +92,29 @@ const EmoticonHome = () => {
   }
 
   const handleBackClick = () => {
-    // 이전 페이지가 /coin인지 확인
-    if (previousPath === '/coin' || previousPath === '/coin/history') {
-      navigate('/home')
-    } else {
+    // 문제가 되는 경로들이거나 특정 코인 페이지에서 온 경우
+    if (
+      previousPath === '/coin' ||
+      previousPath === '/coin/history' ||
+      previousPath?.includes('/fail') ||
+      previousPath?.includes('/success')
+    ) {
+      // 원래 위치가 있으면 그곳으로, 없으면 홈으로
+      if (originPath) {
+        console.log(originPath)
+        navigate(originPath)
+      } else {
+        navigate('/home')
+      }
+    }
+    // 그 외의 경우 일반적인 뒤로가기
+    else {
       navigate(-1)
     }
 
-    // 이전 페이지 정보 초기화
+    // 정리
     clearPreviousPath()
+    clearOriginPath()
   }
 
   const handleCloseModal = () => {
@@ -166,6 +187,25 @@ const EmoticonHome = () => {
     }
     fetchAll()
   }, [])
+
+  useEffect(() => {
+    const problematicPaths = [
+      '/emoticons/purchase/fail',
+      '/emoticons/purchase/success',
+      '/coin/fail',
+      '/coin/success',
+      '/coin',
+      '/coin/history',
+    ]
+
+    if (
+      !originPath &&
+      previousPath &&
+      !problematicPaths.includes(previousPath)
+    ) {
+      setOriginPath(previousPath)
+    }
+  }, [previousPath, originPath, setOriginPath])
 
   const renderModal = () => {
     if (
