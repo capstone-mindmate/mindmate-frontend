@@ -143,7 +143,7 @@ export const insertImageToQuill = (
 
       // 고유한 이미지 ID 생성
       const imageId = `img_${Date.now()}_${Math.floor(Math.random() * 1000)}`
-      console.log('생성된 이미지 ID:', imageId)
+      //console.log('생성된 이미지 ID:', imageId)
 
       // 첫 이미지인 경우 자동으로 대표 이미지로 설정
       const isFeatured = !imageState.featuredImageId
@@ -200,7 +200,7 @@ export const insertImageToQuill = (
             ...prev,
             featuredImageId: imageId,
           }))
-          console.log('대표 이미지 ID 설정:', imageId)
+          //console.log('대표 이미지 ID 설정:', imageId)
         }
 
         // 삽입된 이미지가 올바르게 data-image-id 속성을 가지고 있는지 확인
@@ -217,9 +217,9 @@ export const insertImageToQuill = (
               if (!imgId || imgId !== imageId) {
                 // 속성이 없거나 다른 경우 수정
                 img.setAttribute('data-image-id', imageId)
-                console.log('이미지 ID 속성 수정됨:', imageId)
+                //console.log('이미지 ID 속성 수정됨:', imageId)
               } else {
-                console.log('이미지 ID 속성 확인됨:', imgId)
+                //console.log('이미지 ID 속성 확인됨:', imgId)
               }
 
               foundTargetImage = true

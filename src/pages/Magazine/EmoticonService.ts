@@ -1,6 +1,6 @@
 /**
  * 통합 이모티콘 서비스
- * SimpleEmoticonSolution.tsx와 MagazineEmoticonHandler.tsx의 중복 기능을 통합
+ * 서버 기반 이모티콘 관리
  */
 
 import { EmoticonType } from '../../components/emoticon/Emoticon'
@@ -11,56 +11,26 @@ export interface EmoticonState {
   selectedEmoticonId: string | null
 }
 
-/**
- * 이모티콘 소스 가져오기 함수
- * @param type 이모티콘 타입
- * @returns 이미지 경로
- */
-export const getEmoticonSrc = (type: EmoticonType): string => {
-  // 이미지 경로 매핑
-  switch (type) {
-    case 'normal':
-      return '/emoticons/emoticon_normal.png'
-    case 'love':
-      return '/emoticons/emoticon_love.png'
-    case 'music':
-      return '/emoticons/emoticon_music.png'
-    case 'sad':
-      return '/emoticons/emoticon_sad.png'
-    case 'angry':
-      return '/emoticons/emoticon_angry.png'
-    case 'couple':
-      return '/emoticons/emoticon_couple.png'
-    case 'default':
-      return '/emoticons/emoticon_default.png'
-    case 'talking':
-      return '/emoticons/emoticon_talking.png'
-    case 'thumbsUp':
-      return '/emoticons/emoticon_thumbsUp.png'
-    case 'student':
-      return '/emoticons/emoticon_student.png'
-    case 'graduate':
-      return '/emoticons/emoticon_graduate.png'
-    case 'hoodie':
-      return '/emoticons/emoticon_hoodie.png'
-    case 'study':
-      return '/emoticons/emoticon_study.png'
-    case 'thanks':
-      return '/emoticons/emoticon_thanks.png'
-    default:
-      return '/emoticons/emoticon_normal.png'
-  }
+// 이모티콘 API 응답 타입 (채팅에서 사용하는 형태)
+export interface EmoticonApiResponse {
+  id: string
+  name: string // 이모티콘 타입 (HAPPY, SAD 등)
+  imageUrl: string
 }
 
 /**
- * 이모티콘을 에디터에 삽입하는 함수
+ * 이모티콘을 에디터에 삽입하는 함수 - 서버 기반 이모티콘 사용
  * @param quillRef Quill 에디터 참조
- * @param type 이모티콘 타입
+ * @param emoticonId 이모티콘 ID (API에서 받은 ID)
+ * @param emoticonUrl 이모티콘 이미지 URL
+ * @param emoticonName 이모티콘 이름/타입
  * @param onClose 종료 콜백 (옵션)
  */
 export const insertEmoticonToEditor = (
   quillRef: React.RefObject<ReactQuill>,
-  type: EmoticonType,
+  emoticonId: string,
+  emoticonUrl: string,
+  emoticonName: string,
   onClose?: () => void
 ): void => {
   const quillEditor = quillRef.current
@@ -69,27 +39,41 @@ export const insertEmoticonToEditor = (
     return
   }
 
-  // 이모티콘 ID 생성
-  const emoticonId = `emoticon_${Date.now()}`
-
   // 현재 커서 위치 저장
   const range = quillEditor.getEditor().getSelection()
 
   if (range) {
-    // 이모티콘 이미지 경로 가져오기
-    const emoticonSrc = getEmoticonSrc(type)
+    // 고유한 이모티콘 ID 생성 (매거진 내에서 식별용)
+    const uniqueEmoticonId = `emoticon_${Date.now()}_${Math.floor(Math.random() * 1000)}`
 
-    // 이모티콘 클래스와 데이터 속성 추가
+    // 이모티콘 이미지 HTML 생성 - API ID를 확실히 설정
     const emoticonHtml = `<img 
-      src="${emoticonSrc}" 
-      alt="${type} 이모티콘" 
+      src="${emoticonUrl}" 
+      alt="${emoticonName || 'unknown'} 이모티콘" 
       class="magazine-emoticon" 
-      data-emoticon-type="${type}"
-      data-emoticon-id="${emoticonId}"
-      style="width: 70px; height: 70px; display: inline-block; vertical-align: middle;"
+      data-emoticon-type="${emoticonName || 'unknown'}"
+      data-emoticon-id="${uniqueEmoticonId}"
+      data-emoticon-api-id="${emoticonId}"
+      style="width: 70px; height: 70px; display: inline-block; vertical-align: middle; margin: 0 5px;"
     />`
 
+    //console.log('생성할 이모티콘 HTML:', emoticonHtml)
+    //console.log('이모티콘 정보:', { emoticonId, emoticonName, emoticonUrl })
+
     try {
+      // 에디터에 다른 컨텐츠가 있는지 확인하고 줄바꿈 삽입
+      if (
+        quillEditor.getEditor().getText().trim().length > 0 &&
+        range.index > 0
+      ) {
+        // 커서 위치가 줄의 시작이 아니면 줄바꿈 추가
+        const lastChar = quillEditor.getEditor().getText(range.index - 1, 1)
+        if (lastChar && lastChar !== '\n') {
+          quillEditor.getEditor().insertText(range.index, '\n')
+          range.index += 1
+        }
+      }
+
       // HTML을 에디터에 삽입
       quillEditor
         .getEditor()
@@ -98,7 +82,55 @@ export const insertEmoticonToEditor = (
       // 이모티콘 뒤로 커서 이동
       quillEditor.getEditor().setSelection(range.index + 1, 0)
 
-      console.log('이모티콘 삽입 성공')
+      // 삽입 후 API ID가 제대로 설정되었는지 확인 (더 강력한 검증)
+      setTimeout(() => {
+        const allImages = quillEditor.getEditor().root.querySelectorAll('img')
+        //console.log('에디터의 모든 이미지 수:', allImages.length)
+
+        // 방금 삽입한 이모티콘 찾기
+        let targetEmoticon: HTMLImageElement | null = null
+
+        Array.from(allImages).forEach((img, index) => {
+          const htmlImg = img as HTMLImageElement
+
+          // URL이 일치하는 이모티콘 찾기
+          if (htmlImg.src === emoticonUrl) {
+            targetEmoticon = htmlImg
+          }
+        })
+
+        if (targetEmoticon) {
+          const currentApiId = targetEmoticon.getAttribute(
+            'data-emoticon-api-id'
+          )
+
+          if (!currentApiId || currentApiId !== emoticonId) {
+            console.error('❌ API ID 불일치! 강제 수정 시도...')
+
+            // 강제로 속성 재설정
+            targetEmoticon.setAttribute('data-emoticon-api-id', emoticonId)
+            targetEmoticon.classList.add('magazine-emoticon')
+
+            // 재설정 후 다시 확인
+            const finalApiId = targetEmoticon.getAttribute(
+              'data-emoticon-api-id'
+            )
+            //console.log('✅ 재설정 후 API ID:', finalApiId)
+
+            // 부모 요소에도 속성 설정 시도 (혹시 모를 경우를 대비)
+            if (targetEmoticon.parentElement) {
+              targetEmoticon.parentElement.setAttribute(
+                'data-emoticon-info',
+                `${emoticonId}|${emoticonName}`
+              )
+            }
+          } else {
+            //console.log('✅ API ID 정상 확인:', currentApiId)
+          }
+        } else {
+          console.error('❌ 삽입된 이모티콘을 찾을 수 없습니다!')
+        }
+      }, 200) // 시간을 더 늘려서 DOM 업데이트 완료 보장
     } catch (error) {
       console.error('이모티콘 삽입 중 오류 발생:', error)
     }
@@ -111,38 +143,11 @@ export const insertEmoticonToEditor = (
     try {
       const length = quillEditor.getEditor().getLength()
       quillEditor.getEditor().setSelection(length, 0)
-      console.log('에디터 끝으로 커서 이동. 다시 시도하세요.')
+      //console.log('에디터 끝으로 커서 이동. 다시 시도하세요.')
     } catch (error) {
       console.error('커서 재설정 중 오류:', error)
     }
   }
-}
-
-/**
- * API 요청을 위한 이모티콘 매핑
- * @param emoticonType 이모티콘 타입
- * @returns API 이모티콘 ID
- */
-export const mapEmoticonTypeToId = (emoticonType: EmoticonType): number => {
-  // 실제 API 이모티콘 ID 매핑 (이 매핑은 서버와 일치해야 함)
-  const emoticonMap: Record<EmoticonType, number> = {
-    normal: 1,
-    love: 2,
-    music: 3,
-    sad: 4,
-    angry: 5,
-    couple: 6,
-    default: 7,
-    talking: 8,
-    thumbsUp: 9,
-    student: 10,
-    graduate: 11,
-    hoodie: 12,
-    study: 13,
-    thanks: 14,
-  }
-
-  return emoticonMap[emoticonType] || 1
 }
 
 /**
@@ -152,7 +157,7 @@ export const mapEmoticonTypeToId = (emoticonType: EmoticonType): number => {
  */
 export const extractEmoticonInfo = (
   htmlContent: string
-): Record<string, EmoticonType> => {
+): Record<string, string> => {
   try {
     // DOM 파서를 사용하여 HTML 파싱
     const parser = new DOMParser()
@@ -160,11 +165,11 @@ export const extractEmoticonInfo = (
 
     // 이모티콘 정보 추출
     const emoticonElements = doc.querySelectorAll('.magazine-emoticon')
-    const emoticonInfo: Record<string, EmoticonType> = {}
+    const emoticonInfo: Record<string, string> = {}
 
     emoticonElements.forEach((element) => {
       const id = element.getAttribute('data-emoticon-id')
-      const type = element.getAttribute('data-emoticon-type') as EmoticonType
+      const type = element.getAttribute('data-emoticon-type')
 
       if (id && type) {
         emoticonInfo[id] = type
