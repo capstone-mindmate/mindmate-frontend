@@ -23,6 +23,13 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [toastBoxes, setToastBoxes] = useState<any[]>([])
   const [availableEmoticons, setAvailableEmoticons] = useState<any[]>([])
+  const [profileImages, setProfileImages] = useState<{
+    myImageUrl: string
+    oppositeImageUrl: string
+  }>({
+    myImageUrl: '',
+    oppositeImageUrl: '',
+  })
 
   // 종료 기능 관련 상태 추가
   const [roomStatus, setRoomStatus] = useState<
@@ -251,6 +258,15 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
         const newMessages = Array.isArray(data.messages)
           ? data.messages.map(messageProcessor.parseMessage)
           : []
+
+        // 프로필 이미지 정보 설정
+        if (data.myImageUrl && data.oppositeImageUrl) {
+          setProfileImages({
+            myImageUrl: 'https://mindmate.shop/api' + data.myImageUrl,
+            oppositeImageUrl:
+              'https://mindmate.shop/api' + data.oppositeImageUrl,
+          })
+        }
 
         // 방 상태 정보 설정
         if (data.roomStatus) setRoomStatus(data.roomStatus)
@@ -649,6 +665,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
       closeModalType,
       closeRequestRoleType,
       listener,
+      profileImages,
       sendMessage,
       sendEmoticon,
       markAsRead,
@@ -671,6 +688,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
       closeModalType,
       closeRequestRoleType,
       listener,
+      profileImages,
       sendMessage,
       sendEmoticon,
       markAsRead,
