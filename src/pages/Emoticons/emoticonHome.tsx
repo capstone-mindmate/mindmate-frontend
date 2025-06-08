@@ -124,7 +124,7 @@ const EmoticonHome = () => {
 
   const handlePurchase = () => {
     setIsModalOpen(false)
-    navigate(`/emoticons/purchase/${selectedEmoticonId}`)
+    navigate(`/emoticons/purchase/${selectedEmoticonId}`, { replace: true })
   }
 
   useEffect(() => {
