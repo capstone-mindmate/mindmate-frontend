@@ -1,7 +1,37 @@
-// 매거진 콘텐츠 파서 - 에디터 내용을 API 형식에 맞게 변환
-import { EmoticonType } from '../../components/emoticon/Emoticon'
-import { mapEmoticonTypeToId } from './EmoticonService'
-import { getTokenCookie, fetchWithRefresh } from '../../utils/fetchWithRefresh'
+// 매거진 콘텐츠 파서 - 에디터 내용을 API 형식에 맞게 변환 (서버 기반 이모티콘)
+import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+
+/**
+ * 이모티콘 검증을 위한 헬퍼 함수 (MagazineWrite.tsx와 동일한 로직)
+ */
+const isEmoticonImage = (img: HTMLImageElement): boolean => {
+  // 1. 클래스로 확인 (가장 확실한 방법)
+  if (img.classList.contains('magazine-emoticon')) {
+    return true
+  }
+
+  // 2. data 속성으로 확인
+  if (
+    img.getAttribute('data-emoticon-api-id') ||
+    img.getAttribute('data-emoticon-type')
+  ) {
+    return true
+  }
+
+  // 3. URL 경로로 확인 (보조적 방법)
+  const src = img.src || img.getAttribute('src') || ''
+  if (src.includes('/emoticonImages/') || src.includes('/emoticon/')) {
+    return true
+  }
+
+  // 4. alt 속성으로 확인 (보조적 방법)
+  const alt = img.alt || ''
+  if (alt.includes('이모티콘') || alt.includes('emoticon')) {
+    return true
+  }
+
+  return false
+}
 
 /**
  * 매거진 게시 함수
@@ -18,20 +48,8 @@ export const postMagazine = async (
   content: string
 ): Promise<any> => {
   try {
-    // 토큰 확인
-    const accessToken = getTokenCookie('accessToken')
-    if (!accessToken) {
-      throw new Error('로그인이 필요합니다.')
-    }
-    console.log('토큰 존재 여부 확인:', !!accessToken)
-    console.log('매거진 등록 시도...')
-
     // 1. 콘텐츠 파싱
     const { blocks, imagesToUpload } = parseContentBlocks(content)
-
-    // 디버깅을 위해 로그 추가
-    console.log('파싱된 블록 수:', blocks.length)
-    console.log('업로드할 이미지 수:', imagesToUpload.length)
 
     if (imagesToUpload.length === 0) {
       console.error('업로드할 이미지가 없습니다. HTML 콘텐츠를 확인하세요.')
@@ -42,8 +60,6 @@ export const postMagazine = async (
     let imageIdMap = new Map<string, number>()
     if (imagesToUpload.length > 0) {
       try {
-        console.log(`이미지 업로드 시작: ${imagesToUpload.length}개`)
-
         const apiUrl = 'https://mindmate.shop/api/magazines/image'
         const formData = new FormData()
 
@@ -53,18 +69,11 @@ export const postMagazine = async (
           formData.append('files', blob, `image_${index}.jpg`)
         })
 
-        console.log('이미지 업로드 요청 시작...')
-
         // fetchWithRefresh 사용
         const response = await fetchWithRefresh(apiUrl, {
           method: 'POST',
           body: formData, // FormData는 Content-Type 헤더를 자동으로 설정함
         })
-
-        // 응답 상태 로깅
-        console.log(
-          `이미지 업로드 응답 상태: ${response.status} ${response.statusText}`
-        )
 
         if (!response.ok) {
           // 오류 응답 내용 추출
@@ -82,10 +91,6 @@ export const postMagazine = async (
         }
 
         const uploadedImages: ImageUploadResponse[] = await response.json()
-        console.log(
-          '업로드된 이미지 정보:',
-          JSON.stringify(uploadedImages, null, 2)
-        )
 
         // 이미지 응답이 없거나 비어있는지 확인
         if (!uploadedImages || uploadedImages.length === 0) {
@@ -96,9 +101,6 @@ export const postMagazine = async (
         uploadedImages.forEach((uploadedImg, index) => {
           if (index < imagesToUpload.length) {
             imageIdMap.set(imagesToUpload[index].imageId, uploadedImg.id)
-            console.log(
-              `이미지 ID 매핑: ${imagesToUpload[index].imageId} -> ${uploadedImg.id}`
-            )
           }
         })
       } catch (error) {
@@ -118,9 +120,6 @@ export const postMagazine = async (
 
           if (imageIdMap.has(originalImageId)) {
             const serverImageId = imageIdMap.get(originalImageId)
-            console.log(
-              `이미지 블록 업데이트: 임시ID=${originalImageId}, 서버ID=${serverImageId}`
-            )
 
             // IMAGE 타입 블록에는 imageId 속성만 포함
             return {
@@ -153,8 +152,6 @@ export const postMagazine = async (
 
     // 이미지 블록 검증
     const imageBlocks = updatedBlocks.filter((block) => block.type === 'IMAGE')
-    console.log(`이미지 블록 수: ${imageBlocks.length}`)
-    console.log(`이미지 블록 내용: ${JSON.stringify(imageBlocks, null, 2)}`)
 
     if (imageBlocks.length === 0) {
       throw new Error(
@@ -170,15 +167,6 @@ export const postMagazine = async (
       contents: updatedBlocks,
     }
 
-    // 요청 데이터 로깅
-    console.log(
-      '매거진 게시 요청 데이터:',
-      JSON.stringify(magazineRequest, null, 2)
-    )
-
-    // 5. 매거진 게시 API 호출
-    console.log('=== 매거진 게시 시작 ===')
-
     // fetchWithRefresh 사용 (토큰 관리 자동화)
     const response = await fetchWithRefresh(
       'https://mindmate.shop/api/magazines',
@@ -190,11 +178,6 @@ export const postMagazine = async (
         },
         body: JSON.stringify(magazineRequest),
       }
-    )
-
-    // 응답 로깅
-    console.log(
-      `매거진 게시 응답 상태: ${response.status} ${response.statusText}`
     )
 
     if (!response.ok) {
@@ -259,7 +242,7 @@ export const convertCategoryToApiFormat = (category: string): string => {
 }
 
 /**
- * Quill 에디터 내용을 파싱하는 함수 - HTML 형식 보존 개선
+ * Quill 에디터 내용을 파싱하는 함수 - 서버 기반 이모티콘 처리 (개선됨)
  * @param htmlContent 에디터 HTML 콘텐츠
  * @returns 텍스트와 이미지/이모티콘 블록 배열
  */
@@ -298,11 +281,13 @@ export const parseContentBlocks = (
       // <p> 또는 <div> 내의 콘텐츠 처리
       const childNodes = Array.from(node.childNodes)
 
-      // 이미지가 있는지 확인
-      const hasImage = childNodes.some((child) => child.nodeName === 'IMG')
+      // 이미지나 이모티콘이 있는지 확인
+      const hasImageOrEmoticon = childNodes.some(
+        (child) => child.nodeName === 'IMG'
+      )
 
-      if (hasImage) {
-        // 이미지가 있는 경우, 이미지와 텍스트를 분리
+      if (hasImageOrEmoticon) {
+        // 이미지나 이모티콘이 있는 경우, 이를 텍스트와 분리
         childNodes.forEach((childNode) => {
           if (childNode.nodeName === 'IMG') {
             // 이미지가 발견되면 우선 기존 텍스트 버퍼를 저장
@@ -317,31 +302,58 @@ export const parseContentBlocks = (
             // 이미지 요소
             const imgElement = childNode as HTMLImageElement
 
-            // 이모티콘인지 확인 (magazine-emoticon 클래스가 있는 경우)
-            if (imgElement.classList.contains('magazine-emoticon')) {
-              // 이모티콘 타입 추출
-              const emoticonType = imgElement.getAttribute(
-                'data-emoticon-type'
-              ) as EmoticonType
+            // *** 핵심 개선: 이모티콘 검증 로직 사용 ***
+            if (isEmoticonImage(imgElement)) {
+              // 서버 기반 이모티콘 처리 - 실제 API ID만 사용
+              const emoticonApiId = imgElement.getAttribute(
+                'data-emoticon-api-id'
+              )
 
-              if (emoticonType) {
-                // 이모티콘 블록 추가
+              if (
+                emoticonApiId &&
+                emoticonApiId !== 'null' &&
+                emoticonApiId !== ''
+              ) {
+                // 서버에서 받은 실제 API ID만 사용
                 blocks.push({
                   type: 'EMOTICON',
-                  emoticonId: mapEmoticonTypeToId(emoticonType),
+                  emoticonId: parseInt(emoticonApiId),
                 })
+                //console.log('이모티콘 블록 추가 (실제 API ID):', emoticonApiId)
+              } else {
+                console.warn(
+                  '이모티콘 API ID가 없거나 유효하지 않습니다. 건너뜁니다:',
+                  {
+                    src: imgElement.src,
+                    apiId: emoticonApiId,
+                    type: imgElement.getAttribute('data-emoticon-type'),
+                  }
+                )
+                // API ID가 없는 이모티콘은 처리하지 않음 (서버 에러 방지)
               }
             } else {
-              // 일반 이미지인 경우
-              const imageId =
+              // *** 실제 이미지인 경우만 이미지 업로드 목록에 추가 ***
+              const imageId = imgElement.getAttribute('data-image-id')
+
+              if (!imageId) {
+                console.warn(
+                  '이미지에 data-image-id가 없습니다:',
+                  imgElement.src
+                )
+                // ID가 없는 이미지는 임시 ID 생성
+                const tempId = `temp_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+                imgElement.setAttribute('data-image-id', tempId)
+              }
+
+              const finalImageId =
                 imgElement.getAttribute('data-image-id') ||
                 `temp_${Date.now()}_${Math.floor(Math.random() * 1000)}`
               const src = imgElement.src
 
-              // 이미지 업로드를 위해 목록에 추가
+              // 실제 이미지만 업로드 목록에 추가
               imagesToUpload.push({
                 dataUrl: src,
-                imageId: imageId,
+                imageId: finalImageId,
               })
 
               // 이미지 블록 추가 (이미지 ID는 나중에 업로드 후 업데이트)
@@ -375,28 +387,47 @@ export const parseContentBlocks = (
 
       const imgElement = node as HTMLImageElement
 
-      // 이모티콘인지 확인
-      if (imgElement.classList.contains('magazine-emoticon')) {
-        const emoticonType = imgElement.getAttribute(
-          'data-emoticon-type'
-        ) as EmoticonType
+      // *** 핵심 개선: 이모티콘 검증 로직 사용 ***
+      if (isEmoticonImage(imgElement)) {
+        // 서버 기반 이모티콘 처리 - 실제 API ID만 사용
+        const emoticonApiId = imgElement.getAttribute('data-emoticon-api-id')
 
-        if (emoticonType) {
+        if (emoticonApiId && emoticonApiId !== 'null' && emoticonApiId !== '') {
+          // 서버에서 받은 실제 API ID만 사용
           blocks.push({
             type: 'EMOTICON',
-            emoticonId: mapEmoticonTypeToId(emoticonType),
+            emoticonId: parseInt(emoticonApiId),
           })
+          //console.log('직접 이모티콘 블록 추가 (실제 API ID):', emoticonApiId)
+        } else {
+          console.warn(
+            '직접 이모티콘 API ID가 없거나 유효하지 않습니다. 건너뜁니다:',
+            {
+              src: imgElement.src,
+              apiId: emoticonApiId,
+              type: imgElement.getAttribute('data-emoticon-type'),
+            }
+          )
+          // API ID가 없는 이모티콘은 처리하지 않음 (서버 에러 방지)
         }
       } else {
-        // 일반 이미지
-        const imageId =
-          imgElement.getAttribute('data-image-id') ||
-          `temp_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+        // *** 실제 이미지만 업로드 목록에 추가 ***
+        const imageId = imgElement.getAttribute('data-image-id')
+
+        if (!imageId) {
+          console.warn(
+            '직접 이미지에 data-image-id가 없습니다:',
+            imgElement.src
+          )
+        }
+
+        const finalImageId =
+          imageId || `temp_${Date.now()}_${Math.floor(Math.random() * 1000)}`
         const src = imgElement.src
 
         imagesToUpload.push({
           dataUrl: src,
-          imageId: imageId,
+          imageId: finalImageId,
         })
 
         blocks.push({
