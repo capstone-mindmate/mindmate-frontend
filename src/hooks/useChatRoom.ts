@@ -23,6 +23,13 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [toastBoxes, setToastBoxes] = useState<any[]>([])
   const [availableEmoticons, setAvailableEmoticons] = useState<any[]>([])
+  const [profileImages, setProfileImages] = useState<{
+    myImageUrl: string
+    oppositeImageUrl: string
+  }>({
+    myImageUrl: '',
+    oppositeImageUrl: '',
+  })
 
   // 종료 기능 관련 상태 추가
   const [roomStatus, setRoomStatus] = useState<
@@ -210,7 +217,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
         }
 
         const res = await fetchWithRefresh(
-          `https://mindmate.shop/api/chat/rooms/${chatId}/messages`,
+          `http://localhost/api/chat/rooms/${chatId}/messages`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -251,6 +258,15 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
         const newMessages = Array.isArray(data.messages)
           ? data.messages.map(messageProcessor.parseMessage)
           : []
+
+        // 프로필 이미지 정보 설정
+        if (data.myImageUrl && data.oppositeImageUrl) {
+          setProfileImages({
+            myImageUrl: 'https://mindmate.shop/api' + data.myImageUrl,
+            oppositeImageUrl:
+              'https://mindmate.shop/api' + data.oppositeImageUrl,
+          })
+        }
 
         // 방 상태 정보 설정
         if (data.roomStatus) setRoomStatus(data.roomStatus)
@@ -328,7 +344,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const fetchEmoticons = useCallback(async () => {
     try {
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/emoticons/available',
+        'http://localhost/api/emoticons/available',
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -495,7 +511,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
     async (content: string, onError?: () => void) => {
       try {
         const res = await fetchWithRefresh(
-          `https://mindmate.shop/api/chat/messages`,
+          `http://localhost/api/chat/messages`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -558,7 +574,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const requestClose = useCallback(async () => {
     try {
       await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/close`,
+        `http://localhost/api/chat/rooms/${chatId}/close`,
         { method: 'POST' }
       )
 
@@ -586,7 +602,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const acceptClose = useCallback(async () => {
     try {
       await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/close/accept`,
+        `http://localhost/api/chat/rooms/${chatId}/close/accept`,
         { method: 'POST' }
       )
 
@@ -613,7 +629,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const rejectClose = useCallback(async () => {
     try {
       await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/close/reject`,
+        `http://localhost/api/chat/rooms/${chatId}/close/reject`,
         { method: 'POST' }
       )
 
@@ -649,6 +665,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
       closeModalType,
       closeRequestRoleType,
       listener,
+      profileImages,
       sendMessage,
       sendEmoticon,
       markAsRead,
@@ -671,6 +688,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
       closeModalType,
       closeRequestRoleType,
       listener,
+      profileImages,
       sendMessage,
       sendEmoticon,
       markAsRead,

@@ -687,7 +687,7 @@ const Matching = () => {
       if (userId && !selectedItem?.anonymous) {
         navigate(`/mypage/${userId}`)
       } else {
-        showToast('익명 사용자입니다.', 'error')
+        showToast('상대방 프로필 정보를 찾을 수 없습니다.', 'error')
       }
     }
     return (

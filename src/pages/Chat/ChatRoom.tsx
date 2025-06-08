@@ -55,6 +55,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     sendMessage,
     sendEmoticon,
     markAsRead,
+    profileImages,
     setErrorMessage,
     setCloseModalType,
     requestClose,
@@ -601,7 +602,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                       profileImage={
                         message.isMe
                           ? undefined
-                          : otherProfileImageFromNav ||
+                          : profileImages.oppositeImageUrl ||
                             '/default-profile-image.png'
                       }
                       onProfileClick={
@@ -646,7 +647,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         profileImage={
                           message.isMe
                             ? undefined
-                            : otherProfileImageFromNav ||
+                            : profileImages.oppositeImageUrl ||
                               '/default-profile-image.png'
                         }
                         timestamp={formatKoreanTime(message.timestamp)}
@@ -716,7 +717,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                     profileImage={
                       message.isMe
                         ? undefined
-                        : otherProfileImageFromNav ||
+                        : profileImages.oppositeImageUrl ||
                           '/default-profile-image.png'
                     }
                     onProfileClick={
