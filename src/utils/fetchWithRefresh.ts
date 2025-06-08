@@ -74,7 +74,7 @@ export async function fetchWithRefresh(input: RequestInfo, init?: RequestInit) {
 
     try {
       // 토큰 갱신 요청: 이전 코드의 URL과 헤더, 본문 방식 사용
-      const refreshRes = await fetch('https://mindmate.shop/api/auth/refresh', {
+      const refreshRes = await fetch('http://localhost/api/auth/refresh', {
         // 이전 URL로 복원
         method: 'POST',
         headers: {
