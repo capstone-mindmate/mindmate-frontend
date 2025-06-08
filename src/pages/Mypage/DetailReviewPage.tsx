@@ -32,20 +32,15 @@ const DetailReviewPage: React.FC = () => {
       try {
         let profileId
         if (!userId || (user && String(user.id) === userId)) {
-          // 내 프로필
-          if (user?.profileId) {
-            profileId = user.profileId
-          } else {
-            const myProfileRes = await fetchWithRefresh(
-              `https://mindmate.shop/api/profiles/users/${user?.id}`,
-              {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-              }
-            )
-            const myProfileData = await myProfileRes.json()
-            profileId = myProfileData.id
-          }
+          const myProfileRes = await fetchWithRefresh(
+            `https://mindmate.shop/api/profiles`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          )
+          const myProfileData = await myProfileRes.json()
+          profileId = myProfileData.id
         } else {
           // 타인 프로필
           const otherRes = await fetchWithRefresh(
