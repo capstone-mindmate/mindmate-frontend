@@ -149,7 +149,7 @@ const MagazineWrite: React.FC = () => {
   // 컴포넌트 마운트 시 인증 상태 확인
   useEffect(() => {
     // 토큰 자동 확인 (fetchWithRefresh가 처리)
-    fetchWithRefresh('http://localhost/api/profiles')
+    fetchWithRefresh('https://mindmate.shop/api/profiles')
       .then((response) => {
         if (response.ok) {
           setAuthStatus(true)
@@ -196,7 +196,7 @@ const MagazineWrite: React.FC = () => {
     const { id: emoticonId, type: emoticonName, imageUrl } = emoticonData // name 대신 type 사용
 
     // 서버에서 받은 실제 이미지 URL 구성
-    const fullImageUrl = `http://localhost/api${imageUrl}`
+    const fullImageUrl = `https://mindmate.shop/api${imageUrl}`
 
     // insertEmoticonToEditor 함수를 사용하여 에디터에 삽입
     insertEmoticonToEditor(
