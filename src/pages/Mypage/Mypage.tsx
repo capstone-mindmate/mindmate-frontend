@@ -170,7 +170,9 @@ const MyPage = () => {
               headers: { 'Content-Type': 'application/json' },
             }
           )
+
           profileData = await profileRes.json()
+          console.log(profileData)
           setUserProfile({
             profileImage: profileData.profileImage,
             username: profileData.nickname,
@@ -282,7 +284,7 @@ const MyPage = () => {
 
   // 리뷰 전체보기 클릭 핸들러 - 상세 리뷰 페이지로 이동
   const handleViewAllReviewsClick = () => {
-    navigate('/detailreview')
+    navigate(`/detailreview/${userId}`)
   }
 
   if (loading) {

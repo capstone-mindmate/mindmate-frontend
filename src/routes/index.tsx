@@ -266,6 +266,14 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: '/detailreview/:userId',
+    element: (
+      <RequireAuth>
+        <DetailReviewPage />
+      </RequireAuth>
+    ),
+  },
+  {
     path: '/matching/register',
     element: (
       <RequireAuth>

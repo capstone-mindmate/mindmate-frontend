@@ -31,7 +31,11 @@ const DetailReviewPage: React.FC = () => {
       setLoading(true)
       try {
         let profileId
-        if (!userId || (user && String(user.id) === userId)) {
+        if (
+          !userId ||
+          (user && String(user.id) === userId) ||
+          userId === 'undefined'
+        ) {
           const myProfileRes = await fetchWithRefresh(
             `https://mindmate.shop/api/profiles`,
             {
