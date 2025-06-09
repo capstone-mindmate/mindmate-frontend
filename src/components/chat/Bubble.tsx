@@ -84,9 +84,9 @@ const Bubble: React.FC<BubbleProps> = ({
             src={profileImage}
             alt="프로필"
             onClick={handleProfileImageClick} // 클릭 이벤트 추가
-            style={{
-              cursor: onProfileClick ? 'pointer' : 'default', // 클릭 가능할 때만 포인터 커서
-            }}
+            // style={{
+            //   cursor: onProfileClick ? 'pointer' : 'default', // 클릭 가능할 때만 포인터 커서
+            // }}
             title={onProfileClick ? '프로필 보기' : undefined} // 툴팁 추가
             onError={(e) => {
               console.error('프로필 이미지 로드 실패:', profileImage)
