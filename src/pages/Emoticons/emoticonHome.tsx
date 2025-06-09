@@ -101,7 +101,6 @@ const EmoticonHome = () => {
     ) {
       // 원래 위치가 있으면 그곳으로, 없으면 홈으로
       if (originPath) {
-        console.log(originPath)
         navigate(originPath)
       } else {
         navigate('/home')

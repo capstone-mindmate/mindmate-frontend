@@ -249,6 +249,11 @@ const Register = () => {
           : undefined
 
       if (imageFile) {
+        // 1MB 초과 시 업로드 중단 및 토스트 표시
+        if (imageFile.size > 1048576) {
+          showToast('1MB 이하만 업로드가 가능합니다.', 'error')
+          return // 업로드 중단
+        }
         try {
           // 1. 이미지 업로드
           const formData = new FormData()
