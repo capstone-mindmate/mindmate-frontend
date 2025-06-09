@@ -169,9 +169,9 @@ const MyPage = () => {
             setLoading(false)
             return
           }
-          alert(userId)
+
           profileRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/profiles/users/${userId}`,
+            `https://mindmate.shop/api/profiles/${userId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
