@@ -197,8 +197,8 @@ const Matching = () => {
 
     const endpoint =
       searchQuery.trim() !== ''
-        ? `https://mindmate.shop/api/matchings/search?${params.toString()}`
-        : `https://mindmate.shop/api/matchings?${params.toString()}`
+        ? `http://localhost/api/matchings/search?${params.toString()}`
+        : `http://localhost/api/matchings?${params.toString()}`
     try {
       const res = await fetchWithRefresh(endpoint, {
         method: 'GET',
@@ -212,16 +212,8 @@ const Matching = () => {
           userId: item.userId ?? item.creatorId,
           category: categoryMap[item.category?.trim()] || item.category,
         }))
-        // 중복 제거: id 기준으로 unique하게 만듦
-        setMatchItems((prev: MatchItemType[]) => {
-          const all: MatchItemType[] = append ? [...prev, ...mapped] : mapped
-          const unique = Array.from(
-            new Map<number, MatchItemType>(
-              all.map((item: MatchItemType) => [item.id, item])
-            ).values()
-          )
-          return unique
-        })
+        console.log(mapped)
+        setMatchItems((prev) => (append ? [...prev, ...mapped] : mapped))
         setHasMore(!data.last)
       } else {
         if (!append) setMatchItems([])
@@ -235,9 +227,10 @@ const Matching = () => {
     }
   }
 
-  // 필터 변경 시 page만 0으로 초기화
+  // 필터 변경 시 첫 페이지부터 다시 불러오기
   useEffect(() => {
     setPage(0)
+    fetchMatchings(0, false)
   }, [
     selectedCategory,
     selectedDepartment,
@@ -246,17 +239,13 @@ const Matching = () => {
     searchQuery,
   ])
 
-  // page가 바뀔 때만 fetchMatchings 호출
-  useEffect(() => {
-    fetchMatchings(page, page !== 0)
-  }, [page])
-
-  // 무한 스크롤 (IntersectionObserver) - page 증가만 담당
+  // 무한 스크롤 (IntersectionObserver)
   useEffect(() => {
     if (!hasMore || loading) return
     const observer = new window.IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
+          fetchMatchings(page + 1, true)
           setPage((p) => p + 1)
         }
       },
@@ -266,7 +255,7 @@ const Matching = () => {
     return () => {
       if (loaderRef.current) observer.unobserve(loaderRef.current)
     }
-  }, [hasMore, loading])
+  }, [hasMore, loading, page])
 
   useEffect(() => {
     let filtered = matchItems
@@ -464,7 +453,7 @@ const Matching = () => {
   const handleListenerSelect = async () => {
     try {
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/matchings/auto',
+        'http://localhost/api/matchings/auto',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -488,7 +477,7 @@ const Matching = () => {
   const handleSpeakerSelect = async () => {
     try {
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/matchings/auto',
+        'http://localhost/api/matchings/auto',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -514,7 +503,7 @@ const Matching = () => {
     setIsModalOpen(true)
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/matchings/${item.id}`,
+        `http://localhost/api/matchings/${item.id}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -534,8 +523,8 @@ const Matching = () => {
         borderSet: false,
         username: data.creatorNickname ?? '',
         profileImage: data.anonymous
-          ? 'https://mindmate.shop/api/profileImages/default-profile-image.png'
-          : `https://mindmate.shop/api${data.creatorProfileImage ?? ''}`,
+          ? 'http://localhost/api/profileImages/default-profile-image.png'
+          : `http://localhost/api${data.creatorProfileImage ?? ''}`,
         makeDate: data.createdAt
           ? new Date(data.createdAt).toLocaleString('ko-KR', {
               month: '2-digit',
@@ -576,7 +565,7 @@ const Matching = () => {
     if (selectedItem) {
       try {
         const res = await fetchWithRefresh(
-          `https://mindmate.shop/api/matchings/${selectedItem.id}/applications`,
+          `http://localhost/api/matchings/${selectedItem.id}/applications`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -698,7 +687,7 @@ const Matching = () => {
       if (userId && !selectedItem?.anonymous) {
         navigate(`/mypage/${userId}`)
       } else {
-        showToast('상대방 프로필 정보를 찾을 수 없습니다.', 'error')
+        showToast('익명 사용자의 프로필입니다.', 'error')
       }
     }
     return (

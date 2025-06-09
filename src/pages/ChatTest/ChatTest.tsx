@@ -59,7 +59,9 @@ interface TextMessage extends BaseMessage {
 }
 
 interface EmoticonMessage extends BaseMessage {
+  id: string
   type: 'emoticon'
+  imageUrl: string
   emoticonType: EmoticonType
 }
 

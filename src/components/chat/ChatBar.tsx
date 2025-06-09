@@ -61,7 +61,7 @@ const StyledTextarea = styled.textarea<{ disabled?: boolean }>`
 
 interface ChatBarProps {
   onSendMessage: (message: string, onError?: () => void) => void
-  onSendEmoticon?: (emoticonType: EmoticonType) => void
+  onSendEmoticon?: (emoticonId: string) => void
   onTyping?: (isTyping: boolean) => void
   onEmoticonPickerToggle?: (isOpen: boolean) => void
   onInputFocus?: () => void // 새로 추가
@@ -240,11 +240,15 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
       setShowEmoticonPicker(!showEmoticonPicker)
     }
 
-    const handleSelectEmoticon = (type: EmoticonType) => {
+    const handleSelectEmoticon = (emoticonData: {
+      id: string
+      imageUrl: string
+      type: string
+    }) => {
       if (disabled) return
-
+      console.log('이모티콘 선택됨:', emoticonData) // 디버깅용
       if (onSendEmoticon) {
-        onSendEmoticon(type)
+        onSendEmoticon(emoticonData.id)
       }
       setShowEmoticonPicker(false)
     }

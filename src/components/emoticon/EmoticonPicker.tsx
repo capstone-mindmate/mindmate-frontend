@@ -45,7 +45,7 @@ function EmoticonPicker({
       setError(null)
       try {
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/available',
+          'http://localhost/api/emoticons/available',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -77,7 +77,7 @@ function EmoticonPicker({
 
   // 이모티콘 클릭 핸들러 - 전체 객체를 전달하도록 수정
   const handleEmoticonClick = (emoticon: EmoticonData) => {
-    //console.log('이모티콘 선택됨:', emoticon)
+    console.log('이모티콘 선택됨:', emoticon)
 
     // 전체 이모티콘 객체를 전달
     onSelectEmoticon({
@@ -112,7 +112,7 @@ function EmoticonPicker({
                 onClick={() => handleEmoticonClick(emoticon)} // 전체 객체 전달
               >
                 <Emoticon
-                  emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+                  emoticonURL={'http://localhost/api' + emoticon.imageUrl}
                   type={emoticon.name as EmoticonType} // 타입 변환
                   size="medium"
                   alt={`${emoticon.name} 이모티콘`}
