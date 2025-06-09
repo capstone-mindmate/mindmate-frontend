@@ -751,7 +751,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
         <ChatBar
           ref={chatBarRef}
           onSendMessage={sendMessage}
-          onSendEmoticon={sendEmoticon}
+          onSendEmoticon={(emoticonId: string) => sendEmoticon(emoticonId)} // 타입 명시
           onEmoticonPickerToggle={handleEmoticonPickerToggle}
           onInputFocus={handleInputFocus} // 인풋 포커스 핸들러 추가
           disabled={

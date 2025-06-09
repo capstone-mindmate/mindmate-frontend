@@ -51,10 +51,9 @@ const EmoticonHome = () => {
   const { user } = useAuthStore()
   const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false)
   const realProfileImageUrl = profile?.profileImage
-    ? 'https://mindmate.shop/api' + profile.profileImage
+    ? '/api' + profile.profileImage
     : ''
-  const defaultProfileImageUrl =
-    'https://mindmate.shop/api/profileImages/default-profile-image.png'
+  const defaultProfileImageUrl = '/api/profileImages/default-profile-image.png'
   const {
     previousPath,
     originPath,
@@ -131,47 +130,35 @@ const EmoticonHome = () => {
       setLoading(true)
       try {
         // 프로필 정보
-        let profileRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/profiles',
-          {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          }
-        )
+        let profileRes = await fetchWithRefresh('/api/profiles', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        })
         let profileData = await profileRes.json()
         setProfile(profileData)
 
         // 포인트 잔액
-        let pointRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/points/balance',
-          {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-          }
-        )
+        let pointRes = await fetchWithRefresh('/api/points/balance', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        })
         let point = await pointRes.json()
         setPointBalance(point)
 
         // 상점 이모티콘
-        let shopRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/shop',
-          {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          }
-        )
+        let shopRes = await fetchWithRefresh('/api/emoticons/shop', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        })
         let shopData = await shopRes.json()
         setShopEmoticons(shopData)
 
         // 내 이모티콘
-        let myRes = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/my',
-          {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          }
-        )
+        let myRes = await fetchWithRefresh('/api/emoticons/my', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        })
         let myData = await myRes.json()
         setOwnedEmoticons(myData.ownedEmoticons || [])
         setShopEmoticons(myData.notOwnedEmoticons || [])
@@ -223,7 +210,7 @@ const EmoticonHome = () => {
         onClose={handleCloseModal}
         isOpen={isModalOpen}
         emoticon={{
-          imageUrl: 'https://mindmate.shop/api' + selectedEmoticonImageUrl,
+          imageUrl: '/api' + selectedEmoticonImageUrl,
           type: selectedEmoticonType,
           id: selectedEmoticonId ?? 0,
           size: 'xlarge',
@@ -286,7 +273,7 @@ const EmoticonHome = () => {
               <EmotionWrapper key={emoticon.id}>
                 <Emoticon
                   key={emoticon.id}
-                  emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+                  emoticonURL={'/api' + emoticon.imageUrl}
                   type={emoticon.name as any}
                   size="large"
                   onClick={() =>
@@ -311,7 +298,7 @@ const EmoticonHome = () => {
             {ownedEmoticons.map((emoticon) => (
               <EmotionWrapper key={emoticon.id}>
                 <Emoticon
-                  emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
+                  emoticonURL={'/api' + emoticon.imageUrl}
                   type={emoticon.name as any}
                   size="large"
                 />

@@ -77,7 +77,7 @@ const YellowInputBox: React.FC<YellowInputBoxProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     let newValue = e.target.value
-    console.log(newValue.length)
+    //console.log(newValue.length)
     if (newValue.length >= maxLength) {
       showToast(`최대 ${maxLength}자까지 입력 가능합니다.`, 'warning')
       newValue = newValue.slice(0, maxLength)
