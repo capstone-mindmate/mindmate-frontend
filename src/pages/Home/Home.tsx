@@ -308,7 +308,7 @@ const HomePage = () => {
     if (popularEmoticons.length > 0) {
       return (
         <EmoticonGrid>
-          {popularEmoticons.map((emoticon) => (
+          {popularEmoticons.slice(0, 4).map((emoticon) => (
             <Emoticon
               key={emoticon.id}
               emoticonURL={'https://mindmate.shop/api' + emoticon.imageUrl}
