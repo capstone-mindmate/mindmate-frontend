@@ -69,12 +69,18 @@ const MyPage = () => {
     setIsProfileImageLoaded(false)
   }, [realProfileImageUrl])
 
+  const isMyProfile = () => {
+    if (!userId || userId === '' || userId === 'undefined') return true
+    if (!user) return false
+    return String(user.id) === String(userId)
+  }
+
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true)
       try {
         let profileRes, profileData, reveiwListRes
-        if (!userId || (user && String(user.id) === String(userId))) {
+        if (isMyProfile()) {
           // 내 프로필
           setIsOwnProfile(true)
           if (user?.id) {
@@ -163,6 +169,7 @@ const MyPage = () => {
             setLoading(false)
             return
           }
+          alert(userId)
           profileRes = await fetchWithRefresh(
             `https://mindmate.shop/api/profiles/users/${userId}`,
             {

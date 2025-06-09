@@ -151,7 +151,8 @@ const Matching = () => {
   )
   const [isListenerActive, setIsListenerActive] = useState(false)
   const [isSpeakerActive, setIsSpeakerActive] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState('전체')
+  const initialCategory = location.state?.category || '전체'
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
   const [matchItems, setMatchItems] = useState<MatchItemType[]>([])
   const [filteredItems, setFilteredItems] = useState<MatchItemType[]>([])
 
@@ -235,9 +236,10 @@ const Matching = () => {
     }
   }
 
-  // 필터 변경 시 page만 0으로 초기화
+  // 필터 변경 시 첫 페이지부터 다시 불러오기
   useEffect(() => {
     setPage(0)
+    fetchMatchings(0, false)
   }, [
     selectedCategory,
     selectedDepartment,
@@ -246,27 +248,12 @@ const Matching = () => {
     searchQuery,
   ])
 
-  // page가 바뀔 때만 fetchMatchings 호출
+  // page가 0이 아닐 때만(무한스크롤) fetchMatchings 호출
   useEffect(() => {
-    fetchMatchings(page, page !== 0)
-  }, [page])
-
-  // 무한 스크롤 (IntersectionObserver) - page 증가만 담당
-  useEffect(() => {
-    if (!hasMore || loading) return
-    const observer = new window.IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setPage((p) => p + 1)
-        }
-      },
-      { threshold: 1 }
-    )
-    if (loaderRef.current) observer.observe(loaderRef.current)
-    return () => {
-      if (loaderRef.current) observer.unobserve(loaderRef.current)
+    if (page !== 0) {
+      fetchMatchings(page, true)
     }
-  }, [hasMore, loading])
+  }, [page])
 
   useEffect(() => {
     let filtered = matchItems
@@ -318,7 +305,10 @@ const Matching = () => {
   useEffect(() => {
     if (location.state && location.state.category) {
       setSelectedCategory(location.state.category)
+      setPage(0)
+      fetchMatchings(0, false)
     }
+    // eslint-disable-next-line
   }, [location.state])
 
   // 전역 키보드 이벤트 리스너만 사용 (React 이벤트 핸들러 제거)

@@ -307,9 +307,12 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
     setCreatorProfile(null)
   }
 
-  const handleProfileClick = (userId: number, isAnonymous: boolean = false) => {
-    if (!isAnonymous && userId) {
-      navigate(`/mypage/${userId}`)
+  const handleProfileClick = (
+    waitingUserId: number,
+    isAnonymous: boolean = false
+  ) => {
+    if (!isAnonymous && waitingUserId) {
+      navigate(`/mypage/${waitingUserId}`)
     } else {
       showToast('익명 사용자의 프로필은 볼 수 없습니다.', 'error')
     }
@@ -422,7 +425,10 @@ const MatchedInfo = ({}: MatchedInfoProps) => {
             messageValue: selectedApplication.message || '',
           }}
           onProfileClick={() =>
-            handleProfileClick(creatorProfile.userId, matchingDetail.anonymous)
+            handleProfileClick(
+              selectedApplication.waitingUserId,
+              selectedApplication.anonymous
+            )
           }
         />
       )
