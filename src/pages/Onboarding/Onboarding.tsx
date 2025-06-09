@@ -25,7 +25,7 @@ import {
   OnboardingContainer,
 } from '../../styles/OnboardingStyles'
 import { useNavigate } from 'react-router-dom'
-import { setTokenCookie } from '../../utils/fetchWithRefresh'
+import { setTokenCookie, deleteAllCookies } from '../../utils/fetchWithRefresh'
 import { useAuthStore } from '../../stores/userStore'
 
 // 반응형을 위한 화면 크기 감지 hook
@@ -95,6 +95,8 @@ function OnboardingContent() {
 
   // URL에서 토큰 추출하는 함수
   const extractTokensFromURL = () => {
+    deleteAllCookies()
+    localStorage.removeItem('auth-store')
     const urlParams = new URLSearchParams(window.location.search)
     const token = urlParams.get('token')
     const refreshToken = urlParams.get('refreshToken')

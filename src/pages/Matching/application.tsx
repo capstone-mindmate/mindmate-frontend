@@ -17,6 +17,7 @@ interface MatchedApplicationProps {}
 interface WaitingUser {
   id: number
   waitingUserId: number
+  waitingUserProfileId: number
   waitingUserNickname: string
   waitingUserDepartment: string
   waitingUserEntranceTime: number
@@ -53,7 +54,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
       setIsLoading(true)
       try {
         const res = await fetchWithRefresh(
-          `https://mindmate.shop/api/matchings/${matchedRoom.id}/waiting-users?page=0&size=20`,
+          `https://mindmate.shop/api/matchings/${matchedRoom.id}/waiting-users?page=0&size=30`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -104,8 +105,12 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
     handleOpenModal(application)
   }
 
-  const handleProfileClick = (userId: number) => {
-    navigate(`/mypage/${userId}`)
+  const handleProfileClick = (userId: number, waitingUserNickname: string) => {
+    if (waitingUserNickname !== '익명') {
+      navigate(`/mypage/${userId}`)
+    } else {
+      showToast('익명 사용자는 프로필 정보를 확인할 수 없습니다.', 'error')
+    }
   }
 
   const handleMatchingRequest = async () => {
@@ -201,7 +206,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
           makeDate: new Date(
             selectedApplication.createdAt
           ).toLocaleDateString(),
-          userId: selectedApplication.waitingUserId,
+          userId: selectedApplication.waitingUserProfileId,
         }}
         matchingInfoProps={{
           title: matchedRoom?.title || '',
@@ -211,9 +216,19 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
           onMessageChange: () => {},
           messageValue: selectedApplication.message,
         }}
-        onProfileClick={() =>
-          handleProfileClick(selectedApplication.waitingUserId)
-        }
+        onProfileClick={() => {
+          if (selectedApplication.waitingUserNickname !== '익명') {
+            handleProfileClick(
+              selectedApplication.waitingUserProfileId,
+              selectedApplication.waitingUserNickname
+            )
+          } else {
+            showToast(
+              '익명 사용자는 프로필 정보를 확인할 수 없습니다.',
+              'error'
+            )
+          }
+        }}
       />
     )
   }
@@ -275,7 +290,10 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
                 message={application.message}
                 borderSet={index < applications.length - 1}
                 onProfileClick={() =>
-                  handleProfileClick(application.waitingUserId)
+                  handleProfileClick(
+                    application.waitingUserProfileId,
+                    application.waitingUserNickname
+                  )
                 }
               />
             ))

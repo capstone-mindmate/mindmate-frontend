@@ -350,10 +350,10 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
   // 이벤트 핸들러들
   const handleProfileClick = () => {
-    if (otherUserId) {
+    if (otherUserId && otherUserNameFromNav !== '익명') {
       navigate(`/mypage/${otherUserId}`)
     } else {
-      showToast('상대방 정보를 찾을 수 없습니다.', 'error')
+      showToast('익명 사용자는 프로필 정보를 확인할 수 없습니다.', 'error')
     }
   }
 
