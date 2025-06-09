@@ -192,13 +192,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     navigate,
   ])
 
-  // 이모티콘 피커가 열릴 때 채팅을 맨 아래로 스크롤 (핸들러에서 처리하므로 제거)
-  // useEffect(() => {
-  //   if (isEmoticonPickerOpen && chatEndRef.current) {
-  //     chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
-  //   }
-  // }, [isEmoticonPickerOpen])
-
   // 이전 메시지 무한 스크롤 처리
   useEffect(() => {
     const container = chatContainerRef.current
@@ -350,7 +343,11 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
   // 이벤트 핸들러들
   const handleProfileClick = () => {
-    return
+    if (otherUserId && otherUserNameFromNav !== '익명') {
+      navigate(`/mypage/${otherUserId}`)
+    } else {
+      showToast('익명 사용자는 프로필 정보를 확인할 수 없습니다.', 'error')
+    }
   }
 
   const handleRetry = () => {

@@ -185,8 +185,10 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
           setMessage('')
           setLastSentMessage('')
           setIsWaitingResponse(false)
-          // 메시지 전송 후 포커스 유지
-          maintainFocus()
+          // 메시지 전송 후 강화된 포커스 유지 (PWA 대응)
+          requestAnimationFrame(() => {
+            maintainFocus()
+          })
         },
       }),
       [lastSentMessage, disabled]
@@ -203,6 +205,11 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
         // 현재 메시지를 lastSentMessage에 저장
         setLastSentMessage(messageToSend)
         setIsWaitingResponse(true)
+
+        // PWA에서 키보드 유지를 위해 blur 이벤트 방지
+        if (textareaRef.current) {
+          textareaRef.current.style.pointerEvents = 'auto'
+        }
 
         // 메시지 전송 실패 시 호출될 에러 콜백
         const onError = () => {
@@ -227,7 +234,7 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
         // 입력창은 즉시 비우기 (성공/실패 응답에 따라 복원될 수 있음)
         setMessage('')
 
-        // 메시지 전송 후 포커스 유지
+        // 메시지 전송 후 즉시 포커스 유지 (PWA 키보드 유지)
         maintainFocus()
       }
     }
@@ -236,7 +243,16 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault()
         if (message.trim() && !isWaitingResponse) {
+          // PWA에서 Enter 키로 전송할 때도 포커스 유지
+          const currentTarget = e.currentTarget
           handleSendMessage()
+
+          // Enter 키 전송 후 포커스 강제 유지
+          setTimeout(() => {
+            if (currentTarget && !disabled) {
+              currentTarget.focus()
+            }
+          }, 50)
         }
       }
     }
@@ -268,8 +284,10 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
         onSendEmoticon(emoticonData.id)
       }
       setShowEmoticonPicker(false)
-      // 이모티콘 전송 후에도 포커스 유지
-      maintainFocus()
+      // 이모티콘 전송 후에도 포커스 유지 (PWA 강화)
+      requestAnimationFrame(() => {
+        maintainFocus()
+      })
     }
 
     // 텍스트 입력 포커스 핸들러
@@ -287,8 +305,10 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
 
     const handleEmoticonPickerClose = () => {
       setShowEmoticonPicker(false)
-      // 이모티콘 피커 닫은 후 포커스 유지
-      maintainFocus()
+      // 이모티콘 피커 닫은 후 포커스 유지 (PWA 강화)
+      requestAnimationFrame(() => {
+        maintainFocus()
+      })
     }
 
     return (
@@ -330,6 +350,14 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   onFocus={handleTextareaFocus}
+                  onBlur={(e) => {
+                    // PWA에서 메시지 전송 중에는 blur 이벤트 무시
+                    if (preventBlurRef.current) {
+                      e.preventDefault()
+                      e.target.focus()
+                      return false
+                    }
+                  }}
                   rows={1}
                 />
 
