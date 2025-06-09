@@ -64,7 +64,7 @@ interface ChatBarProps {
   onSendEmoticon?: (emoticonId: string) => void
   onTyping?: (isTyping: boolean) => void
   onEmoticonPickerToggle?: (isOpen: boolean) => void
-  onInputFocus?: () => void // 새로 추가
+  onInputFocus?: () => void
   disabled?: boolean
   chatId?: string | undefined
 }
@@ -90,8 +90,8 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
   ) => {
     const [message, setMessage] = useState<string>('')
     const [showEmoticonPicker, setShowEmoticonPicker] = useState<boolean>(false)
-    const [lastSentMessage, setLastSentMessage] = useState<string>('') // 마지막 전송 메시지
-    const [isWaitingResponse, setIsWaitingResponse] = useState<boolean>(false) // 응답 대기 상태
+    const [lastSentMessage, setLastSentMessage] = useState<string>('')
+    const [isWaitingResponse, setIsWaitingResponse] = useState<boolean>(false)
     const { showToast } = useToast()
     const navigate = useNavigate()
     const location = useLocation()
@@ -109,7 +109,20 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
       }
     }
 
-    // 4. disabled 상태 변경 시 이모티콘 피커 닫기
+    // 포커스 유지 함수 - 메시지 전송 후 호출
+    const maintainFocus = () => {
+      // 짧은 딜레이를 주어 DOM 업데이트 후 포커스 설정
+      setTimeout(() => {
+        if (textareaRef.current && !disabled) {
+          textareaRef.current.focus()
+          // 커서를 텍스트 끝으로 이동
+          const length = textareaRef.current.value.length
+          textareaRef.current.setSelectionRange(length, length)
+        }
+      }, 50)
+    }
+
+    // disabled 상태 변경 시 이모티콘 피커 닫기
     useEffect(() => {
       if (disabled && showEmoticonPicker) {
         setShowEmoticonPicker(false)
@@ -172,9 +185,11 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
           setMessage('')
           setLastSentMessage('')
           setIsWaitingResponse(false)
+          // 메시지 전송 후 포커스 유지
+          maintainFocus()
         },
       }),
-      [lastSentMessage]
+      [lastSentMessage, disabled]
     )
 
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -211,6 +226,9 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
 
         // 입력창은 즉시 비우기 (성공/실패 응답에 따라 복원될 수 있음)
         setMessage('')
+
+        // 메시지 전송 후 포커스 유지
+        maintainFocus()
       }
     }
 
@@ -246,11 +264,12 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
       type: string
     }) => {
       if (disabled) return
-      //console.log('이모티콘 선택됨:', emoticonData) // 디버깅용
       if (onSendEmoticon) {
         onSendEmoticon(emoticonData.id)
       }
       setShowEmoticonPicker(false)
+      // 이모티콘 전송 후에도 포커스 유지
+      maintainFocus()
     }
 
     // 텍스트 입력 포커스 핸들러
@@ -267,7 +286,9 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
     }
 
     const handleEmoticonPickerClose = () => {
-      setShowEmoticonPicker(false) // 피커 닫기
+      setShowEmoticonPicker(false)
+      // 이모티콘 피커 닫은 후 포커스 유지
+      maintainFocus()
     }
 
     return (
@@ -308,7 +329,7 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
                   disabled={disabled || isWaitingResponse}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  onFocus={handleTextareaFocus} // 포커스 이벤트 추가
+                  onFocus={handleTextareaFocus}
                   rows={1}
                 />
 

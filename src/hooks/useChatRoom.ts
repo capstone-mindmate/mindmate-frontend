@@ -477,7 +477,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
     }
   }, [messageProcessor])
 
-  // 메시지 전송 - 성능 최적화
+  // 메시지 전송 - 포커스 유지 추가
   const sendMessage = useCallback(
     (content: string, onError?: () => void) => {
       if (content.trim() === '') return
@@ -494,6 +494,11 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
               type: 'TEXT',
             }),
           })
+
+          // 웹소켓 전송 성공 시 포커스 유지
+          if (chatBarRef.current?.handleMessageSent) {
+            chatBarRef.current.handleMessageSent()
+          }
         } catch (error) {
           console.error('메시지 전송 오류:', error)
           if (onError) onError()
@@ -503,10 +508,10 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
         sendMessageFallback(currentMessage, onError)
       }
     },
-    [stompClient, chatId]
+    [stompClient, chatId, chatBarRef]
   )
 
-  // REST API 메시지 전송 - 성능 최적화
+  // REST API 메시지 전송 - 포커스 유지 추가
   const sendMessageFallback = useCallback(
     async (content: string, onError?: () => void) => {
       try {
@@ -540,6 +545,11 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
 
           const newMessage = messageProcessor.parseMessage(data)
           messageProcessor.addMessage(newMessage, setMessages, markAsRead)
+
+          // REST API 전송 성공 시 포커스 유지
+          if (chatBarRef.current?.handleMessageSent) {
+            chatBarRef.current.handleMessageSent()
+          }
         } else {
           showToast('메시지 전송에 실패했습니다. 다시 시도해주세요.', 'error')
           if (onError) onError()
@@ -550,10 +560,10 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
         if (onError) onError()
       }
     },
-    [chatId, messageProcessor, markAsRead, showToast]
+    [chatId, messageProcessor, markAsRead, showToast, chatBarRef]
   )
 
-  // 이모티콘 전송 - 성능 최적화
+  // 이모티콘 전송 - 포커스 유지 추가
   const sendEmoticon = useCallback(
     (emoticonId: string | number) => {
       if (stompClient && stompClient.connected && chatId) {
@@ -562,12 +572,19 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
             destination: '/app/chat.emoticon',
             body: JSON.stringify({ roomId: chatId, emoticonId }),
           })
+
+          // 이모티콘 전송 후 포커스 유지
+          setTimeout(() => {
+            if (chatBarRef.current?.focusInput) {
+              chatBarRef.current.focusInput()
+            }
+          }, 100)
         } catch (error) {
           console.error('이모티콘 전송 오류:', error)
         }
       }
     },
-    [stompClient, chatId]
+    [stompClient, chatId, chatBarRef]
   )
 
   // 종료 요청 함수 - 원본 로직 사용
