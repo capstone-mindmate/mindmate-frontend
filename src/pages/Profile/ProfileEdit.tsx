@@ -321,7 +321,7 @@ const ProfileEdit = ({}: ProfileEditProps) => {
           title="프로필 편집"
           showBackButton={true}
           onBackClick={() => {
-            handleBackClick
+            handleBackClick()
           }}
           actionText="완료"
           onActionClick={handleSave}
