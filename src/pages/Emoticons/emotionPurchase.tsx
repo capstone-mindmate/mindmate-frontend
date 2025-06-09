@@ -24,7 +24,7 @@ const EmotionPurchase = () => {
         hasCalledAPI.current = true // API 호출 시작 표시
 
         const res = await fetchWithRefresh(
-          `http://localhost/api/emoticons/purchase/${id}`,
+          `https://mindmate.shop/api/emoticons/purchase/${id}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

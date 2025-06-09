@@ -60,7 +60,7 @@ export const postMagazine = async (
     let imageIdMap = new Map<string, number>()
     if (imagesToUpload.length > 0) {
       try {
-        const apiUrl = 'http://localhost/api/magazines/image'
+        const apiUrl = 'https://mindmate.shop/api/magazines/image'
         const formData = new FormData()
 
         // 이미지 파일 추가 - 'files' 키로 파일 추가
@@ -168,14 +168,17 @@ export const postMagazine = async (
     }
 
     // fetchWithRefresh 사용 (토큰 관리 자동화)
-    const response = await fetchWithRefresh('http://localhost/api/magazines', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Authorization 헤더는 fetchWithRefresh가 자동으로 추가
-      },
-      body: JSON.stringify(magazineRequest),
-    })
+    const response = await fetchWithRefresh(
+      'https://mindmate.shop/api/magazines',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Authorization 헤더는 fetchWithRefresh가 자동으로 추가
+        },
+        body: JSON.stringify(magazineRequest),
+      }
+    )
 
     if (!response.ok) {
       // 오류 응답 내용 추출
