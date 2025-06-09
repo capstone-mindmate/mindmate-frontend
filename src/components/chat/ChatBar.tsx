@@ -246,7 +246,7 @@ const ChatBar = forwardRef<ChatBarRef, ChatBarProps>(
       type: string
     }) => {
       if (disabled) return
-      console.log('이모티콘 선택됨:', emoticonData) // 디버깅용
+      //console.log('이모티콘 선택됨:', emoticonData) // 디버깅용
       if (onSendEmoticon) {
         onSendEmoticon(emoticonData.id)
       }

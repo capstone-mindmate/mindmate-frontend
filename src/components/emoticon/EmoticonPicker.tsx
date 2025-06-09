@@ -77,7 +77,7 @@ function EmoticonPicker({
 
   // 이모티콘 클릭 핸들러 - 전체 객체를 전달하도록 수정
   const handleEmoticonClick = (emoticon: EmoticonData) => {
-    console.log('이모티콘 선택됨:', emoticon)
+    //console.log('이모티콘 선택됨:', emoticon)
 
     // 전체 이모티콘 객체를 전달
     onSelectEmoticon({

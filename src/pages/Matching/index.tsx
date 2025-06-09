@@ -151,7 +151,8 @@ const Matching = () => {
   )
   const [isListenerActive, setIsListenerActive] = useState(false)
   const [isSpeakerActive, setIsSpeakerActive] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState('전체')
+  const initialCategory = location.state?.category || '전체'
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
   const [matchItems, setMatchItems] = useState<MatchItemType[]>([])
   const [filteredItems, setFilteredItems] = useState<MatchItemType[]>([])
 
@@ -212,8 +213,16 @@ const Matching = () => {
           userId: item.userId ?? item.creatorId,
           category: categoryMap[item.category?.trim()] || item.category,
         }))
-        console.log(mapped)
-        setMatchItems((prev) => (append ? [...prev, ...mapped] : mapped))
+        // 중복 제거: id 기준으로 unique하게 만듦
+        setMatchItems((prev: MatchItemType[]) => {
+          const all: MatchItemType[] = append ? [...prev, ...mapped] : mapped
+          const unique = Array.from(
+            new Map<number, MatchItemType>(
+              all.map((item: MatchItemType) => [item.id, item])
+            ).values()
+          )
+          return unique
+        })
         setHasMore(!data.last)
       } else {
         if (!append) setMatchItems([])
@@ -239,23 +248,12 @@ const Matching = () => {
     searchQuery,
   ])
 
-  // 무한 스크롤 (IntersectionObserver)
+  // page가 0이 아닐 때만(무한스크롤) fetchMatchings 호출
   useEffect(() => {
-    if (!hasMore || loading) return
-    const observer = new window.IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchMatchings(page + 1, true)
-          setPage((p) => p + 1)
-        }
-      },
-      { threshold: 1 }
-    )
-    if (loaderRef.current) observer.observe(loaderRef.current)
-    return () => {
-      if (loaderRef.current) observer.unobserve(loaderRef.current)
+    if (page !== 0) {
+      fetchMatchings(page, true)
     }
-  }, [hasMore, loading, page])
+  }, [page])
 
   useEffect(() => {
     let filtered = matchItems
@@ -307,7 +305,10 @@ const Matching = () => {
   useEffect(() => {
     if (location.state && location.state.category) {
       setSelectedCategory(location.state.category)
+      setPage(0)
+      fetchMatchings(0, false)
     }
+    // eslint-disable-next-line
   }, [location.state])
 
   // 전역 키보드 이벤트 리스너만 사용 (React 이벤트 핸들러 제거)
@@ -687,7 +688,7 @@ const Matching = () => {
       if (userId && !selectedItem?.anonymous) {
         navigate(`/mypage/${userId}`)
       } else {
-        showToast('익명 사용자의 프로필입니다.', 'error')
+        showToast('상대방 프로필 정보를 찾을 수 없습니다.', 'error')
       }
     }
     return (
