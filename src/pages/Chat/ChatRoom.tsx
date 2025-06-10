@@ -341,15 +341,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
     }
   }
 
-  // 이벤트 핸들러들
-  const handleProfileClick = () => {
-    if (otherUserId && otherUserNameFromNav !== '익명') {
-      navigate(`/mypage/${otherUserId}`)
-    } else {
-      showToast('익명 사용자는 프로필 정보를 확인할 수 없습니다.', 'error')
-    }
-  }
-
   const handleRetry = () => {
     setErrorMessage(null)
   }
@@ -598,9 +589,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                           : profileImages.oppositeImageUrl ||
                             '/default-profile-image.png'
                       }
-                      onProfileClick={
-                        message.isMe ? undefined : handleProfileClick
-                      }
                     >
                       <EmoticonWrapper>
                         <EmoticonComponent
@@ -650,9 +638,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         isContinuous={false}
                         isCustomFormMake={true}
                         onClick={() => handleCustomFormClick(customFormMessage)}
-                        onProfileClick={
-                          message.isMe ? undefined : handleProfileClick
-                        }
                       />
                     </div>
                   )
@@ -682,9 +667,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         isContinuous={false}
                         isCustomFormMake={true}
                         onClick={() => handleCustomFormClick(customFormMessage)}
-                        onProfileClick={
-                          message.isMe ? undefined : handleProfileClick
-                        }
                       />
                     </div>
                   )
@@ -712,9 +694,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         ? undefined
                         : profileImages.oppositeImageUrl ||
                           '/default-profile-image.png'
-                    }
-                    onProfileClick={
-                      message.isMe ? undefined : handleProfileClick
                     }
                   >
                     {message.content}
