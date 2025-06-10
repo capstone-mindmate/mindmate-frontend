@@ -60,10 +60,10 @@ const MyPage = () => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
 
   const realProfileImageUrl = userProfile?.profileImage
-    ? `https://mindmate.shop/api${userProfile.profileImage}`
+    ? `http://localhost/api${userProfile.profileImage}`
     : ''
   const defaultProfileImageUrl =
-    'https://mindmate.shop/api/profileImages/default-profile-image.png'
+    'http://localhost/api/profileImages/default-profile-image.png'
 
   useEffect(() => {
     setIsProfileImageLoaded(false)
@@ -85,7 +85,7 @@ const MyPage = () => {
           setIsOwnProfile(true)
           if (user?.id) {
             profileRes = await fetchWithRefresh(
-              `https://mindmate.shop/api/profiles`,
+              `http://localhost/api/profiles`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -132,7 +132,7 @@ const MyPage = () => {
           }
 
           reveiwListRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
+            `http://localhost/api/reviews/profile/${profileData.id}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -146,8 +146,7 @@ const MyPage = () => {
             (reveiwListData.content || [])
               .filter((r: any) => r.comment !== '')
               .map((r: any) => ({
-                profileImage:
-                  'https://mindmate.shop/api' + r.reviewerProfileImage,
+                profileImage: 'http://localhost/api' + r.reviewerProfileImage,
                 username: r.reviewerNickname,
                 rating: r.rating,
                 date: r.createdAt
@@ -171,7 +170,7 @@ const MyPage = () => {
           }
 
           profileRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/profiles/${userId}`,
+            `http://localhost/api/profiles/${userId}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -218,7 +217,7 @@ const MyPage = () => {
           }
 
           reveiwListRes = await fetchWithRefresh(
-            `https://mindmate.shop/api/reviews/profile/${profileData.id}`,
+            `http://localhost/api/reviews/profile/${profileData.id}`,
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -232,8 +231,7 @@ const MyPage = () => {
             (reveiwListData.content || [])
               .filter((r: any) => r.comment !== '')
               .map((r: any) => ({
-                profileImage:
-                  'https://mindmate.shop/api' + r.reviewerProfileImage,
+                profileImage: 'http://localhost/api' + r.reviewerProfileImage,
                 username: r.reviewerNickname,
                 rating: r.rating,
                 date: r.createdAt
@@ -259,7 +257,7 @@ const MyPage = () => {
     const fetchPointBalance = async () => {
       try {
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/points/balance',
+          'http://localhost/api/points/balance',
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },

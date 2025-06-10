@@ -198,8 +198,8 @@ const Matching = () => {
 
     const endpoint =
       searchQuery.trim() !== ''
-        ? `https://mindmate.shop/api/matchings/search?${params.toString()}`
-        : `https://mindmate.shop/api/matchings?${params.toString()}`
+        ? `http://localhost/api/matchings/search?${params.toString()}`
+        : `http://localhost/api/matchings?${params.toString()}`
     try {
       const res = await fetchWithRefresh(endpoint, {
         method: 'GET',
@@ -454,7 +454,7 @@ const Matching = () => {
   const handleListenerSelect = async () => {
     try {
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/matchings/auto',
+        'http://localhost/api/matchings/auto',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -478,7 +478,7 @@ const Matching = () => {
   const handleSpeakerSelect = async () => {
     try {
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/matchings/auto',
+        'http://localhost/api/matchings/auto',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -504,7 +504,7 @@ const Matching = () => {
     setIsModalOpen(true)
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/matchings/${item.id}`,
+        `http://localhost/api/matchings/${item.id}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -524,8 +524,8 @@ const Matching = () => {
         borderSet: false,
         username: data.creatorNickname ?? '',
         profileImage: data.anonymous
-          ? 'https://mindmate.shop/api/profileImages/default-profile-image.png'
-          : `https://mindmate.shop/api${data.creatorProfileImage ?? ''}`,
+          ? 'http://localhost/api/profileImages/default-profile-image.png'
+          : `http://localhost/api${data.creatorProfileImage ?? ''}`,
         makeDate: data.createdAt
           ? new Date(data.createdAt).toLocaleString('ko-KR', {
               month: '2-digit',
@@ -566,7 +566,7 @@ const Matching = () => {
     if (selectedItem) {
       try {
         const res = await fetchWithRefresh(
-          `https://mindmate.shop/api/matchings/${selectedItem.id}/applications`,
+          `http://localhost/api/matchings/${selectedItem.id}/applications`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

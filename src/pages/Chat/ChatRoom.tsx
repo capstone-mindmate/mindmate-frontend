@@ -300,7 +300,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/messages/before/${oldestId}?size=30`,
+        `http://localhost/api/chat/rooms/${chatId}/messages/before/${oldestId}?size=30`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -338,15 +338,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       setHasMorePrev(false)
     } finally {
       setIsLoadingPrev(false)
-    }
-  }
-
-  // 이벤트 핸들러들
-  const handleProfileClick = () => {
-    if (otherUserId && otherUserNameFromNav !== '익명') {
-      navigate(`/mypage/${otherUserId}`)
-    } else {
-      showToast('익명 사용자는 프로필 정보를 확인할 수 없습니다.', 'error')
     }
   }
 
@@ -416,7 +407,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
       showToast('채팅방을 삭제하는 중입니다...', 'info')
 
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/chat/rooms/${chatId}/delete`,
+        `http://localhost/api/chat/rooms/${chatId}/delete`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -456,7 +447,7 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
 
     try {
       const response = await fetchWithRefresh(
-        `https://mindmate.shop/api/custom-forms/${formId}`,
+        `http://localhost/api/custom-forms/${formId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -598,14 +589,11 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                           : profileImages.oppositeImageUrl ||
                             '/default-profile-image.png'
                       }
-                      onProfileClick={
-                        message.isMe ? undefined : handleProfileClick
-                      }
                     >
                       <EmoticonWrapper>
                         <EmoticonComponent
                           emoticonURL={
-                            'https://mindmate.shop/api' +
+                            'http://localhost/api' +
                             (message as any).emoticonUrl
                           }
                           type={(message as any).emoticonType}
@@ -650,9 +638,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         isContinuous={false}
                         isCustomFormMake={true}
                         onClick={() => handleCustomFormClick(customFormMessage)}
-                        onProfileClick={
-                          message.isMe ? undefined : handleProfileClick
-                        }
                       />
                     </div>
                   )
@@ -682,9 +667,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         isContinuous={false}
                         isCustomFormMake={true}
                         onClick={() => handleCustomFormClick(customFormMessage)}
-                        onProfileClick={
-                          message.isMe ? undefined : handleProfileClick
-                        }
                       />
                     </div>
                   )
@@ -712,9 +694,6 @@ const ChatRoom = ({ chatId }: ChatRoomProps) => {
                         ? undefined
                         : profileImages.oppositeImageUrl ||
                           '/default-profile-image.png'
-                    }
-                    onProfileClick={
-                      message.isMe ? undefined : handleProfileClick
                     }
                   >
                     {message.content}

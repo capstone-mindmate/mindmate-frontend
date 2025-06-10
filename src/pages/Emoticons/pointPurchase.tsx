@@ -46,7 +46,7 @@ const PointPurchase = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/payments/products',
+        'http://localhost/api/payments/products',
         {
           method: 'GET',
         }
@@ -60,7 +60,7 @@ const PointPurchase = () => {
     }
 
     const fetchCoin = async () => {
-      const res = await fetchWithRefresh('https://mindmate.shop/api/profiles', {
+      const res = await fetchWithRefresh('http://localhost/api/profiles', {
         method: 'GET',
       })
       const profileData = await res.json()
