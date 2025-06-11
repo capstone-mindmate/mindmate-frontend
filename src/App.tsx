@@ -3,10 +3,13 @@ import { router } from './routes'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useAuthStore } from './stores/userStore'
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import { requestPermission, listenForegroundMessage } from './utils/settingFCM'
+import {
+  requestPermission,
+  setupForegroundMessageListener,
+} from './utils/settingFCM'
 import { useEffect } from 'react'
 import * as Sentry from '@sentry/react'
-import { decodeJWT, getTokenCookie } from './utils/fetchWithRefresh'
+import { decodeJWT } from './utils/fetchWithRefresh'
 
 function App() {
   const queryClient = new QueryClient()
@@ -17,7 +20,7 @@ function App() {
 
   useEffect(() => {
     requestPermission()
-    listenForegroundMessage()
+    setupForegroundMessageListener()
 
     // JWT 만료 자동 로그아웃
     if (accessToken) {
