@@ -15,6 +15,20 @@ export default defineConfig({
       workbox: {
         cleanupOutdatedCaches: true,
         sourcemap: true,
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/www\.gstatic\.com\/firebasejs\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'firebase-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+              },
+            },
+          },
+        ],
       },
       manifest: {
         name: 'MindMate',

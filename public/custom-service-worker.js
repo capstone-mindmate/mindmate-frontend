@@ -13,19 +13,26 @@ const firebaseConfig = {
   appId: "1:895068697413:web:7383e36432f90be96d842c"
 }
 
-// 서비스 워커 설치 시점에 Firebase 초기화
+// Firebase 초기화 함수
+const initializeFirebase = async () => {
+  try {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    console.log('Firebase 초기화 성공');
+    return true;
+  } catch (error) {
+    console.error('Firebase 초기화 실패:', error);
+    return false;
+  }
+};
+
+// 서비스 워커 설치 시점
 self.addEventListener('install', (event) => {
   console.log('Service Worker 설치 중...');
   event.waitUntil(
     (async () => {
-      try {
-        if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
-        }
-        console.log('Firebase 초기화 성공');
-      } catch (error) {
-        console.error('Firebase 초기화 실패:', error);
-      }
+      await initializeFirebase();
     })()
   );
 });
@@ -104,47 +111,51 @@ self.addEventListener('push', (event) => {
 });
 
 // Firebase 메시징 백그라운드 핸들러
-firebase.messaging().onBackgroundMessage((payload) => {
-  console.log('백그라운드 메시지 수신:', payload);
-  const { title, body, image } = payload.notification || {};
-  
-  return self.registration.getNotifications()
-    .then(notifications => {
-      const existingNotification = notifications.find(
-        notification => 
-          notification.title === (title || '알림') && 
-          notification.body === (body || '내용 없음')
-      );
+try {
+  firebase.messaging().onBackgroundMessage((payload) => {
+    console.log('백그라운드 메시지 수신:', payload);
+    const { title, body, image } = payload.notification || {};
+    
+    return self.registration.getNotifications()
+      .then(notifications => {
+        const existingNotification = notifications.find(
+          notification => 
+            notification.title === (title || '알림') && 
+            notification.body === (body || '내용 없음')
+        );
 
-      if (existingNotification) {
-        console.log('이미 존재하는 알림');
-        return;
-      }
+        if (existingNotification) {
+          console.log('이미 존재하는 알림');
+          return;
+        }
 
-      const notificationOptions = {
-        body: body || '내용 없음',
-        icon: '/fav/favicon-196x196.png',
-        badge: '/fav/favicon-196x196.png',
-        image: image,
-        requireInteraction: true,
-        vibrate: [200, 100, 200],
-        data: payload.data || {},
-        tag: 'fcm-notification',
-        actions: [
-          {
-            action: 'open',
-            title: '열기'
-          },
-          {
-            action: 'close',
-            title: '닫기'
-          }
-        ]
-      };
+        const notificationOptions = {
+          body: body || '내용 없음',
+          icon: '/fav/favicon-196x196.png',
+          badge: '/fav/favicon-196x196.png',
+          image: image,
+          requireInteraction: true,
+          vibrate: [200, 100, 200],
+          data: payload.data || {},
+          tag: 'fcm-notification',
+          actions: [
+            {
+              action: 'open',
+              title: '열기'
+            },
+            {
+              action: 'close',
+              title: '닫기'
+            }
+          ]
+        };
 
-      return showNotification(title || '알림', notificationOptions);
-    });
-});
+        return showNotification(title || '알림', notificationOptions);
+      });
+  });
+} catch (error) {
+  console.error('Firebase Messaging 핸들러 등록 실패:', error);
+}
 
 // 알림 클릭 이벤트 처리
 self.addEventListener('notificationclick', (event) => {
