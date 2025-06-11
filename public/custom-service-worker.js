@@ -13,44 +13,17 @@ const firebaseConfig = {
   appId: "1:895068697413:web:7383e36432f90be96d842c"
 }
 
-// Firebase 초기화 함수
-const initializeFirebase = async () => {
-  try {
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    console.log('Firebase 초기화 성공');
-    return true;
-  } catch (error) {
-    console.error('Firebase 초기화 실패:', error);
-    return false;
+// Firebase 초기화
+let messaging = null;
+try {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
   }
-};
-
-// 서비스 워커 설치 시점
-self.addEventListener('install', (event) => {
-  console.log('Service Worker 설치 중...');
-  event.waitUntil(
-    (async () => {
-      await initializeFirebase();
-    })()
-  );
-});
-
-// 서비스 워커 활성화 시점
-self.addEventListener('activate', (event) => {
-  console.log('Service Worker 활성화됨');
-  event.waitUntil(
-    (async () => {
-      try {
-        const messaging = firebase.messaging();
-        console.log('Firebase Messaging 초기화 성공');
-      } catch (error) {
-        console.error('Firebase Messaging 초기화 실패:', error);
-      }
-    })()
-  );
-});
+  messaging = firebase.messaging();
+  console.log('Firebase 초기화 성공');
+} catch (error) {
+  console.error('Firebase 초기화 실패:', error);
+}
 
 // 알림 표시 함수
 const showNotification = (title, options) => {
@@ -111,8 +84,8 @@ self.addEventListener('push', (event) => {
 });
 
 // Firebase 메시징 백그라운드 핸들러
-try {
-  firebase.messaging().onBackgroundMessage((payload) => {
+if (messaging) {
+  messaging.onBackgroundMessage((payload) => {
     console.log('백그라운드 메시지 수신:', payload);
     const { title, body, image } = payload.notification || {};
     
@@ -153,8 +126,6 @@ try {
         return showNotification(title || '알림', notificationOptions);
       });
   });
-} catch (error) {
-  console.error('Firebase Messaging 핸들러 등록 실패:', error);
 }
 
 // 알림 클릭 이벤트 처리
@@ -186,6 +157,24 @@ self.addEventListener('notificationclick', (event) => {
       })
     );
   }
+});
+
+// 구독 변경 이벤트 처리
+self.addEventListener('pushsubscriptionchange', (event) => {
+  console.log('Push 구독 변경:', event);
+  // 필요한 경우 여기에 구독 갱신 로직 추가
+});
+
+// 서비스 워커 설치 시점
+self.addEventListener('install', (event) => {
+  console.log('Service Worker 설치 중...');
+  event.waitUntil(self.skipWaiting());
+});
+
+// 서비스 워커 활성화 시점
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker 활성화됨');
+  event.waitUntil(clients.claim());
 });
 
 // 프리캐시 매니페스트 적용
