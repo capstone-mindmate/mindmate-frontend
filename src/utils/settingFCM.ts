@@ -70,21 +70,26 @@ export const requestPermission = async () => {
           // Service Worker가 없거나 업데이트가 필요한 경우에만 새로 등록
           if (!registration || registration.active?.state === 'redundant') {
             const newRegistration = await navigator.serviceWorker.register(
-              '/firebase-messaging-sw.js',
+              '/custom-service-worker.js',
               {
                 scope: '/',
               }
             )
+            console.log('Service Worker 등록 성공:', newRegistration)
           }
 
           // 현재 활성화된 Service Worker 사용
           const activeRegistration = await navigator.serviceWorker.ready
+          console.log('Service Worker 준비 완료:', activeRegistration)
 
-          const token = await getToken(getMessaging(app), {
+          const messaging = getMessaging(app)
+          const token = await getToken(messaging, {
             vapidKey:
               'BF23-B976Qg7HI9gI_m7Dk-zI4U1M5k-j93zanosLaTX92azU42wTFKpwTjfSUihVOJMB5KbX3l385Ut5AsaU6E',
             serviceWorkerRegistration: activeRegistration,
           })
+
+          console.log('FCM 토큰 발급 성공:', token)
 
           // 새 토큰 저장
           saveToken(token)
@@ -108,7 +113,7 @@ export const listenForegroundMessage = () => {
   try {
     const messaging = getMessaging(app)
     onMessage(messaging, (payload) => {
-      // console.log('📥 포그라운드 메시지 수신:', payload)
+      console.log('📥 포그라운드 메시지 수신:', payload)
 
       // 앱이 포그라운드에 있고 사용자가 현재 페이지를 보고 있을 때만 알림 표시
       if (isAppInForeground()) {
@@ -124,6 +129,16 @@ export const listenForegroundMessage = () => {
           vibrate: [200, 100, 200],
           data: payload.data || {},
           tag: 'fcm-notification', // 알림 그룹화를 위한 태그
+          actions: [
+            {
+              action: 'open',
+              title: '열기',
+            },
+            {
+              action: 'close',
+              title: '닫기',
+            },
+          ],
         }
 
         if (Notification.permission === 'granted') {
