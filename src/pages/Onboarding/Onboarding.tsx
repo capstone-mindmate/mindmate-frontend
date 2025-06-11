@@ -27,6 +27,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { setTokenCookie, deleteAllCookies } from '../../utils/fetchWithRefresh'
 import { useAuthStore } from '../../stores/userStore'
+import { requestPermission, registerFCMToken } from '../../utils/settingFCM'
 
 // 반응형을 위한 화면 크기 감지 hook
 const useWindowSize = () => {
@@ -130,6 +131,21 @@ function OnboardingContent() {
       if (response.ok) {
         const userData = await response.json()
         setUser(userData)
+
+        // FCM 토큰 요청 및 등록
+        try {
+          const fcmToken = await requestPermission()
+          if (fcmToken) {
+            console.log('FCM 토큰 발급 성공:', fcmToken)
+            const result = await registerFCMToken(fcmToken)
+            console.log('FCM 토큰 서버 등록 결과:', result)
+          } else {
+            console.error('FCM 토큰 발급 실패')
+          }
+        } catch (error) {
+          console.error('FCM 토큰 등록 과정에서 오류 발생:', error)
+        }
+
         navigate('/home', { replace: true })
       } else {
         console.error('사용자 정보 가져오기 실패:', response.status)

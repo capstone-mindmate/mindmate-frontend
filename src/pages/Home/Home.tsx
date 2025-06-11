@@ -35,6 +35,7 @@ import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { usePageAnimation, smoothNavigate } from '../../hooks/usePageAnimation'
 import { getKoreanErrorMessage } from '../../utils/errorMessageUtils'
 import { useNavigationStore } from '../../stores/navigationStore'
+import { registerFCMToken, requestPermission } from '../../utils/settingFCM'
 // 매거진 데이터 인터페이스 정의
 interface MagazineContent {
   id: number
@@ -94,6 +95,22 @@ const HomePage = () => {
   const [cardNewsError, setCardNewsError] = useState<string | null>(null)
   const { showToast } = useToast()
   const { setPreviousPath } = useNavigationStore()
+
+  // FCM 토큰 등록을 위한 useEffect
+  useEffect(() => {
+    const setupFCM = async () => {
+      try {
+        const token = await requestPermission()
+
+        await registerFCMToken(token)
+      } catch (error) {
+        console.error('FCM 설정 실패:', error)
+        showToast('알림 설정에 실패했습니다. 다시 시도해주세요.', 'error')
+      }
+    }
+
+    setupFCM()
+  }, []) // 컴포넌트 마운트 시 한 번만 실행
 
   // 인기 매거진 데이터 가져오기
   useEffect(() => {
