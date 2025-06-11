@@ -56,16 +56,19 @@ export const requestPermission = async () => {
     // 저장된 토큰이 있고 유효한 경우 재사용
     const storedToken = getStoredToken()
     if (storedToken && isTokenValid()) {
+      console.log('기존 FCM 토큰 사용:', storedToken)
       return storedToken
     }
 
     const permission = await Notification.requestPermission()
+    console.log('알림 권한 상태:', permission)
 
     if (permission === 'granted') {
       if ('serviceWorker' in navigator) {
         try {
           // 기존 Service Worker 확인
           const registration = await navigator.serviceWorker.getRegistration()
+          console.log('기존 Service Worker:', registration)
 
           // Service Worker가 없거나 업데이트가 필요한 경우에만 새로 등록
           if (!registration || registration.active?.state === 'redundant') {
@@ -112,6 +115,8 @@ export const requestPermission = async () => {
 export const listenForegroundMessage = () => {
   try {
     const messaging = getMessaging(app)
+    console.log('포그라운드 메시지 리스너 설정 시작')
+
     onMessage(messaging, (payload) => {
       console.log('📥 포그라운드 메시지 수신:', payload)
 
@@ -142,6 +147,10 @@ export const listenForegroundMessage = () => {
         }
 
         if (Notification.permission === 'granted') {
+          console.log('포그라운드 알림 표시 시도:', {
+            title,
+            notificationOptions,
+          })
           const notification = new Notification(
             title || '알림',
             notificationOptions
@@ -150,6 +159,7 @@ export const listenForegroundMessage = () => {
           // 알림 클릭 이벤트 처리
           notification.onclick = (event) => {
             event.preventDefault()
+            console.log('포그라운드 알림 클릭:', event)
 
             // 알림 닫기
             notification.close()
@@ -169,6 +179,7 @@ export const listenForegroundMessage = () => {
         }
       }
     })
+    console.log('포그라운드 메시지 리스너 설정 완료')
   } catch (error) {
     console.error('포그라운드 메시지 리스너 설정 실패:', error)
   }
@@ -177,6 +188,7 @@ export const listenForegroundMessage = () => {
 // FCM 토큰을 서버에 등록하는 함수
 export const registerFCMToken = async (token: string) => {
   try {
+    console.log('FCM 토큰 서버 등록 시도:', token)
     const response = await fetchWithRefresh(
       'https://mindmate.shop/api/fcm/token',
       {
@@ -202,6 +214,7 @@ export const registerFCMToken = async (token: string) => {
     }
 
     const data = await response.json()
+    console.log('FCM 토큰 서버 등록 성공:', data)
     return data
   } catch (error) {
     console.error('FCM 토큰 등록 중 오류 발생:', error)

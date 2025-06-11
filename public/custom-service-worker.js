@@ -44,47 +44,51 @@ const showNotification = (title, options) => {
 self.addEventListener('push', (event) => {
   console.log('Push 이벤트 수신:', event);
   if (event.data) {
-    const payload = event.data.json();
-    console.log('Push 데이터:', payload);
-    
-    const { title, body, image } = payload.notification || {};
-    
-    return self.registration.getNotifications()
-      .then(notifications => {
-        const existingNotification = notifications.find(
-          notification => 
-            notification.title === (title || '알림') && 
-            notification.body === (body || '내용 없음')
-        );
+    try {
+      const payload = event.data.json();
+      console.log('Push 데이터:', payload);
+      
+      const { title, body, image } = payload.notification || {};
+      
+      return self.registration.getNotifications()
+        .then(notifications => {
+          const existingNotification = notifications.find(
+            notification => 
+              notification.title === (title || '알림') && 
+              notification.body === (body || '내용 없음')
+          );
 
-        if (existingNotification) {
-          console.log('이미 존재하는 알림');
-          return;
-        }
+          if (existingNotification) {
+            console.log('이미 존재하는 알림');
+            return;
+          }
 
-        const notificationOptions = {
-          body: body || '내용 없음',
-          icon: '/fav/favicon-196x196.png',
-          badge: '/fav/favicon-196x196.png',
-          image: image,
-          requireInteraction: true,
-          vibrate: [200, 100, 200],
-          data: payload.data || {},
-          tag: 'fcm-notification',
-          actions: [
-            {
-              action: 'open',
-              title: '열기',
-            },
-            {
-              action: 'close',
-              title: '닫기',
-            },
-          ],
-        };
+          const notificationOptions = {
+            body: body || '내용 없음',
+            icon: '/fav/favicon-196x196.png',
+            badge: '/fav/favicon-196x196.png',
+            image: image,
+            requireInteraction: true,
+            vibrate: [200, 100, 200],
+            data: payload.data || {},
+            tag: 'fcm-notification',
+            actions: [
+              {
+                action: 'open',
+                title: '열기',
+              },
+              {
+                action: 'close',
+                title: '닫기',
+              },
+            ],
+          };
 
-        return showNotification(title || '알림', notificationOptions);
-      });
+          return showNotification(title || '알림', notificationOptions);
+        });
+    } catch (error) {
+      console.error('Push 이벤트 처리 실패:', error);
+    }
   }
 });
 
@@ -130,6 +134,9 @@ if (messaging) {
         };
 
         return showNotification(title || '알림', notificationOptions);
+      })
+      .catch(error => {
+        console.error('백그라운드 메시지 처리 실패:', error);
       });
   });
   console.log('Firebase Messaging 핸들러 등록 완료');
