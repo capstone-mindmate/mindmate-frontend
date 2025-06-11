@@ -213,9 +213,9 @@ const Matching = () => {
           userId: item.userId ?? item.creatorId,
           category: categoryMap[item.category?.trim()] || item.category,
         }))
-        // 중복 제거: id 기준으로 unique하게 만듦
         setMatchItems((prev: MatchItemType[]) => {
           const all: MatchItemType[] = append ? [...prev, ...mapped] : mapped
+
           const unique = Array.from(
             new Map<number, MatchItemType>(
               all.map((item: MatchItemType) => [item.id, item])
@@ -223,7 +223,7 @@ const Matching = () => {
           )
           return unique
         })
-        setHasMore(!data.last)
+        setHasMore(!data.last && mapped.length > 0)
       } else {
         if (!append) setMatchItems([])
         setHasMore(false)
@@ -236,9 +236,10 @@ const Matching = () => {
     }
   }
 
-  // 필터 변경 시 첫 페이지부터 다시 불러오기
+  // 필터 변경 시 page, matchItems, hasMore 리셋 + 첫 페이지 로드
   useEffect(() => {
     setPage(0)
+    setHasMore(true)
     fetchMatchings(0, false)
   }, [
     selectedCategory,
@@ -254,6 +255,23 @@ const Matching = () => {
       fetchMatchings(page, true)
     }
   }, [page])
+
+  // IntersectionObserver로 무한 스크롤
+  useEffect(() => {
+    if (!hasMore || loading) return
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setPage((p) => p + 1)
+        }
+      },
+      { threshold: 1 }
+    )
+    if (loaderRef.current) observer.observe(loaderRef.current)
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current)
+    }
+  }, [hasMore, loading])
 
   useEffect(() => {
     let filtered = matchItems
