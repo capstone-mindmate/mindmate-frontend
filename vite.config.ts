@@ -11,6 +11,11 @@ export default defineConfig({
       strategies: 'injectManifest',
       filename: 'custom-service-worker.js',
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      workbox: {
+        cleanupOutdatedCaches: true,
+        sourcemap: true,
+      },
       manifest: {
         name: 'MindMate',
         short_name: 'MindMate',
