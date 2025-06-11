@@ -5,6 +5,14 @@ import ToastProvider from './components/toast/ToastProvider.tsx'
 import { GlobalStyles } from '../styles/GlobalStyles.tsx'
 import * as Sentry from '@sentry/react'
 
+// FCM 및 PWA 서비스워커를 모두 등록
+if ('serviceWorker' in navigator) {
+  // FCM용 서비스워커 등록 (반드시 루트 경로)
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
+  // PWA(Workbox)용 서비스워커 등록
+  navigator.serviceWorker.register('/custom-service-worker.js')
+}
+
 // Sentry 초기화 - 애플리케이션 라이프사이클에서 가장 먼저 실행
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
