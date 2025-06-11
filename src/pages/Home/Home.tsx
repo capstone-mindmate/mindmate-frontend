@@ -179,7 +179,7 @@ const HomePage = () => {
 
       try {
         const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/emoticons/popular/viewed',
+          'https://mindmate.shop/api/emoticons/popular/overall',
           {
             method: 'GET',
           }
