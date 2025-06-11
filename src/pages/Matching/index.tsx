@@ -29,9 +29,10 @@ import MatchItem from '../../components/matching/matchItem'
 import RandomMatchingSelector from '../../components/matching/floating'
 import ModalComponent from '../../components/modal/modalComponent'
 import { css } from '@emotion/react'
-import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
+import { fetchWithRefresh, getTokenCookie } from '../../utils/fetchWithRefresh'
 import { useToast } from '../../components/toast/ToastProvider'
-import { MatchingListSkeleton } from './SkeletonComponents' // 스켈레톤 컴포넌트 import 추가
+import { MatchingListSkeleton, hotCategoryEmoji } from './SkeletonComponents'
+import { useAuthStore } from '../../stores/userStore'
 
 // 카테고리 배열 정의
 const categories = ['전체', '진로', '취업', '학업', '인간관계', '경제', '기타']
@@ -141,6 +142,7 @@ const categoryEngMap: Record<string, string> = {
 }
 
 const Matching = () => {
+  const { user } = useAuthStore()
   const navigate = useNavigate()
   const searchInputRef = useRef<HTMLInputElement>(null)
   const categoryContainerRef = useRef<HTMLDivElement>(null)
@@ -179,6 +181,9 @@ const Matching = () => {
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const [isSwipeInProgress, setIsSwipeInProgress] = useState(false) // 스와이프 진행 중 상태
+
+  // 핫 카테고리 관련 상태
+  const [hotCategories, setHotCategories] = useState<string[]>([])
 
   // 스와이프 감지를 위한 최소 거리 (더 작게 조정)
   const minSwipeDistance = 30
@@ -234,6 +239,62 @@ const Matching = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchHotCategories = async (token: string) => {
+    try {
+      const res = await fetchWithRefresh(
+        'https://mindmate.shop/api/matchings/popular',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include',
+        }
+      )
+
+      if (res.ok) {
+        const data = await res.json()
+        console.log('인기 카테고리 API 응답:', data)
+
+        // 🔥 PopularMatchingCategoryResponse 구조에 맞게 수정
+        let topCategories: string[] = []
+
+        if (data.matchingCategory) {
+          // 단일 카테고리를 한글로 변환
+          const categoryName =
+            categoryMap[data.matchingCategory] || data.matchingCategory
+          if (categoryName && categoryName !== '전체') {
+            topCategories = [categoryName]
+          }
+        }
+
+        setHotCategories(topCategories)
+        console.log('설정된 핫 카테고리:', topCategories)
+      } else {
+        throw new Error(`API 호출 실패: ${res.status} ${res.statusText}`)
+      }
+    } catch (error) {
+      console.error('핫 카테고리 로딩 실패:', error)
+    }
+  }
+
+  useEffect(() => {
+    const cookieToken = getTokenCookie('accessToken')
+    const tokenToUse = user?.accessToken || cookieToken
+
+    if (!tokenToUse) {
+      return
+    }
+
+    fetchHotCategories(tokenToUse)
+  }, [])
+
+  // 카테고리가 핫 카테고리인지 확인
+  const isHotCategory = (category: string) => {
+    return hotCategories.includes(category)
   }
 
   // 필터 변경 시 page, matchItems, hasMore 리셋 + 첫 페이지 로드
@@ -765,6 +826,26 @@ const Matching = () => {
     )
   }
 
+  // 카테고리 렌더링
+  const renderCategoryContainer = () => {
+    return (
+      <CategoryContainer ref={categoryContainerRef}>
+        {categories.map((category) => (
+          <CategoryItem
+            key={category}
+            className={selectedCategory === category ? 'selected' : ''}
+            onClick={() => handleCategorySelect(category)}
+          >
+            <CategoryItemText>
+              {category}
+              {isHotCategory(category) && ' 🔥'}
+            </CategoryItemText>
+          </CategoryItem>
+        ))}
+      </CategoryContainer>
+    )
+  }
+
   return (
     <RootContainer
       onTouchStart={onTouchStart}
@@ -798,17 +879,7 @@ const Matching = () => {
             </IconList>
           </MatchingTopBar>
 
-          <CategoryContainer ref={categoryContainerRef}>
-            {categories.map((category) => (
-              <CategoryItem
-                key={category}
-                className={selectedCategory === category ? 'selected' : ''}
-                onClick={() => handleCategorySelect(category)}
-              >
-                <CategoryItemText>{category}</CategoryItemText>
-              </CategoryItem>
-            ))}
-          </CategoryContainer>
+          {renderCategoryContainer()}
 
           <CategoryDetailContainer>
             <NormalSelectButton
