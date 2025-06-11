@@ -8,10 +8,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      strategies: 'injectManifest',
-      filename: 'custom-service-worker.js',
-      registerType: 'autoUpdate',
-      injectRegister: false,
+      // strategies: 'injectManifest',
+      // filename: 'custom-service-worker.js',
+      // registerType: 'autoUpdate',
+      // injectRegister: false,
       manifest: {
         name: 'MindMate',
         short_name: 'MindMate',
