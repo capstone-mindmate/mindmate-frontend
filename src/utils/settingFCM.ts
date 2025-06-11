@@ -112,71 +112,65 @@ export const requestPermission = async () => {
   }
 }
 
-export const listenForegroundMessage = () => {
+export const setupForegroundMessageListener = () => {
   try {
     const messaging = getMessaging(app)
     console.log('포그라운드 메시지 리스너 설정 시작')
 
     onMessage(messaging, (payload) => {
-      console.log('📥 포그라운드 메시지 수신:', payload)
+      console.log('포그라운드 메시지 수신:', payload)
 
-      // 앱이 포그라운드에 있고 사용자가 현재 페이지를 보고 있을 때만 알림 표시
-      if (isAppInForeground()) {
-        // 알림 데이터 추출
-        const { title, body, image } = payload.notification || {}
+      const { title, body, image } = payload.notification || {}
+      const notificationOptions = {
+        body: body || '내용 없음',
+        icon: '/fav/favicon-196x196.png',
+        badge: '/fav/favicon-196x196.png',
+        image: image,
+        requireInteraction: true,
+        vibrate: [200, 100, 200],
+        data: payload.data || {},
+        tag: 'fcm-notification',
+        actions: [
+          {
+            action: 'open',
+            title: '열기',
+          },
+          {
+            action: 'close',
+            title: '닫기',
+          },
+        ],
+      }
 
-        const notificationOptions = {
-          body: body || '내용 없음',
-          icon: '/fav/favicon-196x196.png',
-          badge: '/fav/favicon-196x196.png',
-          image: image,
-          requireInteraction: true,
-          vibrate: [200, 100, 200],
-          data: payload.data || {},
-          tag: 'fcm-notification', // 알림 그룹화를 위한 태그
-          actions: [
-            {
-              action: 'open',
-              title: '열기',
-            },
-            {
-              action: 'close',
-              title: '닫기',
-            },
-          ],
-        }
+      if (Notification.permission === 'granted') {
+        console.log('포그라운드 알림 표시 시도:', {
+          title,
+          notificationOptions,
+        })
 
-        if (Notification.permission === 'granted') {
-          console.log('포그라운드 알림 표시 시도:', {
-            title,
-            notificationOptions,
-          })
-          const notification = new Notification(
-            title || '알림',
-            notificationOptions
-          )
+        const notification = new Notification(
+          title || '알림',
+          notificationOptions
+        )
 
-          // 알림 클릭 이벤트 처리
-          notification.onclick = (event) => {
-            event.preventDefault()
-            console.log('포그라운드 알림 클릭:', event)
+        notification.onclick = (event) => {
+          event.preventDefault()
+          console.log('포그라운드 알림 클릭:', event)
 
-            // 알림 닫기
-            notification.close()
+          // 알림 닫기
+          notification.close()
 
-            // 앱 포커스
-            window.focus()
-
-            // 알림 타입에 따른 페이지 이동
-            if (payload.data?.type === '매칭 수락') {
-              window.location.href = '/chat'
-            } else if (payload.data?.type === '매칭 거절') {
-              window.location.href = '/matching'
-            } else {
-              window.location.href = '/home'
-            }
+          // 알림 데이터에 따른 페이지 이동
+          if (payload.data?.type === '매칭 수락') {
+            window.location.href = '/chat'
+          } else if (payload.data?.type === '매칭 거절') {
+            window.location.href = '/matching'
+          } else {
+            window.location.href = '/home'
           }
         }
+      } else {
+        console.log('알림 권한이 없어 알림을 표시할 수 없습니다.')
       }
     })
     console.log('포그라운드 메시지 리스너 설정 완료')

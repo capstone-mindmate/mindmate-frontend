@@ -97,6 +97,7 @@ if (messaging) {
   console.log('Firebase Messaging 핸들러 등록 시도');
   messaging.onBackgroundMessage((payload) => {
     console.log('백그라운드 메시지 수신:', payload);
+    
     const { title, body, image } = payload.notification || {};
     
     return self.registration.getNotifications()
