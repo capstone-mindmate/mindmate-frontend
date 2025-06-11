@@ -1,8 +1,12 @@
 import { precacheAndRoute } from 'workbox-precaching';
 
+console.log('Service Worker 스크립트 로드됨');
+
 // Firebase 초기화
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
+
+console.log('Firebase 스크립트 로드됨');
 
 const firebaseConfig = {
   apiKey: "AIzaSyBAyIQnPXrlT67SGeroFWysun0pLcDzPhQ",
@@ -27,6 +31,7 @@ try {
 
 // 알림 표시 함수
 const showNotification = (title, options) => {
+  console.log('알림 표시 시도:', { title, options });
   return self.registration.showNotification(title, options)
     .then(() => {
       console.log('알림 표시 성공');
@@ -69,13 +74,13 @@ self.addEventListener('push', (event) => {
           actions: [
             {
               action: 'open',
-              title: '열기'
+              title: '열기',
             },
             {
               action: 'close',
-              title: '닫기'
-            }
-          ]
+              title: '닫기',
+            },
+          ],
         };
 
         return showNotification(title || '알림', notificationOptions);
@@ -85,6 +90,7 @@ self.addEventListener('push', (event) => {
 
 // Firebase 메시징 백그라운드 핸들러
 if (messaging) {
+  console.log('Firebase Messaging 핸들러 등록 시도');
   messaging.onBackgroundMessage((payload) => {
     console.log('백그라운드 메시지 수신:', payload);
     const { title, body, image } = payload.notification || {};
@@ -114,18 +120,19 @@ if (messaging) {
           actions: [
             {
               action: 'open',
-              title: '열기'
+              title: '열기',
             },
             {
               action: 'close',
-              title: '닫기'
-            }
-          ]
+              title: '닫기',
+            },
+          ],
         };
 
         return showNotification(title || '알림', notificationOptions);
       });
   });
+  console.log('Firebase Messaging 핸들러 등록 완료');
 }
 
 // 알림 클릭 이벤트 처리
@@ -168,13 +175,35 @@ self.addEventListener('pushsubscriptionchange', (event) => {
 // 서비스 워커 설치 시점
 self.addEventListener('install', (event) => {
   console.log('Service Worker 설치 중...');
-  event.waitUntil(self.skipWaiting());
+  event.waitUntil(
+    Promise.all([
+      self.skipWaiting(),
+      // Firebase 초기화 확인
+      new Promise((resolve) => {
+        if (messaging) {
+          console.log('Firebase Messaging 초기화 확인됨');
+          resolve();
+        } else {
+          console.error('Firebase Messaging 초기화되지 않음');
+          resolve();
+        }
+      })
+    ])
+  );
 });
 
 // 서비스 워커 활성화 시점
 self.addEventListener('activate', (event) => {
   console.log('Service Worker 활성화됨');
-  event.waitUntil(clients.claim());
+  event.waitUntil(
+    Promise.all([
+      clients.claim(),
+      // 기존 알림 정리
+      self.registration.getNotifications().then(notifications => {
+        notifications.forEach(notification => notification.close());
+      })
+    ])
+  );
 });
 
 // 프리캐시 매니페스트 적용
