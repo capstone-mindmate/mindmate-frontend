@@ -63,7 +63,6 @@ export const TopBarTitle = styled.p`
   margin: 0;
   user-select: none;
 `
-
 export const CategoryContainer = styled.div`
   width: 100%;
   height: 44px;
@@ -86,14 +85,32 @@ export const CategoryItem = styled.div`
   justify-content: center;
   cursor: pointer;
   color: #afafaf;
-  cursor: selecte;
   box-sizing: border-box;
+  position: relative;
+  transition: all 0.2s ease; /* 🔥 부드러운 전환 효과 */
+
   &.selected {
     box-shadow: inset 0 -2px 0 #392111;
     color: #392111;
     cursor: default;
   }
+
+  /* 🔥 핫 카테고리가 선택되었을 때 특별 처리 */
+  &.selected {
+    /* hotCategoryHighlight 스타일이 적용된 경우 */
+    &[style*='background-color: rgba(255, 107, 53'] {
+      background-color: #ff6b35 !important;
+      color: white !important;
+      box-shadow: none !important;
+    }
+
+    /* hotCategoryGlow 스타일이 적용된 경우 */
+    &[style*='background: linear-gradient(135deg, rgb(255, 107, 53)'] {
+      box-shadow: inset 0 -2px 0 white !important;
+    }
+  }
 `
+
 export const CategoryItemText = styled.p`
   font-size: 14px;
   font-weight: bold;
