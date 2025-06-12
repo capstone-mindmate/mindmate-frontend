@@ -217,7 +217,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
         }
 
         const res = await fetchWithRefresh(
-          `http://localhost/api/chat/rooms/${chatId}/messages`,
+          `https://mindmate.shop/api/chat/rooms/${chatId}/messages`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -262,8 +262,9 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
         // 프로필 이미지 정보 설정
         if (data.myImageUrl && data.oppositeImageUrl) {
           setProfileImages({
-            myImageUrl: 'http://localhost/api' + data.myImageUrl,
-            oppositeImageUrl: 'http://localhost/api' + data.oppositeImageUrl,
+            myImageUrl: 'https://mindmate.shop/api' + data.myImageUrl,
+            oppositeImageUrl:
+              'https://mindmate.shop/api' + data.oppositeImageUrl,
           })
         }
 
@@ -343,7 +344,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const fetchEmoticons = useCallback(async () => {
     try {
       const res = await fetchWithRefresh(
-        'http://localhost/api/emoticons/available',
+        'https://mindmate.shop/api/emoticons/available',
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -515,7 +516,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
     async (content: string, onError?: () => void) => {
       try {
         const res = await fetchWithRefresh(
-          `http://localhost/api/chat/messages`,
+          `https://mindmate.shop/api/chat/messages`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -590,7 +591,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const requestClose = useCallback(async () => {
     try {
       await fetchWithRefresh(
-        `http://localhost/api/chat/rooms/${chatId}/close`,
+        `https://mindmate.shop/api/chat/rooms/${chatId}/close`,
         { method: 'POST' }
       )
 
@@ -618,7 +619,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const acceptClose = useCallback(async () => {
     try {
       await fetchWithRefresh(
-        `http://localhost/api/chat/rooms/${chatId}/close/accept`,
+        `https://mindmate.shop/api/chat/rooms/${chatId}/close/accept`,
         { method: 'POST' }
       )
 
@@ -645,7 +646,7 @@ export const useChatRoom = ({ chatId, chatBarRef }: UseChatRoomProps) => {
   const rejectClose = useCallback(async () => {
     try {
       await fetchWithRefresh(
-        `http://localhost/api/chat/rooms/${chatId}/close/reject`,
+        `https://mindmate.shop/api/chat/rooms/${chatId}/close/reject`,
         { method: 'POST' }
       )
 

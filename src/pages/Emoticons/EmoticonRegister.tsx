@@ -78,7 +78,7 @@ const EmoticonRegister = () => {
         new Blob([JSON.stringify(uploadData)], { type: 'application/json' })
       )
 
-      await fetchWithRefresh('http://localhost/api/emoticons/upload', {
+      await fetchWithRefresh('https://mindmate.shop/api/emoticons/upload', {
         method: 'POST',
         body: formData,
       })
