@@ -183,14 +183,17 @@ export const setupForegroundMessageListener = () => {
 export const registerFCMToken = async (token: string) => {
   try {
     console.log('FCM 토큰 서버 등록 시도:', token)
-    const response = await fetchWithRefresh('http://localhost/api/fcm/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token }),
-      credentials: 'include', // 쿠키 포함
-    })
+    const response = await fetchWithRefresh(
+      'https://mindmate.shop/api/fcm/token',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+        credentials: 'include', // 쿠키 포함
+      }
+    )
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null)

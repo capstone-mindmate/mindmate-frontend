@@ -32,12 +32,15 @@ interface CoinPurchaseProps {
 
 // 결제 설정 정보를 받아오는 함수 (이 파일 내에 직접 구현)
 async function getPaymentConfig() {
-  const res = await fetchWithRefresh('http://localhost/api/payments/config', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  const res = await fetchWithRefresh(
+    'https://mindmate.shop/api/payments/config',
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
   if (!res.ok) throw new Error('결제 설정 정보 조회 실패')
   return res.json()
 }
