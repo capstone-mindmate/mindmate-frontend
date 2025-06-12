@@ -32,6 +32,7 @@ import CustomFormMake from '../pages/Chat/CustomFormMake'
 import CustomFormView from '../pages/Chat/CustomFormView'
 import Auth from '../pages/Onboarding/Auth.tsx'
 
+import EmoticonRegister from '../pages/Emoticons/EmoticonRegister'
 import ChatHome from '../pages/Chat/ChatHome'
 import ChatRoom from '../pages/Chat/ChatRoom'
 import { useAuthStore } from '../stores/userStore'
@@ -490,6 +491,14 @@ export const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <Notification />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/emoticons/register',
+    element: (
+      <RequireAuth>
+        <EmoticonRegister />
       </RequireAuth>
     ),
   },

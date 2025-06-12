@@ -64,15 +64,24 @@ const EmoticonHome = () => {
 
   const bottomSheetMenuItems = [
     {
+      text: '이모티콘 등록',
+      onClick: () => {
+        navigate('/emoticons/register')
+        setBottomSheetOpen(false)
+      },
+    },
+    {
       text: '코인 구매',
       onClick: () => {
         navigate('/coin')
+        setBottomSheetOpen(false)
       },
     },
     {
       text: '코인 사용내역',
       onClick: () => {
         navigate('/coin/history')
+        setBottomSheetOpen(false)
       },
     },
   ]

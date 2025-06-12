@@ -54,7 +54,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
       setIsLoading(true)
       try {
         const res = await fetchWithRefresh(
-          `https://mindmate.shop/api/matchings/${matchedRoom.id}/waiting-users?page=0&size=30`,
+          `http://localhost/api/matchings/${matchedRoom.id}/waiting-users?page=0&size=30`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -118,7 +118,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
 
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/matchings/${matchedRoom.id}/${selectedApplication.id}/acceptance`,
+        `http://localhost/api/matchings/${matchedRoom.id}/${selectedApplication.id}/acceptance`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -165,7 +165,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
     setIsDeleting(true)
     try {
       const res = await fetchWithRefresh(
-        `https://mindmate.shop/api/matchings/${matchedRoom.id}`,
+        `http://localhost/api/matchings/${matchedRoom.id}`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -199,7 +199,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
         isOpen={isModalOpen}
         userProfileProps={{
           profileImage:
-            'https://mindmate.shop/api' +
+            'http://localhost/api' +
             selectedApplication.waitingUserProfileImage,
           name: selectedApplication.waitingUserNickname,
           department: selectedApplication.waitingUserDepartment,
@@ -280,8 +280,7 @@ const MatchedApplication = ({}: MatchedApplicationProps) => {
               <ApplicationInfo
                 key={application.id}
                 profileImage={
-                  'https://mindmate.shop/api' +
-                  application.waitingUserProfileImage
+                  'http://localhost/api' + application.waitingUserProfileImage
                 }
                 name={application.waitingUserNickname}
                 department={application.waitingUserDepartment}

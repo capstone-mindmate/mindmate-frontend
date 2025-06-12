@@ -89,24 +89,21 @@ const ReviewPage = ({
   const handleSubmit = async () => {
     if (selectedRating > 0 && selectedReviews.length > 0) {
       try {
-        const res = await fetchWithRefresh(
-          'https://mindmate.shop/api/reviews',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chatRoomId: Number(chatId),
-              rating: selectedRating,
-              comment: reviewText,
-              tags: selectedReviews
-                .map(
-                  (reviewText) =>
-                    REVIEW_OPTIONS.find((opt) => opt.text === reviewText)?.tag
-                )
-                .filter(Boolean),
-            }),
-          }
-        )
+        const res = await fetchWithRefresh('http://localhost/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chatRoomId: Number(chatId),
+            rating: selectedRating,
+            comment: reviewText,
+            tags: selectedReviews
+              .map(
+                (reviewText) =>
+                  REVIEW_OPTIONS.find((opt) => opt.text === reviewText)?.tag
+              )
+              .filter(Boolean),
+          }),
+        })
         if (!res.ok) throw new Error('리뷰 등록 실패')
         alert('리뷰가 등록되었습니다!')
         navigate('/chat')
