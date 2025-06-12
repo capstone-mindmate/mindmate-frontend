@@ -214,17 +214,14 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         await new Promise((resolve) => setTimeout(resolve, backoffDelay))
       }
 
-      const res = await fetchWithRefresh(
-        'https://mindmate.shop/api/chat/rooms',
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: 'include',
-        }
-      )
+      const res = await fetchWithRefresh('http://localhost/api/chat/rooms', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: 'include',
+      })
 
       if (!res.ok) {
         if (res.status === 429) {
@@ -409,7 +406,7 @@ const ChatHome = ({ matchId }: ChatHomeProps) => {
         ) : filteredChatItems.length > 0 ? (
           filteredChatItems.map((item, index) => {
             const uniqueKey = `${item.id}-${item.profileImage}`
-            const imageUrl = 'https://mindmate.shop/api' + item.profileImage
+            const imageUrl = 'http://localhost/api' + item.profileImage
 
             const isPending = item.chatRoomStatus === 'PENDING'
 

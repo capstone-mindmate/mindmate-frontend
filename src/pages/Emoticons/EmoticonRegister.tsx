@@ -6,10 +6,12 @@ import { fetchWithRefresh } from '../../utils/fetchWithRefresh'
 import { useToast } from '../../components/toast/ToastProvider'
 import { RootContainer, EmoticonsContainer } from './style'
 import TopBar from '../../components/topbar/Topbar'
+import { useNavigationStore } from '../../stores/navigationStore'
 
 const EmoticonRegister = () => {
   const navigate = useNavigate()
   const { showToast } = useToast()
+  const { setPreviousPath } = useNavigationStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string>('')
@@ -78,7 +80,7 @@ const EmoticonRegister = () => {
         new Blob([JSON.stringify(uploadData)], { type: 'application/json' })
       )
 
-      await fetchWithRefresh('https://mindmate.shop/api/emoticons/upload', {
+      await fetchWithRefresh('http://localhost/api/emoticons/upload', {
         method: 'POST',
         body: formData,
       })
@@ -108,8 +110,14 @@ const EmoticonRegister = () => {
     }
   }
 
+  const goToEmoticonHome = () => {
+    // 현재 페이지를 이전 페이지로 설정
+    setPreviousPath('/emoticons/upload')
+  }
+
   const handleBackClick = () => {
     navigate('/emoticons')
+    goToEmoticonHome()
   }
 
   return (
@@ -197,8 +205,8 @@ const EmoticonRegister = () => {
 
 const formContainer = css`
   padding: 20px 0;
-  height: calc(100vh - 60px);
-  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
 `
 
 const uploadSection = css`
@@ -223,6 +231,7 @@ const imageUploadContainer = css`
   justify-content: center;
   cursor: pointer;
   transition: border-color 0.3s;
+  box-sizing: border-box;
 
   &:hover {
     border-color: #392111;
@@ -275,6 +284,7 @@ const textInput = css`
   font-size: 16px;
   box-sizing: border-box;
   transition: border-color 0.3s;
+  min-width: 0; /* flexbox 오버플로우 방지 */
 
   &:focus {
     outline: none;
@@ -305,6 +315,7 @@ const submitButton = css`
   cursor: pointer;
   transition: background-color 0.3s;
   margin-top: 20px;
+  box-sizing: border-box;
 
   &:hover:not(:disabled) {
     background-color: #503018;
@@ -326,6 +337,8 @@ const infoSection = css`
   background-color: #f8f9fa;
   border-radius: 8px;
   border-left: 4px solid #392111;
+  box-sizing: border-box;
+  width: 100%;
 `
 
 const infoText = css`

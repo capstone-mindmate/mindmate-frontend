@@ -101,11 +101,13 @@ const EmoticonHome = () => {
 
   const handleBackClick = () => {
     // 문제가 되는 경로들이거나 특정 코인 페이지에서 온 경우
+    console.log(previousPath)
     if (
       previousPath === '/coin' ||
       previousPath === '/coin/history' ||
       previousPath?.includes('/fail') ||
-      previousPath?.includes('/success')
+      previousPath?.includes('/success') ||
+      previousPath === '/emoticons/upload'
     ) {
       // 원래 위치가 있으면 그곳으로, 없으면 홈으로
       if (originPath) {
@@ -116,7 +118,7 @@ const EmoticonHome = () => {
     }
     // 그 외의 경우 일반적인 뒤로가기
     else {
-      navigate(-1)
+      navigate('/home')
     }
 
     // 정리
@@ -191,6 +193,7 @@ const EmoticonHome = () => {
       '/coin/success',
       '/coin',
       '/coin/history',
+      '/emoticons/upload',
     ]
 
     if (
